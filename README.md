@@ -1,7 +1,7 @@
 
 # INFIERNO PERFECTO
 ## Estado actual del proyecto: Estructura y configuracion inicial del proyecto completadas
-## Integrantes: Lamensa Matias - Maratea Ciro
+### Integrantes: Lamensa Matias - Maratea Ciro
 
 El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghieri en su poesia "La Divina Comedia". Los personajes deberan cargarse de fe o de pecados para destruir a sus enemigos y acabar con el Caos. Sera programado en java, utilizaremos LibGDX y se podra jugar en PC. Utilizaremos los IDE Eclipse e IntelliJ
 
