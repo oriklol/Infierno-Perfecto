@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # TP-JUEGO
 ## Nombre del Juego: Infierno Perfecto
 ## Integrantes: 
@@ -43,7 +42,6 @@ Reemplazar NombreDeLaClasePrincipal por el nombre real de la clase que contiene 
 ## Estado actual del proyecto:
 Configuración inicial y estructura del proyecto
 
-=======
 # Infierno Perfecto
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
@@ -80,4 +78,3 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
->>>>>>> b7443b5 (Configuracion inicial del proyecto con LibGDX Liftoff)
