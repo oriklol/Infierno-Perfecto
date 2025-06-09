@@ -1,4 +1,4 @@
-#Infierno Perfecto
+# Infierno Perfecto
 ## Integrantes: 
 * Lamensa Matias
 * Maratea Ciro
@@ -15,8 +15,7 @@ IDE: IntelliJ IDEA
 Plataformas objetivo: PC (Escritorio - Windows)
 
 ## Instrucciones Básicas de Compilación y Ejecución:
-A continuación se detallan los pasos necesarios para que cualquier persona pueda clonar este repositorio y ejecutar el proyecto Java en su máquina local:
-Clonar el repositorio
+A continuación se detallan los pasos necesarios para que cualquier persona pueda clonar este repositorio y ejecutar el proyecto Java en su máquina local: 
 
 Primero, se debe clonar este repositorio utilizando Git. Para ello, ejecutar el siguiente comando en la terminal:
 git clone https://github.com/tu-usuario/tu-repositorio.git
