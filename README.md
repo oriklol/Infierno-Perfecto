@@ -18,7 +18,7 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 A continuación se detallan los pasos necesarios para que cualquier persona pueda clonar este repositorio y ejecutar el proyecto Java en su máquina local: 
 
 Primero, se debe clonar este repositorio utilizando Git. Para ello, ejecutar el siguiente comando en la terminal:
-git clone https://github.com/tu-usuario/TP-JUEGO.git
+git clone https://github.com/oriklo/TP-JUEGO.git
 
 Luego, ingresar a la carpeta del proyecto:
 cd TP-JUEGO
@@ -29,6 +29,10 @@ java -version
 
 Importar el proyecto en el IDE (IntelliJ IDEA)
 Buscar el archivo build.gradle en la carpeta del archivo, y elegí "Open as Project"
+
+Para ejecutar el proyecto hay dos formas:
+Desde el IDE: Dentro de IntelliJ IDEA, navegar hasta el módulo lwjgl3, encontrar la clase Lwjgl3Launcher.java y ejecutarla
+Desde la consola: Para ejecutar el juego desde la terminal, utilizar el comando ./gradlew run (o gradlew.bat run en Windows)
 
 ## Estado actual del proyecto:
 Configuración inicial y estructura del proyecto
