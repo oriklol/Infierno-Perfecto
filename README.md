@@ -17,44 +17,32 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 ## Instrucciones Básicas de Compilación y Ejecución
 A continuación se detallan los pasos necesarios para clonar este repositorio y ejecutar correctamente el proyecto desarrollado con Java y el framework LibGDX.
 
-# 1. Clonar el repositorio
+### 1. Clonar el repositorio
 Abrí una terminal y ejecutá:
-
-bash
-Copiar
-Editar
 git clone https://github.com/your-user/Infierno-Perfecto
 cd Infierno-Perfecto
-# 2. Verificar que Java esté instalado
+
+### 2. Verificar que Java esté instalado
 Asegurate de tener instalada una versión compatible del JDK (preferentemente Java 8 o superior). Verificá la versión con:
 
-bash
-Copiar
-Editar
+
 java -version
-# 3. Importar el proyecto en el IDE
+### 3. Importar el proyecto en el IDE
 Abrí IntelliJ IDEA, seleccioná la opción "Open", y elegí el archivo build.gradle ubicado en la raíz del proyecto. IntelliJ detectará automáticamente la estructura de módulos (core, desktop, lwjgl3, etc.) y configurará el entorno de trabajo.
 
-# 4. Ejecutar el juego
-Opción A: Desde el IDE
+### 4. Ejecutar el juego
+#### Opción A: Desde el IDE
+
 En IntelliJ IDEA, navegá al módulo lwjgl3.
-
 Abrí la clase Lwjgl3Launcher.java.
-
 Hacé clic derecho sobre la clase y seleccioná "Run 'Lwjgl3Launcher.main()'".
 
-Opción B: Desde la consola
+#### Opción B: Desde la consola
 Ejecutá el siguiente comando desde la raíz del proyecto:
 
-bash
-Copiar
-Editar
 ./gradlew run
 En Windows (si el anterior no funciona):
 
-bash
-Copiar
-Editar
 gradlew.bat run
 
 
