@@ -18,7 +18,7 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 A continuación se detallan los pasos necesarios para que cualquier persona pueda clonar este repositorio y ejecutar el proyecto Java en su máquina local: 
 
 Primero, se debe clonar este repositorio utilizando Git. Para ello, ejecutar el siguiente comando en la terminal:
-git clone [https://github.com/oriklo/TP-JUEGO.git](https://github.com/oriklol/Infierno-Perfecto)
+git clone https://github.com/oriklol/Infierno-Perfecto
 
 Luego, ingresar a la carpeta del proyecto:
 cd TP-JUEGO
