@@ -37,4 +37,14 @@ Desde el IDE: Dentro de IntelliJ IDEA, navegar hasta el módulo lwjgl3, encontra
 Desde la consola: Para ejecutar el juego desde la terminal, utilizar el comando ./gradlew run (o gradlew.bat run en Windows)
 
 ## Estado actual del proyecto:
-Configuración inicial y estructura del proyecto
+Se completó la configuración inicial del entorno de desarrollo utilizando Java con LibGDX
+Se estableció la estructura base del proyecto, incluyendo:
+
+- Organización de carpetas por módulos o funcionalidades.
+- Archivo de configuración (`build.gradle`, `settings.gradle`, etc.) correctamente configurado.
+- Inclusión de archivos esenciales como `.gitignore`, `README.md` y `CHANGELOG.md`.
+- Configuración del entorno de desarrollo: Se integró el proyecto con Gradle, configurando correctamente los módulos `core`, `desktop` y `android` generados por el setup de LibGDX.  
+También se ajustaron las dependencias necesarias en los archivos `build.gradle` y se verificó la correcta ejecución desde un entorno de desarrollo como IntelliJ IDEA o Android Studio.
+- Se confirmó la correcta compilación y ejecución de un ejemplo mínimo funcional como base para desarrollo futuro.
+
+Esta base permite avanzar con el desarrollo de funcionalidades específicas y garantiza una estructura mantenible del proyecto.
