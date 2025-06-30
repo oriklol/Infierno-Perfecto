@@ -19,7 +19,7 @@ A continuación se detallan los pasos necesarios para clonar este repositorio y 
 
 ### 1. Clonar el repositorio
 Abrí una terminal y ejecutá:
-git clone https://github.com/your-user/Infierno-Perfecto
+git clone https://github.com/oriklol/Infierno-Perfecto
 cd Infierno-Perfecto
 
 ### 2. Verificar que Java esté instalado
