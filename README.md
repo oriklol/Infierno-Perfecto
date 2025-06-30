@@ -14,27 +14,49 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 * IDE: IntelliJ IDEA
 * Plataformas objetivo: PC (Escritorio - Windows)
 
-## Instrucciones Básicas de Compilación y Ejecución:
-A continuación se detallan los pasos necesarios para que cualquier persona pueda clonar este repositorio y ejecutar el proyecto Java en su máquina local: 
+## Instrucciones Básicas de Compilación y Ejecución
+A continuación se detallan los pasos necesarios para clonar este repositorio y ejecutar correctamente el proyecto desarrollado con Java y el framework LibGDX.
 
-Primero, se debe clonar este repositorio utilizando Git. Para ello, ejecutar el siguiente comando en la terminal:
+# 1. Clonar el repositorio
+Abrí una terminal y ejecutá:
+
+bash
+Copiar
+Editar
 git clone https://github.com/your-user/Infierno-Perfecto
+cd Infierno-Perfecto
+# 2. Verificar que Java esté instalado
+Asegurate de tener instalada una versión compatible del JDK (preferentemente Java 8 o superior). Verificá la versión con:
 
-Luego, ingresar a la carpeta del proyecto:
-cd TP-JUEGO
-
-Verificar que Java esté instalado
-Asegurarse de tener instalada una versión compatible del JDK (Java Development Kit), preferentemente Java 8 o superior. Se puede verificar con el siguiente comando:
+bash
+Copiar
+Editar
 java -version
+# 3. Importar el proyecto en el IDE
+Abrí IntelliJ IDEA, seleccioná la opción "Open", y elegí el archivo build.gradle ubicado en la raíz del proyecto. IntelliJ detectará automáticamente la estructura de módulos (core, desktop, lwjgl3, etc.) y configurará el entorno de trabajo.
 
-Importar el proyecto en el IDE (IntelliJ IDEA)
-Buscar el archivo build.gradle en la carpeta del archivo, y elegí "Open as Project"
+# 4. Ejecutar el juego
+Opción A: Desde el IDE
+En IntelliJ IDEA, navegá al módulo lwjgl3.
 
-Para ejecutar el proyecto hay dos formas:
+Abrí la clase Lwjgl3Launcher.java.
 
-Desde el IDE: Dentro de IntelliJ IDEA, navegar hasta el módulo lwjgl3, encontrar la clase Lwjgl3Launcher.java y ejecutarla
+Hacé clic derecho sobre la clase y seleccioná "Run 'Lwjgl3Launcher.main()'".
 
-Desde la consola: Para ejecutar el juego desde la terminal, utilizar el comando ./gradlew run (o gradlew.bat run en Windows)
+Opción B: Desde la consola
+Ejecutá el siguiente comando desde la raíz del proyecto:
+
+bash
+Copiar
+Editar
+./gradlew run
+En Windows (si el anterior no funciona):
+
+bash
+Copiar
+Editar
+gradlew.bat run
+
 
 ## Estado actual del proyecto:
 
