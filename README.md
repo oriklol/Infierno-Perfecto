@@ -31,7 +31,9 @@ Importar el proyecto en el IDE (IntelliJ IDEA)
 Buscar el archivo build.gradle en la carpeta del archivo, y elegí "Open as Project"
 
 Para ejecutar el proyecto hay dos formas:
+
 Desde el IDE: Dentro de IntelliJ IDEA, navegar hasta el módulo lwjgl3, encontrar la clase Lwjgl3Launcher.java y ejecutarla
+
 Desde la consola: Para ejecutar el juego desde la terminal, utilizar el comando ./gradlew run (o gradlew.bat run en Windows)
 
 ## Estado actual del proyecto:
