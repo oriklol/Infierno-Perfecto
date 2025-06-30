@@ -37,14 +37,20 @@ Desde el IDE: Dentro de IntelliJ IDEA, navegar hasta el módulo lwjgl3, encontra
 Desde la consola: Para ejecutar el juego desde la terminal, utilizar el comando ./gradlew run (o gradlew.bat run en Windows)
 
 ## Estado actual del proyecto:
-Se completó la configuración inicial del entorno de desarrollo utilizando Java con LibGDX
-Se estableció la estructura base del proyecto, incluyendo:
 
-- Organización de carpetas por módulos o funcionalidades.
-- Archivo de configuración (`build.gradle`, `settings.gradle`, etc.) correctamente configurado.
-- Inclusión de archivos esenciales como `.gitignore`, `README.md` y `CHANGELOG.md`.
-- Configuración del entorno de desarrollo: Se integró el proyecto con Gradle, configurando correctamente los módulos `core`, `desktop` y `android` generados por el setup de LibGDX.  
-También se ajustaron las dependencias necesarias en los archivos `build.gradle` y se verificó la correcta ejecución desde un entorno de desarrollo como IntelliJ IDEA o Android Studio.
-- Se confirmó la correcta compilación y ejecución de un ejemplo mínimo funcional como base para desarrollo futuro.
+Se completó la configuración inicial del proyecto utilizando el framework **LibGDX**, con el lenguaje **Java 17.0.6** como base y el entorno de desarrollo **IntelliJ IDEA**.
 
-Esta base permite avanzar con el desarrollo de funcionalidades específicas y garantiza una estructura mantenible del proyecto.
+Actualmente, el proyecto cuenta con la estructura estándar generada por el setup de LibGDX, organizada en los siguientes módulos:
+
+- `core`: contiene la lógica principal del juego.
+- `desktop`: módulo destinado a ejecutar la versión para PC (Windows).
+
+Además, se configuró correctamente el entorno de desarrollo, incluyendo:
+
+- Integración con **Gradle** para automatizar la compilación, ejecución y gestión de dependencias.
+- Configuración del archivo `build.gradle` con las versiones adecuadas de LibGDX y otras dependencias necesarias.
+- Ajustes en IntelliJ IDEA para reconocer correctamente el proyecto como multiproyecto con módulos separados.
+- Ejecución exitosa de una escena o pantalla base, validando que el entorno está funcionando correctamente en plataforma de escritorio (Windows).
+
+Con esta base, el proyecto está listo para comenzar con el desarrollo de las funcionalidades específicas del juego.
+
