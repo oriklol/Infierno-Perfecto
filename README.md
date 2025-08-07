@@ -8,7 +8,7 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 
 ## Enlace a la wiki del proyecto 
 ### [WIKI Infierno Perfecto 🎮](https://github.com/oriklol/Infierno-Perfecto/wiki/WIKI)
-## Enlace a video demostracion "Primer pre-entrega" 
+## Enlace a video demostracion "Segunda pre-entrega" 
 ### [VIDEO SEGUNDA PRE-ENTREGA 🎥](https://youtu.be/8EgG3hR_nO8)
 
 ## Tecnologías Utilizadas
