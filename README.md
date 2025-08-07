@@ -7,7 +7,7 @@
 El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghieri en su poesia "La Divina Comedia". Los personajes deberan cargarse de fe o de pecados para destruir a sus enemigos y acabar con el Caos. Sera programado en java, utilizaremos LibGDX y se podra jugar en PC
 
 ## Enlace a la wiki del proyecto 
-### [WIKI Infierno Perfecto 🎮](https://github.com/oriklol/Infierno-Perfecto/wiki/WIKI)
+### [WIKI Infierno Perfecto 🎮](https://github.com/oriklol/Infierno-Perfecto/wiki/)
 ## Enlace a video demostracion "Segunda pre-entrega" 
 ### [VIDEO SEGUNDA PRE-ENTREGA 🎥](https://youtu.be/8EgG3hR_nO8)
 
