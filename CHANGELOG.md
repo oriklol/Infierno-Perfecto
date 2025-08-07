@@ -2,6 +2,14 @@
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 ## [Unreleased]
 
+## [0.2.0] - 2025-08-07
+### Added
+- Implementacion de menu
+- Implementacion de opciones para controlar distintos aspectos del videojuego (pantalla, volumen)
+- Sistema de combate basico
+- Uso de viewports para hacer modificacion en la pantalla
+- Implementacion de musica para el juego
+
 ## [0.1.1] - 2025-06-02
 ### Changed
 - Cambios en el README.md: 
