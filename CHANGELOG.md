@@ -1,6 +1,5 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
-## [Unreleased]
 
 ## [0.2.0] - 2025-08-07
 ### Added
