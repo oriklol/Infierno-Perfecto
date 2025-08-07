@@ -51,19 +51,6 @@ gradlew.bat run
 
 ## Estado actual del proyecto:
 
-Se completó la configuración inicial del proyecto utilizando el framework **LibGDX**, con el lenguaje **Java 17.0.6** como base y el entorno de desarrollo **IntelliJ IDEA**.
-
-Actualmente, el proyecto cuenta con la estructura estándar generada por el setup de LibGDX, organizada en los siguientes módulos:
-
-- `core`: contiene la lógica principal del juego.
-- `desktop`: módulo destinado a ejecutar la versión para PC (Windows).
-
-Además, se configuró correctamente el entorno de desarrollo, incluyendo:
-
-- Integración con **Gradle** para automatizar la compilación, ejecución y gestión de dependencias.
-- Configuración del archivo `build.gradle` con las versiones adecuadas de LibGDX y otras dependencias necesarias.
-- Ajustes en IntelliJ IDEA para reconocer correctamente el proyecto como multiproyecto con módulos separados.
-- Ejecución exitosa de una escena o pantalla base, validando que el entorno está funcionando correctamente en plataforma de escritorio (Windows).
-
-Con esta base, el proyecto está listo para comenzar con el desarrollo de las funcionalidades específicas del juego.
-
+Nos encontramos en la segunda etapa del proyecto. Hemos avanzado en el codigo funcional del proyecto de manera continua durante las ultimas semanas para llegar a este estado.
+Empezamos una logica de combate compleja que se va a estar resolviendo en el proximo tiempo. La gran parte de los graficos sirven para tener una idea de como van a ser las cosas. Esta primer entrega es solo la construccion del esqueleto de todo el proyecto.
+Quedan por pulir muchas mecanicas dentro del juego, como tambien nuestras habilidades.
