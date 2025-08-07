@@ -1,0 +1,10 @@
+package com.dojan.infiernoperfecto.entidades.enemigos;
+
+import com.dojan.infiernoperfecto.ataques.enemigos.AtaquesComunes;
+import com.dojan.infiernoperfecto.entidades.Enemigo;
+
+public class MiniBossLimbo extends Enemigo {
+    public MiniBossLimbo() {
+        super("Sabueso", 300, 60, 65, AtaquesComunes.ataquesBasicos());
+    }
+}
