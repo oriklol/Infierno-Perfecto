@@ -3,6 +3,7 @@ package com.dojan.infiernoperfecto;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.dojan.infiernoperfecto.pantallas.PantallaClases;
 import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
 import com.dojan.infiernoperfecto.pantallas.PantallaLimbo;
 import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
@@ -18,7 +19,7 @@ public class InfiernoPerfecto extends Game {
     public void create() {
         Render.app = this;
         Render.batch = new SpriteBatch();
-        this.setScreen(new PantallaCreditos()); // PantallaMenu debe ser reemplazado por PantallaCreditos para iniciar el juego
+        this.setScreen(new PantallaClases()); // PantallaMenu debe ser reemplazado por PantallaCreditos para iniciar el juego
     }
 
     @Override

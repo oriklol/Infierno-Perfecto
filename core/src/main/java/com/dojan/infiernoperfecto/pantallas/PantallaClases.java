@@ -100,18 +100,27 @@ public class PantallaClases implements Screen {
             }
         }
         // si alguien tiene ganas despues hacer que el rectangulo se dibuje tambien en base a donde esta el mouse
-            int cont = 0;
-            for(int i = 0; i<clases.length;i++){
-                if ((entradas.getMouseX()>=clases[i].getX())&&(entradas.getMouseX()<=(clases[i].getX()+clases[i].getAncho()))){
-                    if((((entradas.getMouseY()>=clases[i].getY()-clases[i].getAlto())&&(entradas.getMouseY()<=(clases[i].getY()))))){
+        int mouseX = entradas.getMouseX();
+        int mouseY = Gdx.graphics.getHeight() - entradas.getMouseY(); // invertir eje Y
 
-                        opc=i+1;
-                        cont++;
-                    }
+        int cont = 0;
+        for (int i = 0; i < clases.length; i++) {
+            if ((mouseX >= clases[i].getX()) &&
+                (mouseX <= clases[i].getX() + clases[i].getAncho())) {
 
+                int yBase = (int) (clases[i].getY() / 2f); // mismo cálculo que el rectángulo
+                int altoEquivalente = (int) ((clases[i].getAlto() + 25) * 7);
+
+                if ((mouseY >= yBase) && (mouseY <= yBase + altoEquivalente)) {
+                    opc = i + 1;
+                    cont++;
                 }
             }
-            if(cont >0){
+        }
+
+        mouseClick = cont > 0;
+
+        if(cont >0){
                 mouseClick = true;
             }else{
                 mouseClick = false;
