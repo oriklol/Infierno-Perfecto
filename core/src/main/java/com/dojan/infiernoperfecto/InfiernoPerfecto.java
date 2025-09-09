@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.dojan.infiernoperfecto.pantallas.PantallaClases;
 import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
+import com.dojan.infiernoperfecto.pantallas.PantallaIntro;
 import com.dojan.infiernoperfecto.pantallas.PantallaLimbo;
 import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
 import com.dojan.infiernoperfecto.utiles.Render;

@@ -72,6 +72,7 @@ public abstract class Personaje {
                 float danioHecho = this.danioBase + danioReducido;
                 float danioFinal = Math.max(0, danioHecho - objetivo.getDefensaBase());
                 objetivo.recibirDanio(danioFinal);
+                System.out.println("daño final: "+danioFinal);
                 System.out.println("El danio a "+objetivo.getNombre()+" es de "+danioFinal);
                 return danioFinal;
             }else{

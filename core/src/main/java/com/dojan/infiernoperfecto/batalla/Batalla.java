@@ -52,8 +52,7 @@ public class Batalla {
     private void turnoJugador(int opcE, int opcA) {
         Enemigo objetivo = enemigos.get(opcE);
 
-        jugador.atacar(objetivo, opcA);
-        float danioReal = jugador.atacar(objetivo, opcA);
+        float danioReal = jugador.atacar(objetivo, opcA); // Solo una llamada
         logCombate = "Atacaste a " + objetivo.getNombre() + " e hiciste " + danioReal + " de daño.\n";
 
         if(!objetivo.sigueVivo()){
@@ -64,8 +63,8 @@ public class Batalla {
 
     private void turnoEnemigo(Enemigo enemigo){
         int ataqueEnemigo = Random.generarEntero(enemigo.getAtaques().size());
-        enemigo.atacar(jugador,ataqueEnemigo);
-        logCombate += enemigo.getNombre() + " te hizo " + enemigo.getAtaques().get(ataqueEnemigo).getDanio() + " de daño.\n";
+        float danioReal = enemigo.atacar(jugador, ataqueEnemigo); // Usá el daño real
+        logCombate += enemigo.getNombre() + " te hizo " + danioReal + " de daño.\n";
     }
 
     public String getLogCombate() {
