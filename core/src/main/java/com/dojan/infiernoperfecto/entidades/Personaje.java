@@ -30,7 +30,7 @@ public abstract class Personaje {
         this.ataques = ataques;
     }
 
-    public void atacar(Personaje objetivo, int ataqueElegido){
+    public float atacar(Personaje objetivo, int ataqueElegido){
         int porcentajeReduccionAtaque = 0;
         int porcentajeReduccionDefensa = 0;
         int porcentajeReduccionPrecision = 0;
@@ -73,6 +73,7 @@ public abstract class Personaje {
                 float danioFinal = Math.max(0, danioHecho - objetivo.getDefensaBase());
                 objetivo.recibirDanio(danioFinal);
                 System.out.println("El danio a "+objetivo.getNombre()+" es de "+danioFinal);
+                return danioFinal;
             }else{
                 System.out.println("Fallaste el ataque");
             }
@@ -96,7 +97,7 @@ public abstract class Personaje {
             }
         }
 
-
+    return 0;
     }
 
     public void recibirDanio(float cantidad){

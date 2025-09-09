@@ -40,7 +40,6 @@ public class PantallaLimbo implements Screen {
 
     private boolean esperandoInput = false;
     private EstadoBatalla estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
-
     private final ArrayList<Enemigo> enemigos = new ArrayList<>();
     private final int CANT_ENEMIGOS_MAX = 3;
     private final int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX))+1;
