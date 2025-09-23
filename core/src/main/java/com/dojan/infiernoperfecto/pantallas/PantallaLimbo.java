@@ -350,6 +350,9 @@ public class PantallaLimbo implements Screen {
 
 
         //MENU OPCIONES despues ver que onda
+        /*
+        Deberia ser una clase "PantallaOpcionesInGame" y que el volver te deje al punto de la partida donde estabas
+         */
         if (entradas.isEsc()){
             Render.app.setScreen(new PantallaOpciones());
         }

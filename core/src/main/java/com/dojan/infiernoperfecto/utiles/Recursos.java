@@ -13,6 +13,8 @@ public class Recursos {
     public static final String FONDOARENA2 = "imagenes/fondos/FONDODOSENEMIGOS.png";
     public static final String FONDOARENA3 = "imagenes/fondos/FONDOTRESENEMIGOS.png";
 
+    public static final String FONDOPERDER = "imagenes/fondos/GAMEOVER.png";
+
 
     public static final String FONDOLIMBO = "imagenes/fondos/LIMBO.png";
 
@@ -29,5 +31,6 @@ public class Recursos {
     public static final String FUENTEMENU = "fuentes/Rushing Shine.otf";
     // musica
     public static final String MUSICAMENU = "musica/musica menu.ogg";
+    public static final String MUSICAMUERTE = "musica/musica muerte.ogg";
 
 }
