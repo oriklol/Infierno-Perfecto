@@ -328,6 +328,9 @@ public class PantallaLimbo implements Screen {
                     esperandoInput = false;
                 }
                 break;
+            case FIN_BATALLA:
+
+                break;
             default:
                 break;
         }
