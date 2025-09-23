@@ -4,6 +4,6 @@ import com.dojan.infiernoperfecto.ataques.peleador.ataquesPeleador;
 
 public class Peleador extends Clase{
     public Peleador() {
-        super("Peleador", 12000, 15, 10, ataquesPeleador.ataquesBasicos());
-    }
+        super("Peleador", 12, 15, 10, ataquesPeleador.ataquesBasicos());
+    } //la vida estaba en 12000
 }

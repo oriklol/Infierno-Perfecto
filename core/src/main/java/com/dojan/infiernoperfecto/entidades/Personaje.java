@@ -112,7 +112,7 @@ public abstract class Personaje {
 
 
     public boolean sigueVivo(){
-        if (this.vidaBase<=0){
+        if (this.vidaActual <= 0){
             return false;
         }else {
             return true;

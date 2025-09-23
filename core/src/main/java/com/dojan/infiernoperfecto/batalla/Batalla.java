@@ -53,7 +53,7 @@ public class Batalla {
         Enemigo objetivo = enemigos.get(opcE);
 
         float danioReal = jugador.atacar(objetivo, opcA); // Solo una llamada
-        logCombate = "Atacaste a " + objetivo.getNombre() + " e hiciste " + danioReal + " de daño.\n";
+        logCombate = "Atacaste a " + objetivo.getNombre() + " he hiciste " + danioReal + " de daño.\n";
 
         if(!objetivo.sigueVivo()){
             System.out.println("murio el objetivo: "+objetivo.getNombre());

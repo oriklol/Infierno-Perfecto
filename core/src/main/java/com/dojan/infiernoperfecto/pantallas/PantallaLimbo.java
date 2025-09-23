@@ -288,8 +288,8 @@ public class PantallaLimbo implements Screen {
 
                 Imagen sprDanio = enemigoSpr[enemigoSeleccionado];
                 danioSpr.setPosition(
-                    (int)(sprDanio.getX() + sprDanio.getAncho()/2 - danioSpr.getAncho()/2),
-                    (int)(sprDanio.getY() + sprDanio.getAlto()/2 - danioSpr.getAlto()/2)
+                    (int) (sprDanio.getX() + sprDanio.getAncho() / 2 - danioSpr.getAncho() / 2),
+                    (int) (sprDanio.getY() + sprDanio.getAlto() / 2 - danioSpr.getAlto() / 2)
                 );
 
                 Render.batch.begin();
@@ -313,24 +313,47 @@ public class PantallaLimbo implements Screen {
                 Render.batch.begin();
                 logTexto.dibujar();
                 Render.batch.end();
+
                 // Si es turno de enemigo, cada input avanza un turno enemigo y muestra el log
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
                     if (batalla.getTurno() != 0) {
                         batalla.avanzarTurno(0, 0); // Avanza un turno enemigo
+
+                        // Verificar si la batalla terminó después de avanzar turno
+                        if (batalla.batallaTerminada()) {
+                            estadoActual = EstadoBatalla.FIN_BATALLA;
+                        }
+
                     } else {
+                        // Es turno del jugador, volver a selección
                         if (opc >= enemigos.size()) opc = 0;
                         if (enemigoSeleccionado >= enemigos.size()) enemigoSeleccionado = 0;
-                        estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
+
+                        // Verificar si la batalla terminó antes de continuar
+                        if (batalla.batallaTerminada()) {
+                            estadoActual = EstadoBatalla.FIN_BATALLA;
+                        } else {
+                            estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
+                        }
                     }
                     esperandoInput = true;
                 }
                 if (!(entradas.isEnter() || entradas.isClick())) {
                     esperandoInput = false;
                 }
-                break;
-            case FIN_BATALLA:
 
                 break;
+
+            case FIN_BATALLA:
+                // Verificar si el jugador murió o ganó para decidir qué pantalla mostrar
+                if (!Config.personajeSeleccionado.sigueVivo()) {  // ✅ Verificar si el jugador murió
+                    Render.app.setScreen(new PantallaGameOver());
+                } else {
+                    // aqui debe pasar de nivel
+                    //Render.app.setScreen(new PantallaMenu()); // O la pantalla que corresponda
+                }
+                break;
+
             default:
                 break;
         }
