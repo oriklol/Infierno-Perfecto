@@ -14,6 +14,7 @@ public class Recursos {
     public static final String FONDOARENA3 = "imagenes/fondos/FONDOTRESENEMIGOS.png";
 
     public static final String FONDOPERDER = "imagenes/fondos/GAMEOVER.png";
+    public static final String FONDOGANAR = "imagenes/fondos/victoria.png";
 
 
     public static final String FONDOLIMBO = "imagenes/fondos/LIMBO.png";
