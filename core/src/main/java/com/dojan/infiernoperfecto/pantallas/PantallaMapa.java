@@ -2,6 +2,7 @@ package com.dojan.infiernoperfecto.pantallas;
 
 import com.badlogic.gdx.Screen;
 import com.dojan.infiernoperfecto.elementos.Imagen;
+import com.dojan.infiernoperfecto.utiles.ControladorJuego;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
 
@@ -23,7 +24,7 @@ public class PantallaMapa implements Screen {
 
         Render.batch.end();
         if (tiempo>5){
-            Render.app.setScreen(new PantallaLimbo());
+            ControladorJuego.getInstance().iniciarJuego();
         }
     }
 

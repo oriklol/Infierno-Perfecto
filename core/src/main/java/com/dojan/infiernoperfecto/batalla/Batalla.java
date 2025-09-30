@@ -22,15 +22,9 @@ public class Batalla {
      * El primer turno (turno==0) es del jugador, los siguientes de los enemigos.
      */
     public boolean avanzarTurno(int opcE, int opcA) {
-        if (!jugador.sigueVivo() || enemigos.isEmpty()) {
-            return false; // batalla terminada
-        }
-
         if (turno == 0) {
-            System.out.println("Turno del jugador 1");
             turnoJugador(opcE, opcA);
         } else {
-            System.out.println("Turno del enemigo " + turno);
             Enemigo enemigo = enemigos.get(turno - 1);
             if (enemigo.sigueVivo()) {
                 turnoEnemigo(enemigo);
@@ -38,12 +32,16 @@ public class Batalla {
         }
 
         turno++;
+        // Cuando termina la ronda de enemigos, antes de volver al jugador, verifica si la batalla terminó
         if (turno > enemigos.size()) {
             turno = 0;
+            // Verifica si la batalla terminó solo aquí
+            return !jugador.sigueVivo() || enemigos.isEmpty();
         }
-
-        return jugador.sigueVivo() && !enemigos.isEmpty();
+        // Mientras se ejecutan los turnos enemigos, nunca termina la batalla
+        return false;
     }
+
 
     public boolean batallaTerminada() {
         return !jugador.sigueVivo() || enemigos.isEmpty();
