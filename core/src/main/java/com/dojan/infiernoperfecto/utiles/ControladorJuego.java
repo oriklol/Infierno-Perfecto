@@ -63,6 +63,8 @@ public class ControladorJuego {
         if (nivelActual > this.NIVEL_MAX) {
             // COMPLETASTE el piso
             Render.app.setScreen(new PantallaSiguienteNivel());
+            this.pisoActual++;
+            this.nivelActual = 1;
 
             if (pisoActual == this.NIVEL_TIENDA) {
                 //irATienda();

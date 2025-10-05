@@ -65,7 +65,7 @@ public class PantallaLimbo implements Screen {
             inicializado = true;
         }
         // Crear personaje de prueba
-        //Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
+        // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
 
 //        if (cantEnemigos ==1){
 //            arena = new Imagen(Recursos.FONDOARENA1);
@@ -92,6 +92,12 @@ public class PantallaLimbo implements Screen {
     }
 
     public void reiniciarNivel(int piso, int nivel) {
+
+        if (!inicializado) {
+            inicializarRecursos();
+            inicializado = true;
+        }
+
         // Limpiar estado anterior
         enemigos.clear();
 
