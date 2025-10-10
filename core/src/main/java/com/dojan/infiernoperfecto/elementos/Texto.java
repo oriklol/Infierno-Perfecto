@@ -2,12 +2,11 @@ package com.dojan.infiernoperfecto.elementos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.math.Vector2;
-
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 public class Texto {
@@ -30,6 +29,9 @@ public class Texto {
         }
         fuente = generador.generateFont(parametros);
         layout = new GlyphLayout();
+
+    // free the generator, font keeps the data it needs
+    generador.dispose();
 
     }
 
@@ -82,5 +84,12 @@ public class Texto {
 
     public void setColor(Color color){
         fuente.setColor(color);
+    }
+
+    public void dispose(){
+        if (fuente != null) {
+            fuente.dispose();
+            fuente = null;
+        }
     }
 }

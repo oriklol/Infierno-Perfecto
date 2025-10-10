@@ -4,7 +4,6 @@ import com.badlogic.gdx.Screen;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
-
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 
@@ -81,6 +80,9 @@ public class PantallaCreditos implements Screen {
 
     @Override
     public void dispose() {
-
+        if (creditos != null){
+            try{ creditos.dispose(); }catch(Exception e){}
+            creditos = null;
+        }
     }
 }

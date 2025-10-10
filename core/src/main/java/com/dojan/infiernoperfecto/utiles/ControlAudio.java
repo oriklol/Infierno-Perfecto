@@ -1,6 +1,5 @@
 package com.dojan.infiernoperfecto.utiles;
 
-import com.badlogic.gdx.audio.Music;
 import com.dojan.infiernoperfecto.elementos.Musica;
 
 public class ControlAudio {
@@ -52,6 +51,18 @@ public class ControlAudio {
         if (musicaActual.isPlaying()){
             musicaActual.stop();
             yaIniciada=false;
+        }
+    }
+
+    public static void dispose(){
+        if (musicaActual != null){
+            try{
+                musicaActual.dispose();
+            }catch(Exception e){
+                // ignore
+            }
+            musicaActual = null;
+            yaIniciada = false;
         }
     }
 }

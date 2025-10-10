@@ -8,6 +8,7 @@ import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
+
 import io.Entradas;
 
 public class PantallaSiguienteNivel implements Screen {
@@ -75,6 +76,18 @@ public class PantallaSiguienteNivel implements Screen {
 
     @Override
     public void dispose() {
+        if (ganaste != null){
+            try{ ganaste.dispose(); }catch(Exception e){}
+            ganaste = null;
+        }
 
+        if (opciones != null){
+            for(int i=0;i<opciones.length;i++){
+                if (opciones[i] != null){
+                    try{ opciones[i].dispose(); }catch(Exception e){}
+                    opciones[i]=null;
+                }
+            }
+        }
     }
 }

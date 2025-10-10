@@ -3,7 +3,6 @@ package com.dojan.infiernoperfecto.pantallas;
 import com.badlogic.gdx.Screen;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.utiles.Recursos;
-
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 public class PantallaIntro implements Screen {
@@ -43,6 +42,9 @@ public class PantallaIntro implements Screen {
 
     @Override
     public void dispose() {
-
+        if (intro != null){
+            try{ intro.dispose(); }catch(Exception e){}
+            intro = null;
+        }
     }
 }

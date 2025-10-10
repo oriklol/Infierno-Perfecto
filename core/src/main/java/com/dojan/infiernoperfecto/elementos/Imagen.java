@@ -44,4 +44,11 @@ public class Imagen {
     public float getAlto(){
         return s.getHeight();
     }
+
+    public void dispose(){
+        if (t != null) {
+            t.dispose();
+            t = null;
+        }
+    }
 }

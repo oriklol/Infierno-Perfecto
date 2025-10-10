@@ -50,6 +50,9 @@ public class PantallaMapa implements Screen {
 
     @Override
     public void dispose() {
-
+        if (mapa != null){
+            try{ mapa.dispose(); }catch(Exception e){}
+            mapa = null;
+        }
     }
 }

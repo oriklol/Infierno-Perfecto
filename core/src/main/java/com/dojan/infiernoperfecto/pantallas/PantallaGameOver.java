@@ -10,9 +10,9 @@ import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControlAudio;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
-import io.Entradas;
-
 import static com.dojan.infiernoperfecto.utiles.Render.app;
+
+import io.Entradas;
 
 public class PantallaGameOver implements Screen {
     private Musica musicaFondo;
@@ -124,6 +124,23 @@ public class PantallaGameOver implements Screen {
 
     @Override
     public void dispose() {
+        if (musicaFondo != null){
+            try{ musicaFondo.dispose(); }catch(Exception e){}
+            musicaFondo = null;
+        }
 
+        if (gameOver != null){
+            try{ gameOver.dispose(); }catch(Exception e){}
+            gameOver = null;
+        }
+
+        if (opciones != null){
+            for (int i=0;i<opciones.length;i++){
+                if (opciones[i] != null){
+                    try{ opciones[i].dispose(); }catch(Exception e){}
+                    opciones[i]=null;
+                }
+            }
+        }
     }
 }

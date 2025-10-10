@@ -2,23 +2,18 @@ package com.dojan.infiernoperfecto.pantallas;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
-import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControlAudio;
 import com.dojan.infiernoperfecto.utiles.Recursos;
-import io.Entradas;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-
-
 import static com.dojan.infiernoperfecto.utiles.Render.app;
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
+
+import io.Entradas;
 
 public class PantallaMenu implements Screen {
     private Musica musicaFondo;
@@ -163,6 +158,25 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void dispose() {
+        // dispose resources created in show()
+        if (musicaFondo != null) {
+            try{ musicaFondo.dispose(); }catch(Exception e){}
+            musicaFondo = null;
+        }
+
+        if (menu != null) {
+            try{ menu.dispose(); }catch(Exception e){}
+            menu = null;
+        }
+
+        if (opciones != null) {
+            for(int i=0;i<opciones.length;i++){
+                if (opciones[i] != null){
+                    try{ opciones[i].dispose(); }catch(Exception e){}
+                    opciones[i] = null;
+                }
+            }
+        }
     }
 
     public void setTiempo(float tiempo) {

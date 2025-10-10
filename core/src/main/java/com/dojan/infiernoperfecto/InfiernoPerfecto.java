@@ -3,9 +3,8 @@ package com.dojan.infiernoperfecto;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.dojan.infiernoperfecto.pantallas.*;
+import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
 import com.dojan.infiernoperfecto.utiles.Render;
-import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 
 /** {@link ApplicationListener} implementation shared by all platforms. */
@@ -34,6 +33,26 @@ public class InfiernoPerfecto extends Game {
 
     @Override
     public void dispose() {
-        batch.dispose();
+        // dispose global rendering resources
+        try{
+            if (Render.batch != null) {
+                Render.batch.dispose();
+                Render.batch = null;
+            }
+            if (Render.renderer != null) {
+                Render.renderer.dispose();
+                Render.renderer = null;
+            }
+        }catch(Exception e){
+            // ignore
+        }
+
+        // dispose current screen (if set)
+        if (getScreen() != null){
+            try{ getScreen().dispose(); }catch(Exception e){ }
+        }
+
+        // dispose audio control
+        com.dojan.infiernoperfecto.utiles.ControlAudio.dispose();
     }
 }

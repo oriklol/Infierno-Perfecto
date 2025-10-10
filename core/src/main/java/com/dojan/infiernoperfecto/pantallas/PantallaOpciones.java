@@ -4,16 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControlAudio;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
-import io.Entradas;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-
 import static com.dojan.infiernoperfecto.utiles.Render.app;
+
+import io.Entradas;
 
 
 public class PantallaOpciones implements Screen {
@@ -193,6 +193,23 @@ public class PantallaOpciones implements Screen {
 
     @Override
     public void dispose() {
+        if (fondo != null){
+            try{ fondo.dispose(); }catch(Exception e){}
+            fondo = null;
+        }
 
+        if (titulo != null){
+            try{ titulo.dispose(); }catch(Exception e){}
+            titulo = null;
+        }
+
+        if (opciones != null){
+            for(int i=0;i<opciones.length;i++){
+                if (opciones[i] != null){
+                    try{ opciones[i].dispose(); }catch(Exception e){}
+                    opciones[i]=null;
+                }
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@ import com.dojan.infiernoperfecto.entidades.clases.Soporte;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
+
 import io.Entradas;
 
 public class PantallaClases implements Screen {
@@ -170,6 +171,23 @@ public class PantallaClases implements Screen {
 
     @Override
     public void dispose() {
+        if (seleccionFondo != null){
+            try{ seleccionFondo.dispose(); }catch(Exception e){}
+            seleccionFondo = null;
+        }
 
+        if (clases != null){
+            for (int i=0;i<clases.length;i++){
+                if (clases[i] != null){
+                    try{ clases[i].dispose(); }catch(Exception e){}
+                    clases[i]=null;
+                }
+            }
+        }
+
+        if (shapeRenderer != null){
+            try{ shapeRenderer.dispose(); }catch(Exception e){}
+            shapeRenderer = null;
+        }
     }
 }

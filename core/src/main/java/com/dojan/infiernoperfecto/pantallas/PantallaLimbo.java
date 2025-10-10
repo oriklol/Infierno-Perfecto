@@ -12,11 +12,13 @@ import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
-import com.dojan.infiernoperfecto.entidades.Jugador;
-import com.dojan.infiernoperfecto.entidades.clases.Peleador;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
-import com.dojan.infiernoperfecto.utiles.*;
+import com.dojan.infiernoperfecto.utiles.Config;
+import com.dojan.infiernoperfecto.utiles.ControladorJuego;
+import com.dojan.infiernoperfecto.utiles.Random;
+import com.dojan.infiernoperfecto.utiles.Recursos;
+import com.dojan.infiernoperfecto.utiles.Render;
 
 import io.Entradas;
 
@@ -425,6 +427,52 @@ public class PantallaLimbo implements Screen {
 
     @Override
     public void dispose() {
+        // dispose textures and fonts created by this screen
+        if (fondo != null){
+            try{ fondo.dispose(); }catch(Exception e){}
+            fondo = null;
+        }
 
+        if (arena != null){
+            try{ arena.dispose(); }catch(Exception e){}
+            arena = null;
+        }
+
+        if (danioSpr != null){
+            try{ danioSpr.dispose(); }catch(Exception e){}
+            danioSpr = null;
+        }
+
+        if (lugar != null){
+            try{ lugar.dispose(); }catch(Exception e){}
+            lugar = null;
+        }
+
+        if (enemigoSpr != null){
+            for (int i=0;i<enemigoSpr.length;i++){
+                if (enemigoSpr[i] != null){
+                    try{ enemigoSpr[i].dispose(); }catch(Exception e){}
+                    enemigoSpr[i] = null;
+                }
+            }
+        }
+
+        if (textoAtaques != null){
+            for (int i=0;i<textoAtaques.length;i++){
+                if (textoAtaques[i] != null){
+                    try{ textoAtaques[i].dispose(); }catch(Exception e){}
+                    textoAtaques[i]=null;
+                }
+            }
+            textoAtaques = null;
+        }
+
+        // dispose renderer if this screen created it
+        try{
+            if (Render.renderer != null){
+                Render.renderer.dispose();
+                Render.renderer = null;
+            }
+        }catch(Exception e){ }
     }
 }
