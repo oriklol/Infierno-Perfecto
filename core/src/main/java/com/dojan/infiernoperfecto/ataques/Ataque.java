@@ -1,7 +1,6 @@
 package com.dojan.infiernoperfecto.ataques;
 
 import com.dojan.infiernoperfecto.ataques.efectos.EfectoSecundario;
-import com.dojan.infiernoperfecto.entidades.Personaje;
 import com.dojan.infiernoperfecto.utiles.Random;
 
 public abstract class Ataque {
@@ -10,6 +9,7 @@ public abstract class Ataque {
     protected int precision;
     protected int cantUsos;
     protected EfectoSecundario efectoSecundario;
+    protected int costoFe;
 
 
     public Ataque(String nombre, int danio, int precision, int cantUsos) {
@@ -26,6 +26,15 @@ public abstract class Ataque {
         this.precision = precision;
         this.cantUsos = cantUsos;
         this.efectoSecundario = efectoSecundario;
+    }
+
+    public Ataque(String nombre, int danio, int precision, int cantUsos, EfectoSecundario efectoSecundario, int costoFe) {
+        this.nombre = nombre;
+        this.danio = danio;
+        this.precision = precision;
+        this.cantUsos = cantUsos;
+        this.efectoSecundario = efectoSecundario;
+        this.costoFe = costoFe;
     }
 
     public boolean verificarAcierto(){
@@ -56,6 +65,10 @@ public abstract class Ataque {
 
     public String getNombre() {
         return this.nombre;
+    }
+
+    public int getCostoFe() {
+        return costoFe;
     }
 
 

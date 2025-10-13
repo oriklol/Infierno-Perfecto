@@ -18,6 +18,8 @@ public abstract class Personaje {
     protected int danioBase;
     protected int defensaBase;
     protected List<Ataque> ataques;
+    protected int feBase;
+    protected int feActual;
     private EstadoAlterado estadoAlterado;
 
 
@@ -28,6 +30,10 @@ public abstract class Personaje {
         this.danioBase = danio;
         this.defensaBase = defensa;
         this.ataques = ataques;
+        // si la clase está asignada más tarde (constructor de Jugador), la inicialización de fe
+        // se hará en el constructor correspondiente. Aquí dejamos fe en 0 por defecto.
+        this.feBase = 0;
+        this.feActual = 0;
     }
 
     public float atacar(Personaje objetivo, int ataqueElegido){
@@ -63,9 +69,10 @@ public abstract class Personaje {
             System.out.println(this.nombre + " falla el ataque a " + objetivo.getNombre());
         }
 
-        if(ataques.get(ataqueElegido).getCantUsos()==0){
+        if(ataques.get(ataqueElegido).getCantUsos()<=0){
             System.out.println("Te quedaste sin usos");
         }else{
+            this.ataques.get(ataqueElegido).restarUso();
             if (acierta){
                 float danioBaseAtaque = ataques.get(ataqueElegido).getDanio();
                 float danioReducido = danioBaseAtaque * (1 - porcentajeReduccionAtaque / 100.0f);
@@ -77,9 +84,6 @@ public abstract class Personaje {
                 return danioFinal;
             }else{
                 System.out.println("Fallaste el ataque");
-            }
-            if(ataques.get(ataqueElegido).getCantUsos()>0){
-                this.ataques.get(ataqueElegido).restarUso();
             }
 
             EfectoSecundario efecto = ataques.get(ataqueElegido).getEfectoSecundario();
@@ -141,5 +145,14 @@ public abstract class Personaje {
 
     public float getVidaActual() {
         return vidaActual;
+    }
+
+    public int getFeActual() {
+        return feActual;
+    }
+
+    public void setFeBase(int feBase) {
+        this.feBase = feBase;
+        this.feActual = feBase;
     }
 }

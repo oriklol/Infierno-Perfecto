@@ -66,6 +66,10 @@ public class PantallaLimbo implements Screen {
             inicializarRecursos();
             inicializado = true;
         }
+        // Si no hay batalla inicializada (p. ej. al entrar desde el menú), crear una de muestra
+        if (batalla == null && Config.personajeSeleccionado != null) {
+            reiniciarNivel(1, 1);
+        }
         // Crear personaje de prueba
         // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
 
@@ -280,8 +284,13 @@ public class PantallaLimbo implements Screen {
                     textoPS.dibujar();
                     Texto textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
-                    textoUsos.setPosition(500, 60);
+                    textoUsos.setPosition(500, 80);
                     textoUsos.dibujar();
+                    // Mostrar Fe actual del jugador (similar a Usos)
+                    Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+                    textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
+                    textoFe.setPosition(500, 40);
+                    textoFe.dibujar();
                     Render.batch.end();
 
                     if (tiempo > 0.15f) {
@@ -385,15 +394,13 @@ public class PantallaLimbo implements Screen {
         Render.renderer.begin(ShapeRenderer.ShapeType.Line);
         Render.renderer.setColor(Color.BLACK);
 
-        Imagen spr = enemigoSpr[opc];
-        Render.renderer.rect(spr.getX(), spr.getY(), spr.getAncho(), spr.getAlto());
+        // Dibujar rect alrededor del enemigo seleccionado si existe
+        if (enemigoSpr != null && enemigos.size() > 0 && opc >= 0 && opc < enemigoSpr.length && enemigoSpr[opc] != null) {
+            Imagen spr = enemigoSpr[opc];
+            Render.renderer.rect(spr.getX(), spr.getY(), spr.getAncho(), spr.getAlto());
+        }
 
         Render.renderer.end();
-
-
-
-
-
 
 
         //MENU OPCIONES despues ver que onda

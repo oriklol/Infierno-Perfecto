@@ -4,6 +4,6 @@ import com.dojan.infiernoperfecto.ataques.Ataque;
 
 public class UltimoAliento extends Ataque {
     public UltimoAliento() {
-        super("Ultimo Aliento", 15, 100, 10);
+        super("Ultimo Aliento", 50, 100, 10, null, 20);
     }
 }

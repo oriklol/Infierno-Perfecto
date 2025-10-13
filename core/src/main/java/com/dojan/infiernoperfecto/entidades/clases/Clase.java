@@ -1,24 +1,25 @@
 package com.dojan.infiernoperfecto.entidades.clases;
 
 
-import com.dojan.infiernoperfecto.ataques.Ataque;
-import com.dojan.infiernoperfecto.entidades.Personaje;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.dojan.infiernoperfecto.ataques.Ataque;
 
 public abstract class Clase{
     protected String nombre;
     private int vidaBase;
     private int danioBase;
     private int defensaBase;
+    private int feBase;
     protected List<Ataque> ataques = new ArrayList<>();
 
-    public Clase(String nombre, int vidaBase, int ataqueBase, int defensaBase, List<Ataque> ataques) {
+    public Clase(String nombre, int vidaBase, int ataqueBase, int defensaBase, int feBase, List<Ataque> ataques) {
         this.nombre = nombre;
         this.vidaBase = vidaBase;
         this.danioBase = ataqueBase;
         this.defensaBase = defensaBase;
+        this.feBase = feBase;
         this.ataques = ataques;
     }
 
@@ -36,5 +37,9 @@ public abstract class Clase{
 
     public List<Ataque> getAtaques() {
         return ataques;
+    }
+
+    public int getFeBase() {
+        return feBase;
     }
 }
