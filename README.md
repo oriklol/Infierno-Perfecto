@@ -51,6 +51,4 @@ gradlew.bat run
 
 ## Estado actual del proyecto:
 
-Nos encontramos en la segunda etapa del proyecto. Hemos avanzado en el codigo funcional del proyecto de manera continua durante las ultimas semanas para llegar a este estado.
-Empezamos una logica de combate compleja que se va a estar resolviendo en el proximo tiempo. La gran parte de los graficos sirven para tener una idea de como van a ser las cosas. Esta primer entrega es solo la construccion del esqueleto de todo el proyecto.
-Quedan por pulir muchas mecanicas dentro del juego, como tambien nuestras habilidades.
+El juego se mantiene vivo gracias a la llama de los programadores. Desean llegar a completar su propuesta asi que estan mas prendidos que nunca. Actualmente el juego cuenta con una compleja logica de combates (aun en construccion), una tienda (con muchas ideas en mentes) y con una victoria. Aunque esta victoria no significa nada para el jugador, nosotros sabemos que estamos en el camino correcto. Nos vemos en las proximas actualizaciones con mas contenido.
