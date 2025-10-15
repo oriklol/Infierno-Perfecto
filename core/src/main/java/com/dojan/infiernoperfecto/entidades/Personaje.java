@@ -7,6 +7,7 @@ import com.dojan.infiernoperfecto.ataques.efectos.EfectoSecundario;
 import com.dojan.infiernoperfecto.entidades.clases.Clase;
 import com.dojan.infiernoperfecto.entidades.estados.EstadoAlterado;
 import com.dojan.infiernoperfecto.entidades.estados.EstadoEstadisticaModificada;
+import com.dojan.infiernoperfecto.items.ItemCura;
 import com.dojan.infiernoperfecto.utiles.Random;
 
 public abstract class Personaje {
@@ -20,8 +21,25 @@ public abstract class Personaje {
     protected List<Ataque> ataques;
     protected int feBase;
     protected int feActual;
+    protected int monedasBase;
+    protected int monedasActual;
     private EstadoAlterado estadoAlterado;
 
+
+    public Personaje(String nombre, int vida, int danio, int defensa, int monedas,List<Ataque> ataques) {
+        this.nombre = nombre;
+        this.vidaBase = vida;
+        this.vidaActual = vida;
+        this.danioBase = danio;
+        this.defensaBase = defensa;
+        this.monedasBase = monedas;
+        this.monedasActual = monedas;
+        this.ataques = ataques;
+        // si la clase está asignada más tarde (constructor de Jugador), la inicialización de fe
+        // se hará en el constructor correspondiente. Aquí dejamos fe en 0 por defecto.
+        this.feBase = 0;
+        this.feActual = 0;
+    }
 
     public Personaje(String nombre, int vida, int danio, int defensa, List<Ataque> ataques) {
         this.nombre = nombre;
@@ -123,6 +141,25 @@ public abstract class Personaje {
         }
     }
 
+    public boolean comprar(ItemCura itemSeleccionado){
+        if(this.monedasActual < itemSeleccionado.getPrecio()){
+            System.out.println("No tienes suficiente dinero");
+            return false;
+        }else if(this.monedasActual >= itemSeleccionado.getPrecio()){
+            System.out.println("Compraste "+itemSeleccionado.getNombre());
+            this.monedasActual -= itemSeleccionado.getPrecio();
+            if (this.monedasActual < 0){
+                this.monedasActual = 0;
+            }
+            this.vidaActual += itemSeleccionado.getCantidadCura();
+            if (this.vidaActual > this.vidaBase) {
+                this.vidaActual = this.vidaBase;
+            }
+            return true;
+        }
+        return false;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -154,5 +191,13 @@ public abstract class Personaje {
     public void setFeBase(int feBase) {
         this.feBase = feBase;
         this.feActual = feBase;
+    }
+
+    public int getMonedasBase(){
+        return monedasBase;
+    }
+
+    public int getMonedasActual(){
+        return monedasActual;
     }
 }

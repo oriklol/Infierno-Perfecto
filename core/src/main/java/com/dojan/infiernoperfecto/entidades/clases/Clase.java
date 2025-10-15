@@ -12,14 +12,16 @@ public abstract class Clase{
     private int danioBase;
     private int defensaBase;
     private int feBase;
+    private int monedasBase;
     protected List<Ataque> ataques = new ArrayList<>();
 
-    public Clase(String nombre, int vidaBase, int ataqueBase, int defensaBase, int feBase, List<Ataque> ataques) {
+    public Clase(String nombre, int vidaBase, int ataqueBase, int defensaBase, int feBase,int monedasBase, List<Ataque> ataques) {
         this.nombre = nombre;
         this.vidaBase = vidaBase;
         this.danioBase = ataqueBase;
         this.defensaBase = defensaBase;
         this.feBase = feBase;
+        this.monedasBase = monedasBase;
         this.ataques = ataques;
     }
 
@@ -42,4 +44,9 @@ public abstract class Clase{
     public int getFeBase() {
         return feBase;
     }
+
+    public int getMonedasBase(){
+        return monedasBase;
+    }
+
 }

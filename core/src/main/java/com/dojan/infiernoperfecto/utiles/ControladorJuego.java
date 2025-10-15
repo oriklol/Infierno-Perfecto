@@ -3,6 +3,7 @@ package com.dojan.infiernoperfecto.utiles;
 import com.dojan.infiernoperfecto.pantallas.PantallaGameOver;
 import com.dojan.infiernoperfecto.pantallas.PantallaLimbo;
 import com.dojan.infiernoperfecto.pantallas.PantallaSiguienteNivel;
+import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
 
 public class ControladorJuego {
     private static ControladorJuego instancia;
@@ -15,7 +16,7 @@ public class ControladorJuego {
     private int pisoActual = 1;
 
     private PantallaLimbo pantallaLimbo;
-//    private PantallaTienda pantallaTienda;
+    private PantallaTienda pantallaTienda;
 
     private ControladorJuego() {
 
@@ -51,7 +52,7 @@ public class ControladorJuego {
 
         // Limpiar cache de pantallas para empezar limpio
         pantallaLimbo = null;
-//        pantallaTienda = null;
+        pantallaTienda = null;
 
         cargarNivel();
     }
@@ -66,25 +67,23 @@ public class ControladorJuego {
             this.pisoActual++;
             this.nivelActual = 1;
 
-            if (pisoActual == this.NIVEL_TIENDA) {
-                //irATienda();
-            } else {
-                // COMPLETASTE EL JUEGO
 
-            }
+        } else if (nivelActual == NIVEL_TIENDA) {
+            irATienda();
         } else {
             // Todavía hay niveles en este piso
             cargarNivel();
         }
     }
 
-//    private void irATienda() {
-//        if (pantallaTienda == null) {
-//            pantallaTienda = new PantallaTienda();
-//        }
-//
-//        Render.app.setScreen(pantallaTienda);
-//    }
+    private void irATienda() {
+
+        if (pantallaTienda == null) {
+            pantallaTienda = new PantallaTienda();
+        }
+
+        Render.app.setScreen(pantallaTienda);
+    }
 
     public void gameOver() {
         Render.app.setScreen(new PantallaGameOver());

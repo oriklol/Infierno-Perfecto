@@ -23,7 +23,7 @@ public class PantallaMapa implements Screen {
             mapa.dibujar();
 
         Render.batch.end();
-        if (tiempo>5){
+        if (tiempo>1){// en 5 segundos va a la tienda
             ControladorJuego.getInstance().iniciarJuego();
         }
     }

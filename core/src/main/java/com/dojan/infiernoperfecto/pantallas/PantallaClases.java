@@ -100,7 +100,7 @@ public class PantallaClases implements Screen {
                 }
             }
         }
-        // si alguien tiene ganas despues hacer que el rectangulo se dibuje tambien en base a donde esta el mouse
+
         int mouseX = entradas.getMouseX();
         int mouseY = Gdx.graphics.getHeight() - entradas.getMouseY(); // invertir eje Y
 

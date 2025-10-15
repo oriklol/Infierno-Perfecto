@@ -12,12 +12,18 @@ public class Recursos {
     public static final String FONDOARENA1 = "imagenes/fondos/FONDOUNENEMIGO.png";
     public static final String FONDOARENA2 = "imagenes/fondos/FONDODOSENEMIGOS.png";
     public static final String FONDOARENA3 = "imagenes/fondos/FONDOTRESENEMIGOS.png";
+    public static final String FONDOTIENDA = "imagenes/fondos/tienda.png";
 
     public static final String FONDOPERDER = "imagenes/fondos/GAMEOVER.png";
     public static final String FONDOGANAR = "imagenes/fondos/victoria.png";
 
 
     public static final String FONDOLIMBO = "imagenes/fondos/LIMBO.png";
+
+    // items
+    public static final String ITEMCURA1 = "imagenes/items/heal1.png";
+    public static final String ITEMCURA2 = "imagenes/items/heal2.png";
+    public static final String ITEMCURA3 = "imagenes/items/heal3.png";
 
     // enemigos
     public static final String MINION = "imagenes/enemigos/mini-on.png";

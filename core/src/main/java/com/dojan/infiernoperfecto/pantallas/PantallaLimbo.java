@@ -50,7 +50,6 @@ public class PantallaLimbo implements Screen {
     private int enemigoSeleccionado = 0;
 
     private boolean jugadorMurio = false;
-
     private boolean inicializado = false;
 
 
@@ -66,21 +65,22 @@ public class PantallaLimbo implements Screen {
             inicializarRecursos();
             inicializado = true;
         }
-        // Si no hay batalla inicializada (p. ej. al entrar desde el menú), crear una de muestra
+        // Si no hay batalla inicializada (ej. al entrar desde el menú), crear una de muestra
         if (batalla == null && Config.personajeSeleccionado != null) {
             reiniciarNivel(1, 1);
         }
         // Crear personaje de prueba
         // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
 
-//        if (cantEnemigos ==1){
-//            arena = new Imagen(Recursos.FONDOARENA1);
-//        }else if(cantEnemigos == 2){
-//            arena = new Imagen(Recursos.FONDOARENA2);
-//        }else{
-//            arena = new Imagen(Recursos.FONDOARENA3);
-//        }
-
+        /* Cambia el fondo de la arena dependiendo la cantidad de enemigos
+        if (cantEnemigos ==1){
+            arena = new Imagen(Recursos.FONDOARENA1);
+        }else if(cantEnemigos == 2){
+            arena = new Imagen(Recursos.FONDOARENA2);
+        }else{
+            arena = new Imagen(Recursos.FONDOARENA3);
+        }
+        */
     }
 
     private void inicializarRecursos() {
@@ -111,7 +111,7 @@ public class PantallaLimbo implements Screen {
         lugar.setTexto(nivel + " - " + piso);
 
         // Generar nuevos enemigos
-        int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
+        int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1; // revisar pq arriba hay otro
         for (int i = 0; i < cantEnemigos; i++) {
             Enemigo enemigo;
             int tipoEnemigo = Random.generarEntero(2);

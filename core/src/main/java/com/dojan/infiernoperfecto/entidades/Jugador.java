@@ -6,7 +6,7 @@ public class Jugador extends Personaje {
     private Clase clase;
 
     public Jugador(String nombre, Clase clase) {
-        super(nombre, clase.getVidaBase(), clase.getDanioBase(), clase.getDefensaBase(), clase.getAtaques());
+        super(nombre, clase.getVidaBase(), clase.getDanioBase(), clase.getDefensaBase(),clase.getMonedasBase(), clase.getAtaques());
         this.clase = clase;
         // inicializar fe del personaje desde la clase
         this.setFeBase(clase.getFeBase());
