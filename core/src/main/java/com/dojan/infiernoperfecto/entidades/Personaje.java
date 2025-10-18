@@ -90,6 +90,20 @@ public abstract class Personaje {
         if(ataques.get(ataqueElegido).getCantUsos()<=0){
             System.out.println("Te quedaste sin usos");
         }else{
+            // Verificar costo de Fe antes de ejecutar el ataque
+            Ataque ataque = ataques.get(ataqueElegido);
+            int costoFe = ataque.getCostoFe();
+            if (costoFe > 0) {
+                if (this.feActual < costoFe) {
+                    System.out.println("No tienes suficiente Fe para usar " + ataque.getNombre());
+                    return 0; // ataque no realizado
+                } else {
+                    // Restar la Fe correspondiente al atacante
+                    this.feActual -= costoFe;
+                    if (this.feActual < 0) this.feActual = 0;
+                }
+            }
+
             this.ataques.get(ataqueElegido).restarUso();
             if (acierta){
                 float danioBaseAtaque = ataques.get(ataqueElegido).getDanio();

@@ -246,7 +246,11 @@ public class PantallaLimbo implements Screen {
                 break;
             case SELECCION_ATAQUE:
                 if (batalla.getTurno() == 0) {
-                    // Detección de mouse sobre los ataques
+                    // Obtener lista de ataques y Fe actual
+                    List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
+                    int feActual = Config.personajeSeleccionado.getFeActual();
+
+                    // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
                     for (int i = 0; i < textoAtaques.length; i++) {
@@ -255,21 +259,29 @@ public class PantallaLimbo implements Screen {
                         int y = textoAtaque.getY() - 50;
                         int ancho = (int) textoAtaque.getAncho();
                         int alto = (int) textoAtaque.getAlto() + 50;
-                        // Si el mouse está sobre el área del texto, selecciona ese ataque
                         if (mouseX >= x && mouseX <= x + ancho && mouseY >= y && mouseY <= y + alto) {
-                            ataqueSeleccionado = i;
+                            Ataque a = ataques.get(i);
+                            boolean usable = a.getCantUsos() > 0 && a.getCostoFe() <= feActual;
+                            if (usable) {
+                                ataqueSeleccionado = i;
+                            }
                         }
                     }
 
-                    // Colorear el ataque seleccionado
+                    // Colorear según disponibilidad y selección: los no usables en rojo
                     for (int i = 0; i < textoAtaques.length; i++) {
-                        if (i == (ataqueSeleccionado)) {
+                        Ataque a = ataques.get(i);
+                        boolean usable = a.getCantUsos() > 0 && a.getCostoFe() <= feActual;
+                        if (!usable) {
+                            textoAtaques[i].setColor(Color.RED);
+                        } else if (i == ataqueSeleccionado) {
                             textoAtaques[i].setColor(Color.GOLDENROD);
                         } else {
                             textoAtaques[i].setColor(Color.WHITE);
                         }
                     }
 
+                    // Dibujar textos de ataques
                     for (Texto textoAtaque : textoAtaques) {
                         Render.batch.begin();
                         textoAtaque.dibujar();
@@ -278,19 +290,28 @@ public class PantallaLimbo implements Screen {
 
                     Ataque ataqueSel = Config.personajeSeleccionado.getClase().getAtaques().get(ataqueSeleccionado);
                     Render.batch.begin();
+                    // Mostrar vida y Fe del jugador uno al lado del otro
                     Texto textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
                     textoPS.setPosition(500, 120);
                     textoPS.dibujar();
+                    // Mostrar Fe a la derecha de la vida
+                    Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+                    textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
+                    textoFe.setPosition((int)(textoPS.getX() + textoPS.getAncho() + 20), 120);
+                    textoFe.dibujar();
+
                     Texto textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
                     textoUsos.setPosition(500, 80);
                     textoUsos.dibujar();
-                    // Mostrar Fe actual del jugador (similar a Usos)
-                    Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-                    textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
-                    textoFe.setPosition(500, 40);
-                    textoFe.dibujar();
+                    // Mostrar costo de Fe del ataque solo si tiene costo
+                    if (ataqueSel.getCostoFe() > 0) {
+                        Texto textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
+                        textoCostoFe.setTexto("Costo Fe: " + ataqueSel.getCostoFe());
+                        textoCostoFe.setPosition(500, 40);
+                        textoCostoFe.dibujar();
+                    }
                     Render.batch.end();
 
                     if (tiempo > 0.15f) {
@@ -310,11 +331,18 @@ public class PantallaLimbo implements Screen {
                         }
                         // Solo avanzar si NO estamos esperando input y el usuario acaba de presionar
                         if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                            // Selección redundante, pero mantenida por compatibilidad
-                            System.out.println("ataque seleccionado: " + ataqueSeleccionado);
-                            estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
-                            tiempo = 0;
-                            esperandoInput = true;
+                            // Solo ejecutar si el ataque seleccionado es usable
+                            Ataque aSel = ataques.get(ataqueSeleccionado);
+                            boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
+                            if (usable) {
+                                System.out.println("ataque seleccionado: " + ataqueSeleccionado);
+                                estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
+                                tiempo = 0;
+                                esperandoInput = true;
+                            } else {
+                                // No hacer nada si no es usable
+                                System.out.println("Ataque no usable, ignorando entrada");
+                            }
                         }
                         if (!(entradas.isEnter() || entradas.isClick())) {
                             esperandoInput = false;

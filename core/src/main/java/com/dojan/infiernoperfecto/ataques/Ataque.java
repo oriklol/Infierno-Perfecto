@@ -11,7 +11,7 @@ public abstract class Ataque {
     protected EfectoSecundario efectoSecundario;
     protected int costoFe;
 
-
+    //sin efecto secundario y sin costo de Fe
     public Ataque(String nombre, int danio, int precision, int cantUsos) {
         this.nombre = nombre;
         this.danio = danio;
@@ -20,6 +20,7 @@ public abstract class Ataque {
         this.efectoSecundario = null;
     }
 
+    //con efecto secundario pero sin costo de Fe
     public Ataque(String nombre, int danio, int precision, int cantUsos, EfectoSecundario efectoSecundario) {
         this.nombre = nombre;
         this.danio = danio;
@@ -28,12 +29,23 @@ public abstract class Ataque {
         this.efectoSecundario = efectoSecundario;
     }
 
+    //con efecto secundario y con costo de Fe
     public Ataque(String nombre, int danio, int precision, int cantUsos, EfectoSecundario efectoSecundario, int costoFe) {
         this.nombre = nombre;
         this.danio = danio;
         this.precision = precision;
         this.cantUsos = cantUsos;
         this.efectoSecundario = efectoSecundario;
+        this.costoFe = costoFe;
+    }
+
+    //sin efecto secundario pero con costo de Fe
+    public Ataque(String nombre, int danio, int precision, int cantUsos, int costoFe) {
+        this.nombre = nombre;
+        this.danio = danio;
+        this.precision = precision;
+        this.cantUsos = cantUsos;
+        this.efectoSecundario = null;
         this.costoFe = costoFe;
     }
 
