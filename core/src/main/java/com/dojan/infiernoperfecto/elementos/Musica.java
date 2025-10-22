@@ -2,11 +2,10 @@ package com.dojan.infiernoperfecto.elementos;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.dojan.infiernoperfecto.utiles.ControlAudio;
 
 public class Musica {
 
-    private Music musica;
+    private final Music musica;
 
 
     public Musica(String ruta){

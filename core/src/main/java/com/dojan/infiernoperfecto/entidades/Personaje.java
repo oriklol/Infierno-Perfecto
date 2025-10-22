@@ -54,7 +54,7 @@ public abstract class Personaje {
         this.feActual = 0;
     }
 
-    public float atacar(Personaje objetivo, int ataqueElegido){
+    public ResultadoAtaque atacar(Personaje objetivo, int ataqueElegido){
         int porcentajeReduccionAtaque = 0;
         int porcentajeReduccionDefensa = 0;
         int porcentajeReduccionPrecision = 0;
@@ -96,7 +96,7 @@ public abstract class Personaje {
             if (costoFe > 0) {
                 if (this.feActual < costoFe) {
                     System.out.println("No tienes suficiente Fe para usar " + ataque.getNombre());
-                    return 0; // ataque no realizado
+                    return ResultadoAtaque.empty(); // ataque no realizado
                 } else {
                     // Restar la Fe correspondiente al atacante
                     this.feActual -= costoFe;
@@ -113,17 +113,19 @@ public abstract class Personaje {
                 objetivo.recibirDanio(danioFinal);
                 System.out.println("daño final: "+danioFinal);
                 System.out.println("El danio a "+objetivo.getNombre()+" es de "+danioFinal);
-                return danioFinal;
+                // Capturar mensaje de efecto si existe
+                EfectoSecundario efecto = ataques.get(ataqueElegido).getEfectoSecundario();
+                String mensajeEfecto = null;
+                if(efecto!=null){
+                    if(Random.verificarAcierto(efecto.getProbabilidad())){
+                        mensajeEfecto = efecto.aplicar(objetivo);
+                    }
+                }
+                return new ResultadoAtaque(danioFinal, mensajeEfecto);
             }else{
                 System.out.println("Fallaste el ataque");
             }
 
-            EfectoSecundario efecto = ataques.get(ataqueElegido).getEfectoSecundario();
-            if(efecto!=null){
-                if(Random.verificarAcierto(efecto.getProbabilidad())){
-                    efecto.aplicar(objetivo);
-                }
-            }
         }
 
         if (this.estadoAlterado != null) {
@@ -134,7 +136,7 @@ public abstract class Personaje {
             }
         }
 
-    return 0;
+    return ResultadoAtaque.empty();
     }
 
     public void recibirDanio(float cantidad){

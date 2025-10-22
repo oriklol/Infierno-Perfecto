@@ -50,7 +50,7 @@ public class PantallaLimbo implements Screen {
     };
     private int enemigoSeleccionado = 0;
 
-    private boolean jugadorMurio = false;
+    // private boolean jugadorMurio = false;
     private boolean inicializado = false;
 
 
@@ -64,6 +64,13 @@ public class PantallaLimbo implements Screen {
         if (!inicializado) {
             inicializarRecursos();
             inicializado = true;
+        } else {
+            // Si el renderer global fue liberado por otra pantalla, recrearlo aquí.
+            if (Render.renderer == null) {
+                Render.renderer = new ShapeRenderer();
+            }
+            // Asegurar que este screen reciba entradas
+            Gdx.input.setInputProcessor(entradas);
         }
         // Si no hay batalla inicializada (ej. al entrar desde el menú), crear una de muestra
         if (batalla == null && Config.personajeSeleccionado != null) {
@@ -125,7 +132,7 @@ public class PantallaLimbo implements Screen {
 
         } else {
             // ========== NIVELES NORMALES (1, 2) ==========
-            int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
+            // int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
             for (int i = 0; i < cantEnemigos; i++) {
                 Enemigo enemigo;
                 int tipoEnemigo = Random.generarEntero(2);
@@ -272,7 +279,7 @@ public class PantallaLimbo implements Screen {
                             tiempo = 0;
                             esperandoInput = true;
                             System.out.println("enemigo seleccionado: " + enemigoSeleccionado);
-                            System.out.println("opc: " + opc);
+                            // System.out.println("opc: " + opc);
                         }
                         // Resetear esperandoInput cuando el usuario suelta el input
                         if (!(entradas.isEnter() || entradas.isClick())) {
@@ -295,7 +302,7 @@ public class PantallaLimbo implements Screen {
                     List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
                     int feActual = Config.personajeSeleccionado.getFeActual();
 
-                    // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
+                                // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
                     for (int i = 0; i < textoAtaques.length; i++) {
@@ -333,6 +340,14 @@ public class PantallaLimbo implements Screen {
                         Render.batch.end();
                     }
 
+                    // Asegurar índices válidos antes de usar ataqueSeleccionado
+                    if (ataqueSeleccionado < 0) ataqueSeleccionado = 0;
+                    if (textoAtaques.length == 0) {
+                        // No hay ataques definidos, volver a estado de selección enemigo
+                        estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
+                        break;
+                    }
+                    if (ataqueSeleccionado >= textoAtaques.length) ataqueSeleccionado = textoAtaques.length - 1;
                     Ataque ataqueSel = Config.personajeSeleccionado.getClase().getAtaques().get(ataqueSeleccionado);
                     Render.batch.begin();
                     // Mostrar vida y Fe del jugador uno al lado del otro
@@ -376,18 +391,22 @@ public class PantallaLimbo implements Screen {
                         }
                         // Solo avanzar si NO estamos esperando input y el usuario acaba de presionar
                         if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                            // Solo ejecutar si el ataque seleccionado es usable
-                            Ataque aSel = ataques.get(ataqueSeleccionado);
-                            boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
-                            if (usable) {
-                                System.out.println("ataque seleccionado: " + ataqueSeleccionado);
-                                estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
-                                tiempo = 0;
-                                esperandoInput = true;
-                            } else {
-                                // No hacer nada si no es usable
-                                System.out.println("Ataque no usable, ignorando entrada");
-                            }
+                                // Solo ejecutar si el ataque seleccionado es usable
+                                if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
+                                    System.out.println("Seleccion invalida de ataque, ignorando");
+                                } else {
+                                    Ataque aSel = ataques.get(ataqueSeleccionado);
+                                    boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
+                                    if (usable) {
+                                        System.out.println("ataque seleccionado: " + ataqueSeleccionado);
+                                        estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
+                                        tiempo = 0;
+                                        esperandoInput = true;
+                                    } else {
+                                        // No hacer nada si no es usable
+                                        System.out.println("Ataque no usable, ignorando entrada");
+                                    }
+                                }
                         }
                         if (!(entradas.isEnter() || entradas.isClick())) {
                             esperandoInput = false;
@@ -468,6 +487,7 @@ public class PantallaLimbo implements Screen {
                 if (!Config.personajeSeleccionado.sigueVivo()) {
                     ControladorJuego.getInstance().gameOver();  // ← Usa el controlador
                 } else {
+                    estadoActual = null; // evitar repetir
                     ControladorJuego.getInstance().avanzarNivel();  // ← Usa el controlador
                 }
                 break;
@@ -477,7 +497,7 @@ public class PantallaLimbo implements Screen {
         Render.renderer.setColor(Color.BLACK);
 
         // Dibujar rect alrededor del enemigo seleccionado si existe
-        if (enemigoSpr != null && enemigos.size() > 0 && opc >= 0 && opc < enemigoSpr.size() && enemigoSpr.get(opc) != null) {
+        if (enemigoSpr != null && !enemigos.isEmpty() && opc >= 0 && opc < enemigoSpr.size() && enemigoSpr.get(opc) != null) {
             Imagen spr = enemigoSpr.get(opc);
             Render.renderer.rect(spr.getX(), spr.getY(), spr.getAncho(), spr.getAlto());
         }
@@ -557,11 +577,6 @@ public class PantallaLimbo implements Screen {
         }
 
         // dispose renderer if this screen created it
-        try{
-            if (Render.renderer != null){
-                Render.renderer.dispose();
-                Render.renderer = null;
-            }
-        }catch(Exception e){ }
+        // No se debe disponer del renderer global aquí (lo gestiona la aplicación central).
     }
 }

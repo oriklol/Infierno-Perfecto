@@ -6,7 +6,7 @@ import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 public class Imagen {
     private Texture t;
-    private Sprite s;
+    private final Sprite s;
 
     public Imagen(String ruta){
         t = new Texture(ruta);

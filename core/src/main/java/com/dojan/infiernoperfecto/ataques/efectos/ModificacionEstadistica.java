@@ -1,7 +1,5 @@
 package com.dojan.infiernoperfecto.ataques.efectos;
 
-import java.io.PrintStream;
-
 import com.dojan.infiernoperfecto.entidades.Personaje;
 import com.dojan.infiernoperfecto.entidades.estados.EstadoEstadisticaModificada;
 import com.dojan.infiernoperfecto.utiles.Random;
@@ -21,13 +19,11 @@ public class ModificacionEstadistica extends EfectoSecundario{
     }
 
     @Override
-    public void aplicar(Personaje objetivo){
+    public String aplicar(Personaje objetivo){
         int porcentaje = Random.generarEntero(this.porcentajeMin,this.porcentajeMax);
         int turnos = Random.generarEntero(super.turnosMin,super.turnosMax);
         objetivo.aplicarEstadoAlterado(new EstadoEstadisticaModificada(this.tipoEstadistica, porcentaje, turnos));
-        PrintStream var10000 = System.out;
-        String var10001 = objetivo.getNombre();
-        var10000.println("Ahora " + var10001 + " vera reducida su estadística de " + this.tipoEstadistica.toString().toLowerCase() + " en un " + porcentaje + "% durante " + turnos + " turnos.");
-
+        String mensaje = "Durante " + turnos + " turnos modifica " + this.tipoEstadistica.toString().toLowerCase() + " en " + porcentaje + "%";
+        return mensaje;
     }
 }

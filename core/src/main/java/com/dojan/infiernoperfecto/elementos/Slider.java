@@ -1,14 +1,13 @@
 package com.dojan.infiernoperfecto.elementos;
 
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import io.Entradas;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-import java.awt.*;
+import io.Entradas;
 
 public class Slider {
-    private float x, y;
-    private float width, height;
+    private final float x, y;
+    private final float width, height;
     private float valor;
     private boolean arrastrando = false;
     private boolean adentro = false;

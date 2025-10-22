@@ -8,9 +8,14 @@ import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.items.ItemCura;
-import com.dojan.infiernoperfecto.utiles.*;
-import io.Entradas;
+import com.dojan.infiernoperfecto.utiles.Config;
+import com.dojan.infiernoperfecto.utiles.ControladorJuego;
+import com.dojan.infiernoperfecto.utiles.Random;
+import com.dojan.infiernoperfecto.utiles.Recursos;
+import com.dojan.infiernoperfecto.utiles.Render;
 import static com.dojan.infiernoperfecto.utiles.Render.renderer;
+
+import io.Entradas;
 
 public class PantallaTienda implements Screen {
     private Imagen fondoTienda;
@@ -291,9 +296,6 @@ public class PantallaTienda implements Screen {
             }
         }
 
-        if (renderer != null){
-            try{ renderer.dispose(); }catch(Exception e){}
-            renderer = null;
-        }
+        // No se debe disponer del renderer global aquí (lo gestiona la aplicación central).
     }
 }

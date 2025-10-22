@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.Personaje;
+import com.dojan.infiernoperfecto.entidades.ResultadoAtaque;
 import com.dojan.infiernoperfecto.utiles.Random;
 
 public class Batalla {
@@ -19,9 +20,9 @@ public class Batalla {
         this.enemigos = enemigos;
     }
 
-    /**
-     * Procesa un solo turno de la batalla. Retorna true si la batalla sigue, false si terminó.
-     * El primer turno (turno==0) es del jugador, los siguientes de los enemigos.
+    /*
+    Procesa un solo turno de la batalla. Retorna true si la batalla sigue, false si terminó.
+    El primer turno (turno==0) es del jugador, los siguientes de los enemigos.
      */
     public boolean avanzarTurno(int opcE, int opcA) {
         enemigosMuertosEsteturno.clear(); // ← NUEVO: Limpiar la lista al inicio del turno
@@ -40,10 +41,9 @@ public class Batalla {
         }
 
         turno++;
-        // Cuando termina la ronda de enemigos, antes de volver al jugador, verifica si la batalla terminó
+        // Cuando termina la ronda de enemigos, antes de volver al jugador, verifica si la batalla termino
         if (turno > enemigos.size()) {
             turno = 0;
-            // Verifica si la batalla terminó solo aquí
             return !jugador.sigueVivo() || enemigos.isEmpty();
         }
         // Mientras se ejecutan los turnos enemigos, nunca termina la batalla
@@ -57,8 +57,12 @@ public class Batalla {
     private void turnoJugador(int opcE, int opcA) {
         Enemigo objetivo = enemigos.get(opcE);
 
-        float danioReal = jugador.atacar(objetivo, opcA);
+    ResultadoAtaque resultado = jugador.atacar(objetivo, opcA);
+        float danioReal = resultado.getDanio();
         logCombate = "Atacaste a " + objetivo.getNombre() + " he hiciste " + danioReal + " de daño.\n";
+        if (resultado.getEfectoMensaje() != null && !resultado.getEfectoMensaje().isEmpty()) {
+            logCombate += resultado.getEfectoMensaje() + "\n";
+        }
 
         if(!objetivo.sigueVivo()){
             System.out.println("murio el objetivo: "+objetivo.getNombre());
@@ -69,8 +73,21 @@ public class Batalla {
 
     private void turnoEnemigo(Enemigo enemigo){
         int ataqueEnemigo = Random.generarEntero(enemigo.getAtaques().size());
-        float danioReal = enemigo.atacar(jugador, ataqueEnemigo);
-        logCombate += enemigo.getNombre() + " te hizo " + danioReal + " de daño.\n";
+        ResultadoAtaque resultado = enemigo.atacar(jugador, ataqueEnemigo);
+        float danioReal = resultado.getDanio();
+        String nombreAtaque = "";
+        if (enemigo.getAtaques() != null && !enemigo.getAtaques().isEmpty() && ataqueEnemigo >= 0 && ataqueEnemigo < enemigo.getAtaques().size()) {
+            nombreAtaque = enemigo.getAtaques().get(ataqueEnemigo).getNombre();
+        }
+        if (!nombreAtaque.isEmpty()) {
+            logCombate += enemigo.getNombre() + " usó " + nombreAtaque + " y te hizo " + danioReal + " de daño.\n";
+        } else {
+            logCombate += enemigo.getNombre() + " te hizo " + danioReal + " de daño.\n";
+        }
+        // Si el ataque aplicó un efecto con mensaje, agregarlo en la línea siguiente
+        if (resultado.getEfectoMensaje() != null && !resultado.getEfectoMensaje().isEmpty()) {
+            logCombate += resultado.getEfectoMensaje() + "\n";
+        }
     }
 
     public String getLogCombate() {

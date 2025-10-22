@@ -19,7 +19,8 @@ public abstract class EfectoSecundario {
         this.turnosMax = turnosMax;
     }
 
-    public abstract void aplicar(Personaje objetivo);
+    // Aplica el efecto en el objetivo y retorna una descripción del efecto para logs (o cadena vacía si no aplica)
+    public abstract String aplicar(Personaje objetivo);
 
     public int getProbabilidad() {
         return probabilidad;
