@@ -214,4 +214,8 @@ public abstract class Personaje {
     public int getMonedasActual(){
         return monedasActual;
     }
+
+    public void setMonedasActuales(int monedas) {
+        this.monedasActual += monedas;
+    }
 }

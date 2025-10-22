@@ -25,9 +25,10 @@ public class Recursos {
     public static final String ITEMCURA2 = "imagenes/items/heal2.png";
     public static final String ITEMCURA3 = "imagenes/items/heal3.png";
 
-    // enemigos
+    // enemigos limbo
     public static final String MINION = "imagenes/enemigos/mini-on.png";
     public static final String ESBIRRO = "imagenes/enemigos/esbirro.png";
+    public static final String MINIBOSSLIMBO = "imagenes/enemigos/minibosslimboRemake.png";
     // effectos batalla
     public static final String EFECTODANIO = "imagenes/danio.png";
     // hisotira

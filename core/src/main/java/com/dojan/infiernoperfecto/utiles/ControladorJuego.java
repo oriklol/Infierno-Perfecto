@@ -6,6 +6,7 @@ import com.dojan.infiernoperfecto.pantallas.PantallaSiguienteNivel;
 import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
 
 public class ControladorJuego {
+
     private static ControladorJuego instancia;
 
     private final int NIVEL_MAX = 4;
@@ -17,6 +18,8 @@ public class ControladorJuego {
 
     private PantallaLimbo pantallaLimbo;
     private PantallaTienda pantallaTienda;
+
+    private static final int MONEDAS_GANADAS_POR_NIVEL = 100;
 
     private ControladorJuego() {
 
@@ -59,6 +62,7 @@ public class ControladorJuego {
 
     public void avanzarNivel() {
         this.nivelActual++;
+        Config.personajeSeleccionado.setMonedasActuales(MONEDAS_GANADAS_POR_NIVEL);
 
         // Verificar si completamos todos los niveles del piso
         if (nivelActual > this.NIVEL_MAX) {
@@ -66,7 +70,6 @@ public class ControladorJuego {
             Render.app.setScreen(new PantallaSiguienteNivel());
             this.pisoActual++;
             this.nivelActual = 1;
-
 
         } else if (nivelActual == NIVEL_TIENDA) {
             irATienda();

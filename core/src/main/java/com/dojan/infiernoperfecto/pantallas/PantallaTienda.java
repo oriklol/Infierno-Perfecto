@@ -26,7 +26,6 @@ public class PantallaTienda implements Screen {
     private Texto continuarPartida;
 
     private float tiempo;
-    private float tiempoEnter; // Timer separado para Enter
     private int opc = 0;
 
     Entradas entradas = new Entradas();

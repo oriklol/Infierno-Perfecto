@@ -14,6 +14,7 @@ import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
+import com.dojan.infiernoperfecto.entidades.enemigos.MiniBossLimbo;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControladorJuego;
 import com.dojan.infiernoperfecto.utiles.Random;
@@ -35,14 +36,14 @@ public class PantallaLimbo implements Screen {
     Entradas entradas = new Entradas();
     private Batalla batalla;
     private float tiempo;
-    private int opc=0;
+    private int opc = 0;
 
     private boolean esperandoInput = false;
     private EstadoBatalla estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
     private final ArrayList<Enemigo> enemigos = new ArrayList<>();
     private final int CANT_ENEMIGOS_MAX = 3;
-    private final int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX))+1;
-    private final Imagen[] enemigoSpr = new Imagen[CANT_ENEMIGOS_MAX];
+    private final int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
+    private final ArrayList<Imagen> enemigoSpr = new ArrayList<>();
     private static final String[] SPRITES_ENEMIGOS = {
         Recursos.ESBIRRO,
         Recursos.MINION
@@ -51,7 +52,6 @@ public class PantallaLimbo implements Screen {
 
     private boolean jugadorMurio = false;
     private boolean inicializado = false;
-
 
 
     //private List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
@@ -94,7 +94,7 @@ public class PantallaLimbo implements Screen {
 
         // Texto de ubicación (se actualizará en reiniciarNivel)
         lugar = new Texto(Recursos.FUENTEMENU, 60, Color.BLACK, false);
-        lugar.setPosition((int)(Config.ANCHO/1.2f), (int)(Config.ALTO/1.1f));
+        lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
     }
 
     public void reiniciarNivel(int piso, int nivel) {
@@ -106,24 +106,41 @@ public class PantallaLimbo implements Screen {
 
         // Limpiar estado anterior
         enemigos.clear();
+        enemigoSpr.clear();
 
         // Actualizar ubicación
         lugar.setTexto(nivel + " - " + piso);
 
-        // Generar nuevos enemigos
-        int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1; // revisar pq arriba hay otro
-        for (int i = 0; i < cantEnemigos; i++) {
-            Enemigo enemigo;
-            int tipoEnemigo = Random.generarEntero(2);
+        // Verificar si es el nivel del miniboss
+        if (nivel == 4) {
+            // ========== NIVEL 4 = MINIBOSS ==========
+            Enemigo miniboss = new MiniBossLimbo();
+            Imagen spriteMiniboss = new Imagen(Recursos.MINIBOSSLIMBO);
 
-            if (tipoEnemigo == 1) {
-                enemigo = new EnemigoLimbo1();
-                enemigoSpr[i] = new Imagen(Recursos.ESBIRRO);
-            } else {
-                enemigo = new EnemigoLimbo2();
-                enemigoSpr[i] = new Imagen(Recursos.MINION);
+
+            enemigos.add(miniboss);
+            enemigoSpr.add(spriteMiniboss);
+
+            System.out.println("¡MINIBOSS DEL PISO " + piso + " HA APARECIDO!");
+
+        } else {
+            // ========== NIVELES NORMALES (1, 2) ==========
+            int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
+            for (int i = 0; i < cantEnemigos; i++) {
+                Enemigo enemigo;
+                int tipoEnemigo = Random.generarEntero(2);
+
+                Imagen sprite;
+                if (tipoEnemigo == 1) {
+                    enemigo = new EnemigoLimbo1();
+                    sprite = new Imagen(Recursos.ESBIRRO);
+                } else {
+                    enemigo = new EnemigoLimbo2();
+                    sprite = new Imagen(Recursos.MINION);
+                }
+                enemigos.add(enemigo);
+                enemigoSpr.add(sprite);
             }
-            enemigos.add(enemigo);
         }
 
         // Crear nueva batalla
@@ -153,29 +170,57 @@ public class PantallaLimbo implements Screen {
         }
     }
 
+    public void eliminarEnemigo(int indice) {
+        if (indice >= 0 && indice < enemigos.size()) {
+            enemigos.remove(indice);
+            if (indice < enemigoSpr.size()) {
+                Imagen sprite = enemigoSpr.remove(indice);
+                sprite.dispose(); // liberar recursos
+            }
+            // Ajustar selección si es necesario
+            if (enemigoSeleccionado >= enemigos.size() && enemigos.size() > 0) {
+                enemigoSeleccionado = enemigos.size() - 1;
+            }
+            if (opc >= enemigos.size() && enemigos.size() > 0) {
+                opc = enemigos.size() - 1;
+            }
+        }
+    }
+
 
     @Override
     public void render(float delta) {
+        // Dibujar fondo y arena
         Render.batch.begin();
-            fondo.dibujar();
-            arena.dibujar();
-            for (int i = 0; i<enemigos.size(); i++){
-                enemigoSpr[i].setPosition((int) ((Config.ANCHO/3.5f)*i)+20,Config.ALTO/2);
-                enemigoSpr[i].dibujar();
-            }
-            lugar.dibujar();
+        fondo.dibujar();
+        arena.dibujar();
+        lugar.dibujar();
         Render.batch.end();
 
+        // Dibujar enemigos con HP
         Render.batch.begin();
         for (int i = 0; i < enemigos.size(); i++) {
-            enemigoSpr[i].setPosition((int) ((Config.ANCHO / 3.5f) * i) + 20, Config.ALTO / 2);
-            enemigoSpr[i].dibujar();
+            int posX;
 
+            // Si hay solo 1 enemigo (miniboss), centrarlo
+            if (enemigos.size() == 1) {
+                posX = Config.ANCHO / 2 - (int)(enemigoSpr.get(i).getAncho() / 2);
+            } else {
+                // Enemigos normales en fila
+                posX = (int) ((Config.ANCHO / 3.5f) * i) + 20;
+            }
+
+            enemigoSpr.get(i).setPosition(posX, Config.ALTO / 2);
+            enemigoSpr.get(i).dibujar();
+
+            // Dibujar HP del enemigo
             Enemigo enemigo = enemigos.get(i);
             Texto vidaEnemigo = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
             vidaEnemigo.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
-            vidaEnemigo.setPosition((int) (enemigoSpr[i].getX() + enemigoSpr[i].getAncho() / 2 - vidaEnemigo.getAncho() / 2),
-                (int) (enemigoSpr[i].getY() - 20));
+            vidaEnemigo.setPosition(
+                (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - vidaEnemigo.getAncho() / 2),
+                (int) (enemigoSpr.get(i).getY() - 20)
+            );
             vidaEnemigo.dibujar();
         }
         Render.batch.end();
@@ -195,7 +240,7 @@ public class PantallaLimbo implements Screen {
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
                     for (int i = 0; i < enemigos.size(); i++) {
-                        Imagen spr = enemigoSpr[i];
+                        Imagen spr = enemigoSpr.get(i);
                         int x = (int) spr.getX();
                         int y = (int) spr.getY();
                         int ancho = (int) spr.getAncho();
@@ -361,7 +406,7 @@ public class PantallaLimbo implements Screen {
 
                 tiempoDanio += delta;
 
-                Imagen sprDanio = enemigoSpr[enemigoSeleccionado];
+                Imagen sprDanio = enemigoSpr.get(enemigoSeleccionado);
                 danioSpr.setPosition(
                     (int) (sprDanio.getX() + sprDanio.getAncho() / 2 - danioSpr.getAncho() / 2),
                     (int) (sprDanio.getY() + sprDanio.getAlto() / 2 - danioSpr.getAlto() / 2)
@@ -391,18 +436,27 @@ public class PantallaLimbo implements Screen {
                 Render.batch.end();
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    if (batalla.getTurno() != 0) {
-                        // Avanza el turno enemigo
-                        batalla.avanzarTurno(0, 0);
-                        // No mostrar FIN_BATALLA aquí, solo avanzar el turno
-                    } else {
-                        // Ahora sí, al volver al jugador, verificar si terminó la batalla
-                        if (batalla.batallaTerminada()) {
-                            estadoActual = EstadoBatalla.FIN_BATALLA;
-                        } else {
-                            estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
-                        }
+                    // Obtener lista de enemigos muertos este turno
+                    List<Integer> enemigosMuertos = batalla.getEnemigosMuertosEsteTurno();
+
+                    // Eliminar enemigos muertos (de atrás hacia adelante para evitar problemas de índices)
+                    for (int i = enemigosMuertos.size() - 1; i >= 0; i--) {
+                        int indice = enemigosMuertos.get(i);
+                        System.out.println("Eliminando enemigo en índice: " + indice);
+                        eliminarEnemigo(indice);
                     }
+
+                    // Verificar si la batalla terminó
+                    if (batalla.batallaTerminada()) {
+                        estadoActual = EstadoBatalla.FIN_BATALLA;
+                    } else if (batalla.getTurno() != 0) {
+                        // Turno enemigo
+                        batalla.avanzarTurno(0, 0);
+                    } else {
+                        // Volver a selección de enemigo
+                        estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
+                    }
+
                     esperandoInput = true;
                 }
                 if (!(entradas.isEnter() || entradas.isClick())) {
@@ -423,8 +477,8 @@ public class PantallaLimbo implements Screen {
         Render.renderer.setColor(Color.BLACK);
 
         // Dibujar rect alrededor del enemigo seleccionado si existe
-        if (enemigoSpr != null && enemigos.size() > 0 && opc >= 0 && opc < enemigoSpr.length && enemigoSpr[opc] != null) {
-            Imagen spr = enemigoSpr[opc];
+        if (enemigoSpr != null && enemigos.size() > 0 && opc >= 0 && opc < enemigoSpr.size() && enemigoSpr.get(opc) != null) {
+            Imagen spr = enemigoSpr.get(opc);
             Render.renderer.rect(spr.getX(), spr.getY(), spr.getAncho(), spr.getAlto());
         }
 
@@ -484,12 +538,12 @@ public class PantallaLimbo implements Screen {
         }
 
         if (enemigoSpr != null){
-            for (int i=0;i<enemigoSpr.length;i++){
-                if (enemigoSpr[i] != null){
-                    try{ enemigoSpr[i].dispose(); }catch(Exception e){}
-                    enemigoSpr[i] = null;
+            for (Imagen sprite : enemigoSpr) { // ← cambiar el for
+                if (sprite != null){
+                    try{ sprite.dispose(); }catch(Exception e){}
                 }
             }
+            enemigoSpr.clear(); // ← agregar clear
         }
 
         if (textoAtaques != null){
