@@ -40,5 +40,7 @@ public class Recursos {
     // musica
     public static final String MUSICAMENU = "musica/musica menu.ogg";
     public static final String MUSICAMUERTE = "musica/musica muerte.ogg";
+    public static final String MUSICACREDITOS = "musica/inicio.ogg";
+
 
 }

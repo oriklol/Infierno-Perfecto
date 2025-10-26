@@ -2,26 +2,32 @@ package com.dojan.infiernoperfecto.pantallas;
 
 import com.badlogic.gdx.Screen;
 import com.dojan.infiernoperfecto.elementos.Imagen;
+import com.dojan.infiernoperfecto.elementos.Musica;
+import com.dojan.infiernoperfecto.utiles.ControlAudio;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
 
 public class PantallaCreditos implements Screen {
+    private Musica musicaFondo;
     private Imagen creditos;
     private boolean fadeInTerminado = false,termina = false;
-    private float contTiempo = 0, tiempoEspera = 5;
-    private float contTiempoTermina = 0, tiempoTermina = 5;
+    private float contTiempo = 0, tiempoEspera = 7;
+    private float contTiempoTermina = 0, tiempoTermina = 9;
     private float alpha = 0;
 
     @Override
     public void show() {
+        musicaFondo = new Musica(Recursos.MUSICACREDITOS);
+        ControlAudio.setMusicaActual(musicaFondo);
         creditos = new Imagen(Recursos.FONDOCREDITOS);
         creditos.setTransparencia(alpha);
     }
 
     @Override
     public void render(float delta) {
+        ControlAudio.reproducirMusica();
         Render.limpiarPantalla(0,0,0);
         batch.begin();
             creditos.dibujar();
@@ -53,6 +59,7 @@ public class PantallaCreditos implements Screen {
         if (termina) {
             contTiempoTermina += 0.1f;
             if (contTiempoTermina > tiempoTermina) {
+                ControlAudio.pararMusica();
                 Render.app.setScreen(new PantallaMenu());
             }
         }
