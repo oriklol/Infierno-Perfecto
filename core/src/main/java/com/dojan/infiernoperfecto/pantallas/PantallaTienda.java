@@ -43,11 +43,14 @@ public class PantallaTienda implements Screen {
 
         Gdx.input.setInputProcessor(entradas);
 
-        // Inicializar items
+        // ← RESETEAR items y estado de compra cada vez que se muestra la tienda
         for(int i = 0; i < items.length; i++) {
             items[i] = generarItemRandom();
-            itemsComprados[i] = false;
+            itemsComprados[i] = false;  // ← Resetear a false
         }
+
+        // ← Resetear la opción seleccionada
+        opc = 0;
 
         // Info del personaje
         for(int i = 0; i < infoPersonaje.length; i++){

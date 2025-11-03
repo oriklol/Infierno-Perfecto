@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.pantallas;
+package com.dojan.infiernoperfecto.pantallas.niveles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
-import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
-import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
-import com.dojan.infiernoperfecto.entidades.enemigos.MiniBossLimbo;
+import com.dojan.infiernoperfecto.entidades.enemigos.*;
+import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
+import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControladorJuego;
 import com.dojan.infiernoperfecto.utiles.Random;
@@ -24,7 +24,7 @@ import com.dojan.infiernoperfecto.utiles.Render;
 import io.Entradas;
 
 
-public class PantallaLimbo implements Screen {
+public class PantallaLujuria implements Screen {
     private Imagen fondo;
     private Imagen arena;
     private Imagen danioSpr;
@@ -44,10 +44,7 @@ public class PantallaLimbo implements Screen {
     private final int CANT_ENEMIGOS_MAX = 3;
     private final int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
     private final ArrayList<Imagen> enemigoSpr = new ArrayList<>();
-    private static final String[] SPRITES_ENEMIGOS = {
-        Recursos.ESBIRRO,
-        Recursos.MINION
-    };
+
     private int enemigoSeleccionado = 0;
 
     // private boolean jugadorMurio = false;
@@ -76,8 +73,7 @@ public class PantallaLimbo implements Screen {
         if (batalla == null && Config.personajeSeleccionado != null) {
             reiniciarNivel(1, 1);
         }
-        // Crear personaje de prueba
-        // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
+
 
         /* Cambia el fondo de la arena dependiendo la cantidad de enemigos
         if (cantEnemigos ==1){
@@ -95,7 +91,7 @@ public class PantallaLimbo implements Screen {
         Render.renderer = new ShapeRenderer();
 
         // Texturas que se reutilizan
-        fondo = new Imagen(Recursos.FONDOLIMBO);
+        fondo = new Imagen(Recursos.FONDOLUJURIA);
         arena = new Imagen(Recursos.FONDOARENA);
         danioSpr = new Imagen(Recursos.EFECTODANIO);
 
@@ -121,8 +117,8 @@ public class PantallaLimbo implements Screen {
         // Verificar si es el nivel del miniboss
         if (nivel == 4) {
             // ========== NIVEL 4 = MINIBOSS ==========
-            Enemigo miniboss = new MiniBossLimbo();
-            Imagen spriteMiniboss = new Imagen(Recursos.MINIBOSSLIMBO);
+            Enemigo miniboss = new MiniBossLujuria();
+            Imagen spriteMiniboss = new Imagen(Recursos.MINIBOSSLUJURIA);
 
 
             enemigos.add(miniboss);
@@ -139,11 +135,11 @@ public class PantallaLimbo implements Screen {
 
                 Imagen sprite;
                 if (tipoEnemigo == 1) {
-                    enemigo = new EnemigoLimbo1();
-                    sprite = new Imagen(Recursos.ESBIRRO);
+                    enemigo = new EnemigoLujuria1();
+                    sprite = new Imagen(Recursos.ENEMIGOLUJURIA1);
                 } else {
-                    enemigo = new EnemigoLimbo2();
-                    sprite = new Imagen(Recursos.MINION);
+                    enemigo = new EnemigoLujuria2();
+                    sprite = new Imagen(Recursos.ENEMIGOLUJURIA2);
                 }
                 enemigos.add(enemigo);
                 enemigoSpr.add(sprite);
@@ -302,7 +298,7 @@ public class PantallaLimbo implements Screen {
                     List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
                     int feActual = Config.personajeSeleccionado.getFeActual();
 
-                                // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
+                    // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
                     for (int i = 0; i < textoAtaques.length; i++) {
@@ -391,22 +387,22 @@ public class PantallaLimbo implements Screen {
                         }
                         // Solo avanzar si NO estamos esperando input y el usuario acaba de presionar
                         if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                                // Solo ejecutar si el ataque seleccionado es usable
-                                if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
-                                    System.out.println("Seleccion invalida de ataque, ignorando");
+                            // Solo ejecutar si el ataque seleccionado es usable
+                            if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
+                                System.out.println("Seleccion invalida de ataque, ignorando");
+                            } else {
+                                Ataque aSel = ataques.get(ataqueSeleccionado);
+                                boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
+                                if (usable) {
+                                    System.out.println("ataque seleccionado: " + ataqueSeleccionado);
+                                    estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
+                                    tiempo = 0;
+                                    esperandoInput = true;
                                 } else {
-                                    Ataque aSel = ataques.get(ataqueSeleccionado);
-                                    boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
-                                    if (usable) {
-                                        System.out.println("ataque seleccionado: " + ataqueSeleccionado);
-                                        estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
-                                        tiempo = 0;
-                                        esperandoInput = true;
-                                    } else {
-                                        // No hacer nada si no es usable
-                                        System.out.println("Ataque no usable, ignorando entrada");
-                                    }
+                                    // No hacer nada si no es usable
+                                    System.out.println("Ataque no usable, ignorando entrada");
                                 }
+                            }
                         }
                         if (!(entradas.isEnter() || entradas.isClick())) {
                             esperandoInput = false;

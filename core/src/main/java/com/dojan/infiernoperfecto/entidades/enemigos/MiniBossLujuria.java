@@ -3,8 +3,8 @@ package com.dojan.infiernoperfecto.entidades.enemigos;
 import com.dojan.infiernoperfecto.ataques.enemigos.AtaquesMiniBoss;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 
-public class MiniBossLimbo extends Enemigo {
-    public MiniBossLimbo() {
-        super("Sabueso", 300, 60, 65, AtaquesMiniBoss.ataquesBasicos());
+public class MiniBossLujuria extends Enemigo {
+    public MiniBossLujuria() {
+        super("Jujurion", 440, 67, 85, AtaquesMiniBoss.ataquesBasicos());
     }
 }
