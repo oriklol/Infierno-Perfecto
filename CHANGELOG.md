@@ -1,6 +1,7 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+
 ## [0.7.0] - 2025-11-02
 ### Added
 - Se añadieron cuatro nuevos niveles, cada uno implementado como una clase independiente.
@@ -96,3 +97,45 @@ Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se 
 - Se modificó la pantalla de selección de clases: ahora detecta el mouse y presenta nuevos diseños.
 
 ---
+
+## [0.3.0] - 2025-09-08
+### Fixed
+- Se corrigieron los cálculos de daño.  
+  Ahora todos los valores se muestran correctamente en el log de combate.
+
+---
+
+## [0.2.1] - 2025-09-08
+### Added
+- Implementación inicial del **menú de clases** (fase temprana).
+
+---
+
+## [0.2.0] - 2025-08-07
+### Added
+- Implementación del **menú principal**.
+- Añadidas **opciones de configuración** (pantalla, volumen, etc.).
+- Sistema de **combate básico**.
+- Uso de **viewports** para ajustar la visualización.
+- Implementación de **música** dentro del juego.
+
+---
+
+## [0.1.1] - 2025-06-02
+### Changed
+- Actualización del `README.md`:
+  - Se agregó la sección **Tecnologías Utilizadas**.
+  - Se cambió el formato del enlace a la Wiki por un hipervínculo.
+  - Se modificó la presentación de los participantes del proyecto.
+- Actualización del `CHANGELOG.md`:
+  - Se añadieron más detalles sobre los cambios iniciales del proyecto.
+
+---
+
+## [0.1.0] - 2025-05-25
+### Added
+- Inicialización del proyecto.
+- Creación de la estructura base del repositorio.
+- Creación del `README.md` inicial.
+- Creación de este `CHANGELOG.md`.
+- Configuración inicial de la Wiki con la propuesta del proyecto.
