@@ -1,6 +1,9 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+## [0.7.1] - 2025-11-08
+### Added
+- Se añadio musica de fondo en las batallas
 
 ## [0.7.0] - 2025-11-02
 ### Added
