@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.dojan.infiernoperfecto.ataques.Ataque;
 import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.elementos.Imagen;
+import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
@@ -17,16 +18,13 @@ import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
 import com.dojan.infiernoperfecto.entidades.enemigos.MiniBossLimbo;
 import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
 import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
-import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControladorJuego;
-import com.dojan.infiernoperfecto.utiles.Random;
-import com.dojan.infiernoperfecto.utiles.Recursos;
-import com.dojan.infiernoperfecto.utiles.Render;
+import com.dojan.infiernoperfecto.utiles.*;
 
 import io.Entradas;
 
 
 public class PantallaLimbo implements Screen {
+    private Musica musicaFondo;
     private Imagen fondo;
     private Imagen arena;
     private Imagen danioSpr;
@@ -62,6 +60,8 @@ public class PantallaLimbo implements Screen {
 
     @Override
     public void show() {
+        musicaFondo = new Musica(Recursos.MUSICABATALLA);
+        ControlAudio.setMusicaActual(musicaFondo);
 
         if (!inicializado) {
             inicializarRecursos();
@@ -199,6 +199,7 @@ public class PantallaLimbo implements Screen {
 
     @Override
     public void render(float delta) {
+        ControlAudio.reproducirMusica();
         // Dibujar fondo y arena
         Render.batch.begin();
         fondo.dibujar();
