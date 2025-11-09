@@ -1,5 +1,6 @@
 package com.dojan.infiernoperfecto.elementos;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
@@ -9,7 +10,8 @@ public class Imagen {
     private final Sprite s;
 
     public Imagen(String ruta){
-        t = new Texture(ruta);
+        // Crear texture directamente (sin cache por ahora)
+        this.t = new Texture(Gdx.files.internal(ruta));
         s = new Sprite(t);
     }
 
@@ -46,10 +48,13 @@ public class Imagen {
     }
 
     public void dispose(){
-        if (t != null) {
-            t.dispose();
-            t = null;
-        }
+        // Dispose the texture created by this Imagen
+        try{
+            if (t != null) {
+                t.dispose();
+                t = null;
+            }
+        } catch(Exception e){ /* ignore */ }
     }
 
 }

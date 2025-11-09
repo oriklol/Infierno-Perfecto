@@ -18,10 +18,11 @@ import io.Entradas;
 public class PantallaMenu implements Screen {
     private Musica musicaFondo;
     private Imagen menu;
-    private Texto opciones[] = new Texto[3];
+    final private Texto opciones[] = new Texto[4];
     String textos[] = {
         "Nueva Partida",
         "Opciones",
+        "Turorial",
         "Salir"
     };
     private int opc = 1;

@@ -39,7 +39,9 @@ public class PantallaTienda implements Screen {
     @Override
     public void show() {
         fondoTienda = new Imagen(Recursos.FONDOTIENDA);
-        renderer = new ShapeRenderer();
+        if (Render.renderer == null) {
+            Render.renderer = new ShapeRenderer();
+        }
 
         Gdx.input.setInputProcessor(entradas);
 

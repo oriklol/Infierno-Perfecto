@@ -33,6 +33,14 @@ public class PantallaTraicion implements Screen {
     private final float DURACION_DANIO = 1.5f;
 
     private Texto lugar; // muestra el nivel y el piso
+    // Reutilizables para evitar crear fuentes en el loop de render
+    private Texto textoEnemigoSeleccionado;
+    private Texto vidaEnemigoTexto;
+    private Texto textoPS;
+    private Texto textoFe;
+    private Texto textoUsos;
+    private Texto textoCostoFe;
+    private Texto logTexto;
     Entradas entradas = new Entradas();
     private Batalla batalla;
     private float tiempo;
@@ -92,7 +100,9 @@ public class PantallaTraicion implements Screen {
 
     private void inicializarRecursos() {
         Gdx.input.setInputProcessor(entradas);
-        Render.renderer = new ShapeRenderer();
+        if (Render.renderer == null) {
+            Render.renderer = new ShapeRenderer();
+        }
 
         // Texturas que se reutilizan
         fondo = new Imagen(Recursos.FONDOSTRAICION[2]);
@@ -102,6 +112,15 @@ public class PantallaTraicion implements Screen {
         // Texto de ubicación (se actualizará en reiniciarNivel)
         lugar = new Texto(Recursos.FUENTEMENU, 60, Color.BLACK, false);
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
+
+        // Crear textos reutilizables
+        textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
+        vidaEnemigoTexto = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+        textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
+        logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
     }
 
     public void reiniciarNivel(int piso, int nivel) {
@@ -197,15 +216,14 @@ public class PantallaTraicion implements Screen {
             enemigoSpr.get(i).setPosition(posX, Config.ALTO / 2);
             enemigoSpr.get(i).dibujar();
 
-            // Dibujar HP del enemigo
+            // Dibujar HP del enemigo (reutilizando Texto)
             Enemigo enemigo = enemigos.get(i);
-            Texto vidaEnemigo = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
-            vidaEnemigo.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
-            vidaEnemigo.setPosition(
-                (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - vidaEnemigo.getAncho() / 2),
+            vidaEnemigoTexto.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
+            vidaEnemigoTexto.setPosition(
+                (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - vidaEnemigoTexto.getAncho() / 2),
                 (int) (enemigoSpr.get(i).getY() - 20)
             );
-            vidaEnemigo.dibujar();
+            vidaEnemigoTexto.dibujar();
         }
         Render.batch.end();
 
@@ -266,7 +284,6 @@ public class PantallaTraicion implements Screen {
                 }
 
                 Render.batch.begin();
-                Texto textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
                 textoEnemigoSeleccionado.setTexto("Selecciona a un enemigo");
                 textoEnemigoSeleccionado.setPosition((Gdx.graphics.getWidth() - (Gdx.graphics.getWidth() / 2) - ((int) textoEnemigoSeleccionado.getAncho() / 2)), 120);
                 textoEnemigoSeleccionado.dibujar();
@@ -327,24 +344,20 @@ public class PantallaTraicion implements Screen {
                     if (ataqueSeleccionado >= textoAtaques.length) ataqueSeleccionado = textoAtaques.length - 1;
                     Ataque ataqueSel = Config.personajeSeleccionado.getClase().getAtaques().get(ataqueSeleccionado);
                     Render.batch.begin();
-                    // Mostrar vida y Fe del jugador uno al lado del otro
-                    Texto textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+                    // Mostrar vida y Fe del jugador uno al lado del otro (reutilizando textos)
                     textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
                     textoPS.setPosition(500, 120);
                     textoPS.dibujar();
                     // Mostrar Fe a la derecha de la vida
-                    Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
                     textoFe.setPosition((int)(textoPS.getX() + textoPS.getAncho() + 20), 120);
                     textoFe.dibujar();
 
-                    Texto textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
                     textoUsos.setPosition(500, 80);
                     textoUsos.dibujar();
                     // Mostrar costo de Fe del ataque solo si tiene costo
                     if (ataqueSel.getCostoFe() > 0) {
-                        Texto textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
                         textoCostoFe.setTexto("Costo Fe: " + ataqueSel.getCostoFe());
                         textoCostoFe.setPosition(500, 40);
                         textoCostoFe.dibujar();
@@ -424,7 +437,6 @@ public class PantallaTraicion implements Screen {
                 break;
 
             case RESULTADOS_COMBATE:
-                Texto logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
                 logTexto.setTexto(batalla.getLogCombate());
                 logTexto.setPosition(50, 150);
                 Render.batch.begin();
@@ -552,6 +564,15 @@ public class PantallaTraicion implements Screen {
             }
             textoAtaques = null;
         }
+
+        // dispose textos reutilizables
+        if (textoEnemigoSeleccionado != null){ try{ textoEnemigoSeleccionado.dispose(); }catch(Exception e){} textoEnemigoSeleccionado = null; }
+        if (vidaEnemigoTexto != null){ try{ vidaEnemigoTexto.dispose(); }catch(Exception e){} vidaEnemigoTexto = null; }
+        if (textoPS != null){ try{ textoPS.dispose(); }catch(Exception e){} textoPS = null; }
+        if (textoFe != null){ try{ textoFe.dispose(); }catch(Exception e){} textoFe = null; }
+        if (textoUsos != null){ try{ textoUsos.dispose(); }catch(Exception e){} textoUsos = null; }
+        if (textoCostoFe != null){ try{ textoCostoFe.dispose(); }catch(Exception e){} textoCostoFe = null; }
+        if (logTexto != null){ try{ logTexto.dispose(); }catch(Exception e){} logTexto = null; }
 
         // dispose renderer if this screen created it
         // No se debe disponer del renderer global aquí (lo gestiona la aplicación central).

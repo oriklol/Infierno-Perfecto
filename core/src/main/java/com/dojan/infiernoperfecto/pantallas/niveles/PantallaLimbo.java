@@ -33,6 +33,14 @@ public class PantallaLimbo implements Screen {
     private final float DURACION_DANIO = 1.5f;
 
     private Texto lugar; // muestra el nivel y el piso
+    // Reutilizables para evitar crear fuentes en el loop de render
+    private Texto textoEnemigoSeleccionado;
+    private Texto vidaEnemigoTexto;
+    private Texto textoPS;
+    private Texto textoFe;
+    private Texto textoUsos;
+    private Texto textoCostoFe;
+    private Texto logTexto;
     Entradas entradas = new Entradas();
     private Batalla batalla;
     private float tiempo;
@@ -94,7 +102,9 @@ public class PantallaLimbo implements Screen {
 
     private void inicializarRecursos() {
         Gdx.input.setInputProcessor(entradas);
-        Render.renderer = new ShapeRenderer();
+        if (Render.renderer == null) {
+            Render.renderer = new ShapeRenderer();
+        }
 
         // Texturas que se reutilizan
         fondo = new Imagen(Recursos.FONDOLIMBO);

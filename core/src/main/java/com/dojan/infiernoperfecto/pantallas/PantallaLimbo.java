@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.pantallas.niveles;
+package com.dojan.infiernoperfecto.pantallas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +12,9 @@ import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
-import com.dojan.infiernoperfecto.entidades.enemigos.*;
-import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
-import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
+import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
+import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
+import com.dojan.infiernoperfecto.entidades.enemigos.MiniBossLimbo;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControladorJuego;
 import com.dojan.infiernoperfecto.utiles.Random;
@@ -24,7 +24,7 @@ import com.dojan.infiernoperfecto.utiles.Render;
 import io.Entradas;
 
 
-public class PantallaCodicia implements Screen {
+public class PantallaLimbo implements Screen {
     private Imagen fondo;
     private Imagen arena;
     private Imagen danioSpr;
@@ -52,7 +52,10 @@ public class PantallaCodicia implements Screen {
     private final int CANT_ENEMIGOS_MAX = 3;
     private final int cantEnemigos = (Random.generarEntero(CANT_ENEMIGOS_MAX)) + 1;
     private final ArrayList<Imagen> enemigoSpr = new ArrayList<>();
-
+    private static final String[] SPRITES_ENEMIGOS = {
+        Recursos.ENEMIGOLIMBO2,
+        Recursos.ENEMIGOLIMBO1
+    };
     private int enemigoSeleccionado = 0;
 
     // private boolean jugadorMurio = false;
@@ -70,12 +73,10 @@ public class PantallaCodicia implements Screen {
             inicializarRecursos();
             inicializado = true;
         } else {
-            // Si el renderer global fue liberado por otra pantalla, recrearlo aquí.
-            if (Render.renderer == null) {
+                // Si el renderer global fue liberado por otra pantalla, recrearlo aquí.
                 if (Render.renderer == null) {
                     Render.renderer = new ShapeRenderer();
                 }
-            }
             // Asegurar que este screen reciba entradas
             Gdx.input.setInputProcessor(entradas);
         }
@@ -83,7 +84,8 @@ public class PantallaCodicia implements Screen {
         if (batalla == null && Config.personajeSeleccionado != null) {
             reiniciarNivel(1, 1);
         }
-
+        // Crear personaje de prueba
+        // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
 
         /* Cambia el fondo de la arena dependiendo la cantidad de enemigos
         if (cantEnemigos ==1){
@@ -103,7 +105,7 @@ public class PantallaCodicia implements Screen {
         }
 
         // Texturas que se reutilizan
-        fondo = new Imagen(Recursos.FONDOCODICIA);
+        fondo = new Imagen(Recursos.FONDOLIMBO);
         arena = new Imagen(Recursos.FONDOARENA);
         danioSpr = new Imagen(Recursos.EFECTODANIO);
 
@@ -111,14 +113,14 @@ public class PantallaCodicia implements Screen {
         lugar = new Texto(Recursos.FUENTEMENU, 60, Color.BLACK, false);
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
 
-        // Crear textos reutilizables
-        textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
-        vidaEnemigoTexto = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
-        textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-        textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-        textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-        textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
-        logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
+    // Crear textos reutilizables (evitar crear fuentes en render loop)
+    textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
+    vidaEnemigoTexto = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+    textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+    textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+    textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+    textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
+    logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
     }
 
     public void reiniciarNivel(int piso, int nivel) {
@@ -138,8 +140,8 @@ public class PantallaCodicia implements Screen {
         // Verificar si es el nivel del miniboss
         if (nivel == 4) {
             // ========== NIVEL 4 = MINIBOSS ==========
-            Enemigo miniboss = new MiniBossCodicia();
-            Imagen spriteMiniboss = new Imagen(Recursos.MINIBOSSCODICIA);
+            Enemigo miniboss = new MiniBossLimbo();
+            Imagen spriteMiniboss = new Imagen(Recursos.MINIBOSSLIMBO);
 
 
             enemigos.add(miniboss);
@@ -156,11 +158,11 @@ public class PantallaCodicia implements Screen {
 
                 Imagen sprite;
                 if (tipoEnemigo == 1) {
-                    enemigo = new EnemigoCodicia1();
-                    sprite = new Imagen(Recursos.ENEMIGOCODICIA1);
+                    enemigo = new EnemigoLimbo1();
+                    sprite = new Imagen(Recursos.ENEMIGOLIMBO2);
                 } else {
-                    enemigo = new EnemigoCodicia2();
-                    sprite = new Imagen(Recursos.ENEMIGOCODICIA2);
+                    enemigo = new EnemigoLimbo2();
+                    sprite = new Imagen(Recursos.ENEMIGOLIMBO1);
                 }
                 enemigos.add(enemigo);
                 enemigoSpr.add(sprite);
@@ -317,7 +319,7 @@ public class PantallaCodicia implements Screen {
                     List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
                     int feActual = Config.personajeSeleccionado.getFeActual();
 
-                    // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
+                                // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
                     for (int i = 0; i < textoAtaques.length; i++) {
@@ -402,22 +404,22 @@ public class PantallaCodicia implements Screen {
                         }
                         // Solo avanzar si NO estamos esperando input y el usuario acaba de presionar
                         if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                            // Solo ejecutar si el ataque seleccionado es usable
-                            if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
-                                System.out.println("Seleccion invalida de ataque, ignorando");
-                            } else {
-                                Ataque aSel = ataques.get(ataqueSeleccionado);
-                                boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
-                                if (usable) {
-                                    System.out.println("ataque seleccionado: " + ataqueSeleccionado);
-                                    estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
-                                    tiempo = 0;
-                                    esperandoInput = true;
+                                // Solo ejecutar si el ataque seleccionado es usable
+                                if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
+                                    System.out.println("Seleccion invalida de ataque, ignorando");
                                 } else {
-                                    // No hacer nada si no es usable
-                                    System.out.println("Ataque no usable, ignorando entrada");
+                                    Ataque aSel = ataques.get(ataqueSeleccionado);
+                                    boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
+                                    if (usable) {
+                                        System.out.println("ataque seleccionado: " + ataqueSeleccionado);
+                                        estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
+                                        tiempo = 0;
+                                        esperandoInput = true;
+                                    } else {
+                                        // No hacer nada si no es usable
+                                        System.out.println("Ataque no usable, ignorando entrada");
+                                    }
                                 }
-                            }
                         }
                         if (!(entradas.isEnter() || entradas.isClick())) {
                             esperandoInput = false;

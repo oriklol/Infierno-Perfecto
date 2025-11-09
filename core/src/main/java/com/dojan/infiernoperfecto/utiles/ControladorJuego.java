@@ -1,10 +1,14 @@
 package com.dojan.infiernoperfecto.utiles;
 
-import com.dojan.infiernoperfecto.pantallas.PantallaVictoria;
 import com.dojan.infiernoperfecto.pantallas.PantallaGameOver;
-import com.dojan.infiernoperfecto.pantallas.niveles.*;
 import com.dojan.infiernoperfecto.pantallas.PantallaSiguientePiso;
 import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
+import com.dojan.infiernoperfecto.pantallas.PantallaVictoria;
+import com.dojan.infiernoperfecto.pantallas.niveles.PantallaCodicia;
+import com.dojan.infiernoperfecto.pantallas.niveles.PantallaFraude;
+import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLimbo;
+import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLujuria;
+import com.dojan.infiernoperfecto.pantallas.niveles.PantallaTraicion;
 
 public class ControladorJuego {
 
@@ -43,43 +47,44 @@ public class ControladorJuego {
         Config.nivel = nivelActual;
 
         // ← MODIFICAR: Cargar la pantalla según el piso actual
-        if (pisoActual == 1) {
-            // PISO 1: LIMBO
-            if (pantallaLimbo == null) {
-                pantallaLimbo = new PantallaLimbo();
-            }
-            pantallaLimbo.reiniciarNivel(pisoActual, nivelActual);
-            Render.app.setScreen(pantallaLimbo);
-
-        } else if (pisoActual == 2) {
-            // PISO 2: FRAUDE
-            if (pantallaFraude == null) {
-                pantallaFraude = new PantallaFraude();
-            }
-            pantallaFraude.reiniciarNivel(pisoActual, nivelActual);
-            Render.app.setScreen(pantallaFraude);
-        } else if (pisoActual == 3) {
-            // PISO 3: Codicia
-            if (pantallaCodicia == null) {
-                pantallaCodicia = new PantallaCodicia();
-            }
-            pantallaCodicia.reiniciarNivel(pisoActual, nivelActual);
-            Render.app.setScreen(pantallaCodicia);
-        }else if(pisoActual== 4){
-            // PISO 4 LUJURIA
-            if (pantallaLujuria == null) {
-                pantallaLujuria = new PantallaLujuria();
-            }
-            pantallaLujuria.reiniciarNivel(pisoActual, nivelActual);
-            Render.app.setScreen(pantallaLujuria);
-        }
-        else if(pisoActual == 5){
-            // PISO 5: TRAICION
-            if (pantallaTraicion == null) {
-                pantallaTraicion = new PantallaTraicion();
-            }
-            pantallaTraicion.reiniciarNivel(pisoActual, nivelActual);
-            Render.app.setScreen(pantallaTraicion);
+        switch (pisoActual) {
+            case 1:
+                // PISO 1: LIMBO
+                if (pantallaLimbo == null) {
+                    pantallaLimbo = new PantallaLimbo();
+                }   pantallaLimbo.reiniciarNivel(pisoActual, nivelActual);
+                Render.app.setScreen(pantallaLimbo);
+                break;
+            case 2:
+                // PISO 2: FRAUDE
+                if (pantallaFraude == null) {
+                    pantallaFraude = new PantallaFraude();
+                }   pantallaFraude.reiniciarNivel(pisoActual, nivelActual);
+                Render.app.setScreen(pantallaFraude);
+                break;
+            case 3:
+                // PISO 3: Codicia
+                if (pantallaCodicia == null) {
+                    pantallaCodicia = new PantallaCodicia();
+                }   pantallaCodicia.reiniciarNivel(pisoActual, nivelActual);
+                Render.app.setScreen(pantallaCodicia);
+                break;
+            case 4:
+                // PISO 4 LUJURIA
+                if (pantallaLujuria == null) {
+                    pantallaLujuria = new PantallaLujuria();
+                }   pantallaLujuria.reiniciarNivel(pisoActual, nivelActual);
+                Render.app.setScreen(pantallaLujuria);
+                break;
+            case 5:
+                // PISO 5: TRAICION
+                if (pantallaTraicion == null) {
+                    pantallaTraicion = new PantallaTraicion();
+                }   pantallaTraicion.reiniciarNivel(pisoActual, nivelActual);
+                Render.app.setScreen(pantallaTraicion);
+                break;
+            default:
+                break;
         }
 
     }
