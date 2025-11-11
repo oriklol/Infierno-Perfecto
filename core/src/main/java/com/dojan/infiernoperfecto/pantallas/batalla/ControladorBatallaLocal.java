@@ -1,0 +1,31 @@
+public class ControladorBatallaLocal {
+    private ServicioCombate servicioCombate;
+    private Batalla batalla;
+
+    public ControladorBatallaLocal(Batalla batalla) {
+        this.batalla = batalla;
+        this.servicioCombate = new ServicioCombate();
+    }
+
+    /**
+     * Procesa un comando del jugador.
+     * Más adelante, esto enviará el comando al servidor en lugar de ejecutarlo local.
+     */
+    public ResultadoCombate procesarComando(ComandoAtacar comando) {
+        Enemigo objetivo = batalla.getEnemigos().get(comando.getEnemigoIndex());
+        Personaje jugador = batalla.getJugador();
+
+        return servicioCombate.ejecutarAtaque(
+            jugador,
+            objetivo,
+            comando.getAtaqueIndex()
+        );
+    }
+
+    public boolean estaTerminada() {
+        return servicioCombate.verificarFinBatalla(
+            batalla.getJugador(),
+            batalla.getEnemigos()
+        );
+    }
+}
