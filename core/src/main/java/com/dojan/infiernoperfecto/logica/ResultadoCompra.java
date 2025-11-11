@@ -1,3 +1,5 @@
+package com.dojan.infiernoperfecto.logica;
+
 public class ResultadoCompra {
     private boolean exitoso;
     private String mensajeError;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dojan.infiernoperfecto.entidades.Enemigo;
+import com.dojan.infiernoperfecto.entidades.Jugador;
 import com.dojan.infiernoperfecto.entidades.Personaje;
 import com.dojan.infiernoperfecto.entidades.ResultadoAtaque;
 import com.dojan.infiernoperfecto.utiles.Random;
@@ -101,5 +102,17 @@ public class Batalla {
     // ← NUEVO: Método para obtener los enemigos que murieron este turno
     public List<Integer> getEnemigosMuertosEsteTurno() {
         return new ArrayList<>(enemigosMuertosEsteturno);
+    }
+
+    public Personaje getJugador() {
+        return jugador;
+    }
+
+    public List<Enemigo> getEnemigos() {
+        return enemigos;
+    }
+
+    public List<Integer> getEnemigosMuertosEsteturno() {
+        return enemigosMuertosEsteturno;
     }
 }

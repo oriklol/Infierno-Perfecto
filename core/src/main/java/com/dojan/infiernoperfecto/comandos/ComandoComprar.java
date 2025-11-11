@@ -1,3 +1,5 @@
+package com.dojan.infiernoperfecto.comandos;
+
 public class ComandoComprar implements ComandoJugador {
     private int itemIndex;
 

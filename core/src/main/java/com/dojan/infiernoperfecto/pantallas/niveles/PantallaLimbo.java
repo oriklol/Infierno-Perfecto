@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.dojan.infiernoperfecto.ataques.Ataque;
 import com.dojan.infiernoperfecto.batalla.Batalla;
+import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
@@ -16,8 +17,10 @@ import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
 import com.dojan.infiernoperfecto.entidades.enemigos.MiniBossLimbo;
+import com.dojan.infiernoperfecto.logica.ResultadoCombate;
 import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
 import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
+import com.dojan.infiernoperfecto.pantallas.batalla.ControladorBatallaLocal;
 import com.dojan.infiernoperfecto.utiles.*;
 
 import io.Entradas;
@@ -30,7 +33,7 @@ public class PantallaLimbo implements Screen {
     private Imagen danioSpr;
     private boolean mostrarDanio = false;
     private float tiempoDanio = 0f;
-    private final float DURACION_DANIO = 1.5f;
+    private final float DURACION_DANIO = 0.5f;
 
     private Texto lugar; // muestra el nivel y el piso
     // Reutilizables para evitar crear fuentes en el loop de render
@@ -65,6 +68,9 @@ public class PantallaLimbo implements Screen {
     //private List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
     private Texto[] textoAtaques;
     private int ataqueSeleccionado = 0;
+
+    private ControladorBatallaLocal controladorBatalla;
+    private ResultadoCombate ultimoResultado;
 
     @Override
     public void show() {
@@ -114,6 +120,15 @@ public class PantallaLimbo implements Screen {
         // Texto de ubicación (se actualizará en reiniciarNivel)
         lugar = new Texto(Recursos.FUENTEMENU, 60, Color.BLACK, false);
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
+
+        // textos reutilizables
+        textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
+        vidaEnemigoTexto = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+        textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
+        textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
+        logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
     }
 
     public void reiniciarNivel(int piso, int nivel) {
@@ -187,6 +202,8 @@ public class PantallaLimbo implements Screen {
             int y = (i % 2 == 0) ? 120 : 60;
             textoAtaques[i].setPosition(x, y);
         }
+
+        controladorBatalla = new ControladorBatallaLocal(batalla);
     }
 
     public void eliminarEnemigo(int indice) {
@@ -311,13 +328,12 @@ public class PantallaLimbo implements Screen {
                 break;
             case SELECCION_ATAQUE:
                 if (batalla.getTurno() == 0) {
-                    // Obtener lista de ataques y Fe actual
                     List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
                     int feActual = Config.personajeSeleccionado.getFeActual();
 
-                                // Detección de mouse sobre los ataques: solo cambia la selección si el ataque está disponible
+                    // Detección de mouse sobre los ataques
                     int mouseX = Gdx.input.getX();
-                    int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
+                    int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
                     for (int i = 0; i < textoAtaques.length; i++) {
                         Texto textoAtaque = textoAtaques[i];
                         int x = textoAtaque.getX();
@@ -333,7 +349,7 @@ public class PantallaLimbo implements Screen {
                         }
                     }
 
-                    // Colorear según disponibilidad y selección: los no usables en rojo
+                    // Colorear según disponibilidad
                     for (int i = 0; i < textoAtaques.length; i++) {
                         Ataque a = ataques.get(i);
                         boolean usable = a.getCantUsos() > 0 && a.getCostoFe() <= feActual;
@@ -353,22 +369,23 @@ public class PantallaLimbo implements Screen {
                         Render.batch.end();
                     }
 
-                    // Asegurar índices válidos antes de usar ataqueSeleccionado
+                    // Validaciones de índices
                     if (ataqueSeleccionado < 0) ataqueSeleccionado = 0;
                     if (textoAtaques.length == 0) {
-                        // No hay ataques definidos, volver a estado de selección enemigo
                         estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
                         break;
                     }
                     if (ataqueSeleccionado >= textoAtaques.length) ataqueSeleccionado = textoAtaques.length - 1;
+
                     Ataque ataqueSel = Config.personajeSeleccionado.getClase().getAtaques().get(ataqueSeleccionado);
+
+                    // Mostrar info del jugador
                     Render.batch.begin();
-                    // Mostrar vida y Fe del jugador uno al lado del otro
                     Texto textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
                     textoPS.setPosition(500, 120);
                     textoPS.dibujar();
-                    // Mostrar Fe a la derecha de la vida
+
                     Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
                     textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
                     textoFe.setPosition((int)(textoPS.getX() + textoPS.getAncho() + 20), 120);
@@ -378,7 +395,7 @@ public class PantallaLimbo implements Screen {
                     textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
                     textoUsos.setPosition(500, 80);
                     textoUsos.dibujar();
-                    // Mostrar costo de Fe del ataque solo si tiene costo
+
                     if (ataqueSel.getCostoFe() > 0) {
                         Texto textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
                         textoCostoFe.setTexto("Costo Fe: " + ataqueSel.getCostoFe());
@@ -387,6 +404,7 @@ public class PantallaLimbo implements Screen {
                     }
                     Render.batch.end();
 
+                    // Navegación con teclado
                     if (tiempo > 0.15f) {
                         if (entradas.isDerecha()) {
                             ataqueSeleccionado++;
@@ -402,40 +420,41 @@ public class PantallaLimbo implements Screen {
                             }
                             tiempo = 0;
                         }
-                        // Solo avanzar si NO estamos esperando input y el usuario acaba de presionar
+
+                        // ✅ AQUÍ ESTÁ LA CORRECCIÓN
                         if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                                // Solo ejecutar si el ataque seleccionado es usable
-                                if (ataqueSeleccionado < 0 || ataqueSeleccionado >= ataques.size()) {
-                                    System.out.println("Seleccion invalida de ataque, ignorando");
-                                } else {
-                                    Ataque aSel = ataques.get(ataqueSeleccionado);
-                                    boolean usable = aSel.getCantUsos() > 0 && aSel.getCostoFe() <= feActual;
-                                    if (usable) {
-                                        System.out.println("ataque seleccionado: " + ataqueSeleccionado);
-                                        estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
-                                        tiempo = 0;
-                                        esperandoInput = true;
-                                    } else {
-                                        // No hacer nada si no es usable
-                                        System.out.println("Ataque no usable, ignorando entrada");
-                                    }
-                                }
+                            // 1. Crear comando
+                            ComandoAtacar comando = new ComandoAtacar(
+                                enemigoSeleccionado,
+                                ataqueSeleccionado
+                            );
+
+                            // 2. Procesar comando
+                            ultimoResultado = controladorBatalla.procesarComando(comando);
+
+                            // 3. Verificar si fue válido
+                            if (ultimoResultado.isValido()) {
+                                estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
+                                tiempoDanio = 0; // ← RESETEAR el contador de tiempo de animación
+                                esperandoInput = true;
+                            } else {
+                                System.out.println("Error: " + ultimoResultado.getMensajeError());
+                            }
                         }
+
+                        // ✅ ESTO ES LO QUE FALTABA
                         if (!(entradas.isEnter() || entradas.isClick())) {
                             esperandoInput = false;
                         }
                     }
                 }
                 break;
-            case EJECUTAR_BATALLA:
-                // Ejecutar el ataque automáticamente al entrar en este estado
-                System.out.println("Ejecutar batalla");
-                batalla.avanzarTurno(enemigoSeleccionado, ataqueSeleccionado);
 
+            case EJECUTAR_BATALLA:
+                // ✅ ELIMINAR esta línea:
+                // batalla.avanzarTurno(enemigoSeleccionado, ataqueSeleccionado); // ❌ BORRAR
 
                 mostrarDanio = true;
-                tiempoDanio = 0;
-
                 tiempoDanio += delta;
 
                 Imagen sprDanio = enemigoSpr.get(enemigoSeleccionado);
@@ -446,51 +465,47 @@ public class PantallaLimbo implements Screen {
 
                 Render.batch.begin();
                 danioSpr.dibujar();
-                danioSpr.dibujar();
+                Render.batch.end();
 
                 if (tiempoDanio >= DURACION_DANIO) {
                     mostrarDanio = false;
                     estadoActual = EstadoBatalla.RESULTADOS_COMBATE;
+                    tiempo = 0;
                 }
-
-
-                Render.batch.end();
-                estadoActual = EstadoBatalla.RESULTADOS_COMBATE;
-                tiempo = 0;
                 break;
 
             case RESULTADOS_COMBATE:
+                /* antes de red
                 Texto logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
                 logTexto.setTexto(batalla.getLogCombate());
                 logTexto.setPosition(50, 150);
                 Render.batch.begin();
                 logTexto.dibujar();
                 Render.batch.end();
+                */
+                // after red
+                mostrarResultado(ultimoResultado);
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    // Obtener lista de enemigos muertos este turno
-                    List<Integer> enemigosMuertos = batalla.getEnemigosMuertosEsteTurno();
-
-                    // Eliminar enemigos muertos (de atrás hacia adelante para evitar problemas de índices)
-                    for (int i = enemigosMuertos.size() - 1; i >= 0; i--) {
-                        int indice = enemigosMuertos.get(i);
-                        System.out.println("Eliminando enemigo en índice: " + indice);
-                        eliminarEnemigo(indice);
+                    // Eliminar enemigos muertos
+                    if (ultimoResultado.isObjetivoMurio()) {
+                        eliminarEnemigo(enemigoSeleccionado);
                     }
 
-                    // Verificar si la batalla terminó
-                    if (batalla.batallaTerminada()) {
+                    // Verificar fin de batalla
+                    if (controladorBatalla.estaTerminada()) {
                         estadoActual = EstadoBatalla.FIN_BATALLA;
                     } else if (batalla.getTurno() != 0) {
                         // Turno enemigo
+                        // AQUÍ TENDRÍAS QUE ADAPTAR LA LÓGICA DEL ENEMIGO TAMBIÉN
                         batalla.avanzarTurno(0, 0);
                     } else {
-                        // Volver a selección de enemigo
                         estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
                     }
 
                     esperandoInput = true;
                 }
+
                 if (!(entradas.isEnter() || entradas.isClick())) {
                     esperandoInput = false;
                 }
@@ -525,6 +540,22 @@ public class PantallaLimbo implements Screen {
         if (entradas.isEsc()){
             Render.app.setScreen(new PantallaOpciones());
         }
+
+
+    }
+
+    private void mostrarResultado(ResultadoCombate resultado) {
+        String log = "Hiciste " + resultado.getDanio() + " de daño";
+        if (resultado.getEfectoMensaje() != null) {
+            log += "\n" + resultado.getEfectoMensaje();
+        }
+
+        logTexto.setTexto(log);
+        logTexto.setPosition(50, 150);
+
+        Render.batch.begin();
+        logTexto.dibujar();
+        Render.batch.end();
     }
 
     @Override

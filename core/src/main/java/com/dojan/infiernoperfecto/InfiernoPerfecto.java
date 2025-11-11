@@ -18,7 +18,7 @@ public class InfiernoPerfecto extends Game {
     public void create() {
         Render.app = this;
         Render.batch = new SpriteBatch();
-        this.setScreen(new PantallaCreditos()); // PantallaMenu debe ser reemplazado por PantallaCreditos para inprivate Texto lugar; iciar el juego
+        this.setScreen(new PantallaClases()); // PantallaMenu debe ser reemplazado por PantallaCreditos para inprivate Texto lugar; iciar el juego
     }
 
     @Override

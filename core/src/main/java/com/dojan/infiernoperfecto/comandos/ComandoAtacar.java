@@ -1,3 +1,4 @@
+package com.dojan.infiernoperfecto.comandos;
 
 public class ComandoAtacar implements ComandoJugador {
     private int enemigoIndex;
@@ -13,5 +14,11 @@ public class ComandoAtacar implements ComandoJugador {
         return "ATACAR";
     }
 
-    // getters...
+    public int getAtaqueIndex() {
+        return ataqueIndex;
+    }
+
+    public int getEnemigoIndex() {
+        return enemigoIndex;
+    }
 }

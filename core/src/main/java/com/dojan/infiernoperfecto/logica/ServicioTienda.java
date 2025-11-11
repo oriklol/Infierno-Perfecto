@@ -1,3 +1,8 @@
+package com.dojan.infiernoperfecto.logica;
+
+import com.dojan.infiernoperfecto.entidades.Personaje;
+import com.dojan.infiernoperfecto.items.ItemCura;
+
 public class ServicioTienda {
 
     public ResultadoCompra procesarCompra(Personaje jugador, ItemCura item) {

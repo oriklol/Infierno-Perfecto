@@ -1,3 +1,5 @@
+package com.dojan.infiernoperfecto.logica;
+
 public class ResultadoCombate {
     private boolean valido;
     private String mensajeError;
@@ -8,13 +10,6 @@ public class ResultadoCombate {
     private float vidaObjetivoRestante;
     private int feAtacanteRestante;
 
-    public static ResultadoCombate invalido(String mensaje) {
-        ResultadoCombate r = new ResultadoCombate();
-        r.valido = false;
-        r.mensajeError = mensaje;
-        return r;
-    }
-
     public ResultadoCombate(float danio, String efectoMensaje, boolean objetivoMurio,
                             float vidaObjetivoRestante, int feAtacanteRestante) {
         this.valido = true;
@@ -24,6 +19,19 @@ public class ResultadoCombate {
         this.vidaObjetivoRestante = vidaObjetivoRestante;
         this.feAtacanteRestante = feAtacanteRestante;
     }
+
+    public ResultadoCombate() {
+
+    }
+
+    public static ResultadoCombate invalido(String mensaje) {
+        ResultadoCombate r = new ResultadoCombate();
+        r.valido = false;
+        r.mensajeError = mensaje;
+        return r;
+    }
+
+
 
     public float getDanio(){
         return danio;
@@ -43,5 +51,13 @@ public class ResultadoCombate {
 
     public String getMensajeError() {
         return mensajeError;
+    }
+
+    public boolean isValido() {
+        return valido;
+    }
+
+    public boolean isObjetivoMurio() {
+        return objetivoMurio;
     }
 }
