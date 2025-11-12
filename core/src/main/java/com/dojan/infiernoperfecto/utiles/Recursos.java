@@ -33,6 +33,11 @@ public class Recursos {
     public static final String FONDOESPERA3 = "imagenes/fondos/espera/pantallaespera2.png";
     public static final String FONDOESPERA4 = "imagenes/fondos/espera/pantallaespera3.png";
 
+    // imagenes tutorial
+    public static final String IMAGENTUTORIAL1 = "imagenes/fondos/tutorial/imgTutorial1.png";
+    public static final String IMAGENTUTORIAL2 = "imagenes/fondos/tutorial/imgTutorial2.png";
+    public static final String IMAGENTUTORIAL3 = "imagenes/fondos/tutorial/imgTutorial3.png";
+
 
 
 

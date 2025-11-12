@@ -68,13 +68,13 @@ public class PantallaMenu implements Screen {
 
         Gdx.input.setInputProcessor(entradas);
 
-        int avanceY = 40;
+        int avanceY = 30;
         int avanceX = 200;
 
         for(int i = 0; i<opciones.length;i++){
             opciones[i] = new Texto(Recursos.FUENTEMENU,90,Color.WHITE,true);
             opciones[i].setTexto(textos[i]);
-            opciones[i].setPosition((int) ((Config.ANCHO/2)-(opciones[i].getAncho()/2))+avanceX, (int) (((Config.ALTO/1.4f)+(opciones[0].getAlto()/2))-(opciones[i].getAlto()+avanceY)*i));
+            opciones[i].setPosition((int) ((Config.ANCHO/2)-(opciones[i].getAncho()/2))+avanceX, (int) (((Config.ALTO/1.4f)+(opciones[0].getAlto()/1.2))-(opciones[i].getAlto()+avanceY)*i));
         }
 
         // Textos para la pantalla de espera

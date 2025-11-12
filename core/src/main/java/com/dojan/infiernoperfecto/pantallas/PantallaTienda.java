@@ -60,7 +60,7 @@ public class PantallaTienda implements Screen {
 
             float anchoTexto = infoPersonaje[i].getAncho();
             int centroX = Config.ANCHO / 3;
-            int x = (int)(centroX - anchoTexto);
+            int x = (int)((centroX/2) - anchoTexto);
             int y = (int)(Config.ALTO * 0.8f) - (i * 120);
             infoPersonaje[i].setPosition(x, y);
         }
