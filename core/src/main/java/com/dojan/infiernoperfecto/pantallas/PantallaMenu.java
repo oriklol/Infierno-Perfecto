@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
+import com.dojan.infiernoperfecto.red.HiloCliente;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControlAudio;
 import com.dojan.infiernoperfecto.utiles.Recursos;
@@ -18,17 +19,30 @@ import io.Entradas;
 public class PantallaMenu implements Screen {
     private Musica musicaFondo;
     private Imagen menu;
-    final private Texto opciones[] = new Texto[4];
+    private final Imagen[] pantallasEspera = new Imagen[4];
+    final private Texto opciones[] = new Texto[5];
     String textos[] = {
         "Nueva Partida",
+        "Multijugador",
         "Opciones",
-        "Turorial",
+        "Tutorial",
         "Salir"
     };
     private int opc = 1;
     private boolean mouseClick = false;
     private float tiempo;
     private FitViewport fitViewport;
+
+    // Variables para manejar las pantallas de espera
+    private float tiempoEspera = 0f;
+    private boolean mostrandoEspera = false;
+    private int indiceEspera = 0;
+    private float duracionPorPantalla = 1.5f; // segundos por pantalla
+    private float tiempoMaximoEspera = 30f; // segundos antes de volver al menú
+    private Texto textoEspera;
+    private Texto textoCancelar;
+
+    HiloCliente cliente;
 
     public PantallaMenu(){
     }
@@ -44,6 +58,14 @@ public class PantallaMenu implements Screen {
         menu = new Imagen(Recursos.FONDOMENU);
         menu.setSize(Config.ANCHO, Config.ALTO);
 
+        pantallasEspera[0] = new Imagen(Recursos.FONDOESPERA1);
+        pantallasEspera[1] = new Imagen(Recursos.FONDOESPERA2);
+        pantallasEspera[2] = new Imagen(Recursos.FONDOESPERA3);
+        pantallasEspera[3] = new Imagen(Recursos.FONDOESPERA4);
+        for (int i = 0; i < pantallasEspera.length; i++){
+            pantallasEspera[i].setSize(Config.ANCHO, Config.ALTO);
+        }
+
         Gdx.input.setInputProcessor(entradas);
 
         int avanceY = 40;
@@ -55,6 +77,14 @@ public class PantallaMenu implements Screen {
             opciones[i].setPosition((int) ((Config.ANCHO/2)-(opciones[i].getAncho()/2))+avanceX, (int) (((Config.ALTO/1.4f)+(opciones[0].getAlto()/2))-(opciones[i].getAlto()+avanceY)*i));
         }
 
+        // Textos para la pantalla de espera
+        textoEspera = new Texto(Recursos.FUENTEMENU, 40, Color.WHITE, true);
+        textoEspera.setTexto("Esperando jugadores...");
+        textoEspera.setPosition((int)(Config.ANCHO/2 - textoEspera.getAncho()/2), 100);
+
+        textoCancelar = new Texto(Recursos.FUENTEMENU, 30, Color.LIGHT_GRAY, true);
+        textoCancelar.setTexto("Presiona ESC para cancelar");
+        textoCancelar.setPosition((int)(Config.ANCHO/2 - textoCancelar.getAncho()/2), 50);
     }
 
     @Override
@@ -62,27 +92,31 @@ public class PantallaMenu implements Screen {
         fitViewport.apply();
         ControlAudio.reproducirMusica();
 
+        // Si estamos mostrando pantallas de espera
+        if (mostrandoEspera) {
+            renderPantallasEspera(delta);
+            return; // No renderizar el menú
+        }
 
+        // Renderizado normal del menú
         batch.begin();
-            menu.dibujar();
-            for(int i = 0; i<opciones.length;i++){
-                opciones[i].dibujar();
-            }
+        menu.dibujar();
+        for(int i = 0; i<opciones.length;i++){
+            opciones[i].dibujar();
+        }
         batch.end();
-
-
 
         tiempo+= delta;
 
+        // Navegación con teclado
         if(entradas.isAbajo()){
             if(tiempo>0.15f){
                 tiempo=0;
                 opc++;
-                if(opc>3){
+                if(opc>4){
                     opc=1;
                 }
             }
-
         }
 
         if(entradas.isArriba()){
@@ -90,12 +124,12 @@ public class PantallaMenu implements Screen {
                 tiempo=0;
                 opc--;
                 if(opc<1){
-                    opc=3;
+                    opc=4;
                 }
             }
-
         }
-//CUESTION MOUSE
+
+        // Detección de mouse
         int cont = 0;
         for(int i = 0; i<opciones.length;i++){
             if ((entradas.getMouseX()>=opciones[i].getX())&&(entradas.getMouseX()<=(opciones[i].getX()+opciones[i].getAncho()))){
@@ -103,16 +137,11 @@ public class PantallaMenu implements Screen {
                     opc=i+1;
                     cont++;
                 }
-
             }
         }
-        if(cont >0){
-            mouseClick = true;
-        }else{
-            mouseClick = false;
-        }
+        mouseClick = cont > 0;
 
-
+        // Colorear opción seleccionada
         for(int i=0; i<opciones.length;i++){
             if(i==(opc-1)){
                 opciones[i].setColor(Color.GOLDENROD);
@@ -121,20 +150,95 @@ public class PantallaMenu implements Screen {
             }
         }
 
+        // Manejo de selección
         if(entradas.isEnter() || entradas.isClick()){
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
-                ControlAudio.pararMusica();
                 app.setScreen(new PantallaHistoria());
+                ControlAudio.pararMusica();
             }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
-                app.setScreen(new PantallaOpciones());
+                // Iniciar pantallas de espera
+                mostrandoEspera = true;
+                tiempoEspera = 0f;
+                indiceEspera = 0;
+
+                if (cliente == null) {
+                    cliente = new HiloCliente();  // ← ESTO ES LO QUE HACE LA CONEXIÓN
+                    cliente.start();
+                }
+
             }else if(((opc==3)&&(entradas.isEnter())) || ((opc==3)&&(entradas.isClick())&&(mouseClick))){
+                app.setScreen(new PantallaOpciones());
+            }else if(((opc==4)&&(entradas.isEnter())) || ((opc==4)&&(entradas.isClick())&&(mouseClick))){
+                app.setScreen(new PantallaTutorial());
+                ControlAudio.pararMusica();
+            }
+            else if(((opc==5)&&(entradas.isEnter())) || ((opc==5)&&(entradas.isClick())&&(mouseClick))){
                 Gdx.app.exit();
             }
         }
+    }
 
+    private void renderPantallasEspera(float delta) {
+        tiempoEspera += delta;
 
+        // Cambiar de pantalla cada duracionPorPantalla segundos
+        indiceEspera = (int)(tiempoEspera / duracionPorPantalla) % pantallasEspera.length;
 
+        batch.begin();
+        pantallasEspera[indiceEspera].dibujar();
 
+        // Mostrar texto de espera
+        textoEspera.dibujar();
+        textoCancelar.dibujar();
+
+        // Mostrar tiempo restante
+        int tiempoRestante = (int)(tiempoMaximoEspera - tiempoEspera);
+        if (tiempoRestante > 0) {
+            String tiempoTexto = "Tiempo restante: " + tiempoRestante + "s";
+            textoEspera.setTexto("Esperando jugadores... (" + tiempoRestante + "s)");
+            textoEspera.setPosition((int)(Config.ANCHO/2 - textoEspera.getAncho()/2), 100);
+        }
+        batch.end();
+
+        // Permitir cancelar con ESC
+        if (entradas.isEsc()) {
+            cancelarEspera();
+            return;
+        }
+
+        // Verificar si hay dos jugadores conectados
+        if (Config.empiezaPartida || verificarDosJugadoresConectados()) {
+            ControlAudio.pararMusica();
+            app.setScreen(new PantallaHistoria());
+            return;
+        }
+
+        // Timeout: volver al menú si se acaba el tiempo
+        if (tiempoEspera >= tiempoMaximoEspera) {
+            cancelarEspera();
+            // Opcional: mostrar un mensaje de error
+            System.out.println("Tiempo de espera agotado. No se encontraron jugadores.");
+        }
+    }
+
+    private void cancelarEspera() {
+        mostrandoEspera = false;
+        tiempoEspera = 0f;
+        indiceEspera = 0;
+
+        // Desconectar del servidor si ya estaba conectado
+        // tuCliente.disconnect();
+
+        // Resetear Config si es necesario
+        Config.empiezaPartida = false;
+    }
+
+    // Método que deberías implementar para verificar la conexión
+    private boolean verificarDosJugadoresConectados() {
+        // Aquí verificas el estado de tu conexión de red
+        // Por ejemplo:
+        // return tuClienteRed != null && tuClienteRed.getNumeroJugadores() >= 2;
+        return false; // Por ahora retorna false
     }
 
     @Override
@@ -144,22 +248,18 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
-        // dispose resources created in show()
         if (musicaFondo != null) {
             try{ musicaFondo.dispose(); }catch(Exception e){}
             musicaFondo = null;
@@ -170,6 +270,14 @@ public class PantallaMenu implements Screen {
             menu = null;
         }
 
+        if (pantallasEspera != null) {
+            for(int i=0; i<pantallasEspera.length; i++){
+                if (pantallasEspera[i] != null){
+                    try{ pantallasEspera[i].dispose(); }catch(Exception e){}
+                }
+            }
+        }
+
         if (opciones != null) {
             for(int i=0;i<opciones.length;i++){
                 if (opciones[i] != null){
@@ -178,13 +286,19 @@ public class PantallaMenu implements Screen {
                 }
             }
         }
+
+        if (textoEspera != null) {
+            try{ textoEspera.dispose(); }catch(Exception e){}
+            textoEspera = null;
+        }
+
+        if (textoCancelar != null) {
+            try{ textoCancelar.dispose(); }catch(Exception e){}
+            textoCancelar = null;
+        }
     }
 
     public void setTiempo(float tiempo) {
         this.tiempo = tiempo;
     }
-//
-//    public Musica getMusicaFondo() {
-//        return musicaFondo;
-//    }
 }

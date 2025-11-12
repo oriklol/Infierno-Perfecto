@@ -15,6 +15,8 @@ public class Config {
     public static int ANCHO = 800;
     public static int ALTO = 600;
 
+    public static boolean empiezaPartida = false;
+
     public void aumentarNivel() {
         if (nivel<4){
             nivel++;

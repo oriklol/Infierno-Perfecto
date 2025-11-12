@@ -27,6 +27,12 @@ public class Recursos {
     public static final String FONDOPERDER = "imagenes/fondos/GAMEOVER.png";
     public static final String FONDOGANAR = "imagenes/fondos/victoria.png";
 
+    // pantalla espera
+    public static final String FONDOESPERA1 = "imagenes/fondos/espera/pantallaespera.png";
+    public static final String FONDOESPERA2 = "imagenes/fondos/espera/pantallaespera1.png";
+    public static final String FONDOESPERA3 = "imagenes/fondos/espera/pantallaespera2.png";
+    public static final String FONDOESPERA4 = "imagenes/fondos/espera/pantallaespera3.png";
+
 
 
 
