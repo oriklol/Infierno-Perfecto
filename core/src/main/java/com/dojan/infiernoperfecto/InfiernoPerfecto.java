@@ -3,22 +3,33 @@ package com.dojan.infiernoperfecto;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.dojan.infiernoperfecto.pantallas.PantallaClases;
 import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
-import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
-import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
+import com.dojan.infiernoperfecto.serverred.HiloServidor;
 import com.dojan.infiernoperfecto.utiles.Render;
 
 
 /** {@link ApplicationListener} implementation shared by all platforms. */
 public class InfiernoPerfecto extends Game {
-
+    private HiloServidor hiloServidor;
 
     @Override
     public void create() {
         Render.app = this;
         Render.batch = new SpriteBatch();
-        this.setScreen(new PantallaClases()); // PantallaMenu debe ser reemplazado por PantallaCreditos para inprivate Texto lugar; iciar el juego
+        
+        // Iniciar el servidor de red en un hilo separado
+        System.out.println("=================================");
+        System.out.println("   SERVIDOR - INFIERNO PERFECTO  ");
+        System.out.println("=================================");
+        System.out.println("Iniciando servidor en puerto 6666...");
+        
+        hiloServidor = new HiloServidor();
+        hiloServidor.start();
+        
+        System.out.println("✓ Servidor iniciado correctamente.");
+        System.out.println("✓ Esperando conexiones de clientes...");
+        
+        this.setScreen(new PantallaCreditos()); // PantallaMenu debe ser reemplazado por PantallaCreditos si se desea iniciar en la pantalla de créditos
     }
 
     @Override
@@ -36,6 +47,11 @@ public class InfiernoPerfecto extends Game {
 
     @Override
     public void dispose() {
+        // Detener servidor de red
+        if (hiloServidor != null) {
+            hiloServidor.detener();
+        }
+        
         // dispose global rendering resources
         try{
             if (Render.batch != null) {
