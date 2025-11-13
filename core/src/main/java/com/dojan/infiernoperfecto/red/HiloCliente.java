@@ -1,8 +1,14 @@
 package com.dojan.infiernoperfecto.red;
 
-import com.dojan.infiernoperfecto.utiles.Config;
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
+import com.dojan.infiernoperfecto.utiles.Config;
 
 public class HiloCliente extends Thread {
 
@@ -17,12 +23,13 @@ public class HiloCliente extends Thread {
 
     public HiloCliente() {
         try {
-            // IP broadcast correcta
+            // Usar broadcast para descubrir el servidor
             ipServer = InetAddress.getByName("255.255.255.255");
             conexion = new DatagramSocket();
             conexion.setBroadcast(true);
             // Timeout para no bloquear indefinidamente
             conexion.setSoTimeout(1000); // 1 segundo
+            System.out.println("Cliente: Iniciando búsqueda de servidor por broadcast...");
         } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
         }
