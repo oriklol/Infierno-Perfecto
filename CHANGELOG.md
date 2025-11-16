@@ -1,6 +1,14 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+## [0.8.2] - 2025-11-16
+## Cliente
+### Added
+- Enciclopedia añadida
+- Enums complejos añadidos para manejar la enciclopedia
+- Se añadio una pantalla para confirmar si el usuario desea abandonar la partida
+- Se utiliza un Runnable para manejarla
+
 ## [0.8.1] - 2025-11-16
 ## Cliente
 ### Added
