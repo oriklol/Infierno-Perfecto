@@ -19,6 +19,9 @@ El juego es un RPG por turnos ambientado en el infierno que cuenta Dante Alghier
 * IDE: IntelliJ IDEA
 * Plataformas objetivo: PC (Escritorio - Windows)
 
+## Branches
+El repositorio cuenta con tres branches (ramas) separadas de codigo. La rama "main" fue la ultima actualizacion que se hizo antes de empezar a programar la parte de red. La que se refiere a "Cliente" es la que va a usar el usuario comun que este jugando al juego, es donde se sube el codigo que va a tener el jugador en su computadora. Por ultimo la rama servidor sirve para que el Cliente pueda jugar el juego en multijugador
+
 ## Instrucciones Básicas de Compilación y Ejecución
 A continuación se detallan los pasos necesarios para clonar este repositorio y ejecutar correctamente el proyecto desarrollado con Java y el framework LibGDX.
 
