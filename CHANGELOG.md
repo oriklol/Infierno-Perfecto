@@ -1,6 +1,12 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+## [0.8.1] - 2025-11-16
+## Cliente
+### Added
+- Menu de opciones ahora integrado dentro de la batalla.
+- Se agrego un gestor de pantallas en el que se pueden almacenar las pantallas usadas anteriormente
+
 ## [0.8.0] - 2025-11-12
 ## Server
 ### Added
