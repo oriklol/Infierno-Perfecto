@@ -7,6 +7,7 @@ import com.dojan.infiernoperfecto.pantallas.PantallaClases;
 import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
 import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
 import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
+import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.utiles.Render;
 
 
