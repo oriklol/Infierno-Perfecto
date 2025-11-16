@@ -13,6 +13,7 @@ import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
+import com.dojan.infiernoperfecto.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
@@ -261,6 +262,18 @@ public class PantallaLimbo implements Screen {
             vidaEnemigo.dibujar();
         }
         Render.batch.end();
+
+        // otras pantallas
+
+
+        if (entradas.isEnciclopedia()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
+        }
+
+
+        if (entradas.isEsc()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaOpciones());
+        }
 
         tiempo += delta;
 

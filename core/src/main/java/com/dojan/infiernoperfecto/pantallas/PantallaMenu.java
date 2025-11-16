@@ -10,6 +10,7 @@ import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.red.HiloCliente;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControlAudio;
+import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import static com.dojan.infiernoperfecto.utiles.Render.app;
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
@@ -85,6 +86,8 @@ public class PantallaMenu implements Screen {
         textoCancelar = new Texto(Recursos.FUENTEMENU, 30, Color.LIGHT_GRAY, true);
         textoCancelar.setTexto("Presiona ESC para cancelar");
         textoCancelar.setPosition((int)(Config.ANCHO/2 - textoCancelar.getAncho()/2), 50);
+
+        GestorPantallas.getInstance().limpiarHistorial();
     }
 
     @Override

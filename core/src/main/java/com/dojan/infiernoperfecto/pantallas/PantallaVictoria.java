@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
-import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControlAudio;
-import com.dojan.infiernoperfecto.utiles.Recursos;
-import com.dojan.infiernoperfecto.utiles.Render;
+import com.dojan.infiernoperfecto.utiles.*;
 import io.Entradas;
 
 import static com.dojan.infiernoperfecto.utiles.Render.app;
@@ -45,6 +42,8 @@ public class PantallaVictoria implements Screen {
             int y = (int)(Config.ALTO * 0.8f) - (i * 120);
             opciones[i].setPosition(x, y);
         }
+
+        GestorPantallas.getInstance().limpiarHistorial();
 
     }
 

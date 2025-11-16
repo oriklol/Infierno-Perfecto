@@ -14,6 +14,7 @@ public class Entradas implements InputProcessor {
     private boolean click = false;
 //    private boolean cambioHecho = false;
     private boolean enterPresionado = false;
+    private boolean enciclopedia;
 
     public Entradas(){
 
@@ -35,7 +36,9 @@ public class Entradas implements InputProcessor {
         return click;
     }
 
-
+    public boolean isEnciclopedia() {
+        return enciclopedia;
+    }
 
     public boolean isDerecha() {
         return derecha;
@@ -93,6 +96,10 @@ public class Entradas implements InputProcessor {
             this.esc = true;
         }
 
+        if (keycode==Keys.C){
+            this.enciclopedia = true;
+        }
+
         return false;
     }
 
@@ -120,6 +127,10 @@ public class Entradas implements InputProcessor {
 
         if(keycode==Keys.ESCAPE){
             this.esc = false;
+        }
+
+        if (keycode==Keys.C){
+            this.enciclopedia = false;
         }
 
         return false;

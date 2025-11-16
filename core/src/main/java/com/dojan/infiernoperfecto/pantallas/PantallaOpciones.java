@@ -7,10 +7,8 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
-import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControlAudio;
-import com.dojan.infiernoperfecto.utiles.Recursos;
-import com.dojan.infiernoperfecto.utiles.Render;
+import com.dojan.infiernoperfecto.utiles.*;
+
 import static com.dojan.infiernoperfecto.utiles.Render.app;
 
 import io.Entradas;
@@ -118,6 +116,11 @@ public class PantallaOpciones implements Screen {
             }
         }
 
+        if (entradas.isEsc()) {
+            GestorPantallas.getInstance().volverAtras();
+            tiempo = 0;
+        }
+
 
         // CUESTION MOUSE
         int cont = 0;
@@ -161,11 +164,18 @@ public class PantallaOpciones implements Screen {
                     tiempoCooldown = 0;
                 }
             } else if (((opc == 4) && (entradas.isEnter())) || ((opc == 4) && (entradas.isClick()) && (mouseClick))) {
-                app.setScreen(new PantallaMenu());
+                if (GestorPantallas.getInstance().hayHistorial()){
+                    GestorPantallas.getInstance().volverAtras();
+                }else{
+                    app.setScreen(new PantallaMenu());
+                }
+
             }
 
         }
     }
+
+
 
 
 

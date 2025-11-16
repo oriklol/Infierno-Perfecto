@@ -12,6 +12,7 @@ import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
+import com.dojan.infiernoperfecto.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.*;
 import com.dojan.infiernoperfecto.logica.ResultadoCombate;
@@ -23,6 +24,7 @@ import com.dojan.infiernoperfecto.utiles.ControladorJuego;
 import com.dojan.infiernoperfecto.utiles.Random;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
+import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 
 import io.Entradas;
 
@@ -255,6 +257,21 @@ public class PantallaCodicia implements Screen {
             vidaEnemigoTexto.dibujar();
         }
         Render.batch.end();
+
+        // otras pantallas
+
+
+        if (entradas.isEnciclopedia()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
+        }
+
+
+        if (entradas.isEsc()){
+            Render.app.setScreen(new PantallaOpciones());
+        }
+
+
+        // batalla
 
         tiempo += delta;
 
@@ -531,9 +548,7 @@ public class PantallaCodicia implements Screen {
         /*
         Deberia ser una clase "PantallaOpcionesInGame" y que el volver te deje al punto de la partida donde estabas
          */
-        if (entradas.isEsc()){
-            Render.app.setScreen(new PantallaOpciones());
-        }
+
     }
 
     private void mostrarResultado(ResultadoCombate resultado) {
@@ -602,11 +617,14 @@ public class PantallaCodicia implements Screen {
             enemigoSpr.clear(); // ← agregar clear
         }
 
-        if (textoAtaques != null){
-            for (int i=0;i<textoAtaques.length;i++){
-                if (textoAtaques[i] != null){
-                    try{ textoAtaques[i].dispose(); }catch(Exception e){}
-                    textoAtaques[i]=null;
+        if (textoAtaques != null) {
+            for (int i = 0; i < textoAtaques.length; i++) {
+                if (textoAtaques[i] != null) {
+                    try {
+                        textoAtaques[i].dispose();
+                    } catch (Exception e) {
+                    }
+                    textoAtaques[i] = null;
                 }
             }
             textoAtaques = null;
