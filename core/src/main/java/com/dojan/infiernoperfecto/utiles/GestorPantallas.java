@@ -50,7 +50,7 @@ public class GestorPantallas {
 
             // Volver a activarla
             Render.app.setScreen(pantallaAnterior);
-            pantallaAnterior.show(); // Reactivar
+            //pantallaAnterior.show(); // Reactivar
         }
     }
 

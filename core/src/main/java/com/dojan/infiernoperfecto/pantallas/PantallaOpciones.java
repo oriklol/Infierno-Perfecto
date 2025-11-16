@@ -3,6 +3,7 @@ package com.dojan.infiernoperfecto.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dojan.infiernoperfecto.elementos.Imagen;
@@ -61,9 +62,16 @@ public class PantallaOpciones implements Screen {
 
     @Override
     public void show() {
-        System.out.println("PantallaOpciones.show() - enBatalla: " + enBatalla);
+        System.out.println("============================================");
+        System.out.println("PantallaOpciones.show() EJECUTÁNDOSE");
+        System.out.println("enBatalla: " + enBatalla);
+        System.out.println("saliendo ANTES de resetear: " + saliendo);
+        System.out.println("============================================");
 
         fitViewport = new FitViewport(800, 600);
+        if (fondo != null) {
+            try { fondo.dispose(); } catch(Exception e) {}
+        }
         fondo = new Imagen(Recursos.FONDOOPCIONES);
         fondo.setSize(Config.ANCHO, Config.ALTO);
 
@@ -76,10 +84,21 @@ public class PantallaOpciones implements Screen {
         int avanceTitulo = 20;
         int avanceX = -150;
 
+        if (titulo != null) {
+            try { titulo.dispose(); } catch(Exception e) {}
+        }
         titulo = new Texto(Recursos.FUENTEMENU, 80, Color.WHITE, true);
         titulo.setTexto("OPCIONES");
         titulo.setPosition((int) ((Config.ANCHO - layout.width) / 3.1f),
             (int) (((Config.ALTO + layout.height) / 1.1f) + avanceTitulo));
+
+        if (opciones != null) {
+            for (int i = 0; i < opciones.length; i++) {
+                if (opciones[i] != null) {
+                    try { opciones[i].dispose(); } catch(Exception e) {}
+                }
+            }
+        }
 
         // ✅ Crear array del tamaño correcto
         opciones = new Texto[cantidadOpciones];
@@ -103,16 +122,28 @@ public class PantallaOpciones implements Screen {
         saliendo = false;
 
         System.out.println("Opciones inicializadas: " + opciones.length);
+        System.out.println("saliendo DESPUÉS de resetear: " + saliendo);
+        System.out.println("fondo != null: " + (fondo != null));
+        System.out.println("titulo != null: " + (titulo != null));
+        System.out.println("============================================");
     }
 
     @Override
     public void render(float delta) {
+        System.out.println("PantallaOpciones.render() - saliendo: " + saliendo); // ← Agregar esto
+
         if (saliendo) {
+            System.out.println("RENDER BLOQUEADO porque saliendo=true");
             return;
         }
 
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         int avanceX = 0;
         fitViewport.apply();
+
+        System.out.println("Dibujando fondo...");
         Render.batch.begin();
         fondo.dibujar();
         titulo.dibujar();
@@ -124,6 +155,7 @@ public class PantallaOpciones implements Screen {
             opciones[i].dibujar();
         }
         Render.batch.end();
+        System.out.println("Fondo dibujado OK"); // ← Agregar esto
 
         tiempo += delta;
 
@@ -215,14 +247,22 @@ public class PantallaOpciones implements Screen {
             else if (enBatalla && !esperandoInputVolver &&
                 ((opc == 5 && entradas.isEnter()) ||
                     (opc == 5 && entradas.isClick() && mouseClick))) {
-                System.out.println("Salir al Menu seleccionado");
-                ControlAudio.pararMusica();
+                System.out.println("Salir al Menu - Mostrando confirmación");
                 saliendo = true;
                 esperandoInputVolver = true;
 
-                // Limpiar historial y volver al menú
-                GestorPantallas.getInstance().limpiarHistorial();
-                app.setScreen(new PantallaMenu());
+                // ✅ Crear pantalla de confirmación con la acción
+                PantallaConfirmacion confirmacion = new PantallaConfirmacion(
+                    "¿SALIR AL MENU?",
+                    "Perderas el progreso de la batalla",
+                    () -> {
+                        // Esta acción se ejecuta si presiona "SÍ"
+                        GestorPantallas.getInstance().limpiarHistorial();
+                        app.setScreen(new PantallaMenu());
+                    }
+                );
+
+                GestorPantallas.getInstance().irAPantalla(confirmacion);
                 return;
             }
         }
