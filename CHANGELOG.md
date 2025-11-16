@@ -2,12 +2,12 @@
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
 ## [0.8.0] - 2025-11-12
-### Server
+## Server
 ### Added
 - Logica para el correcto funcionamiento del servidor
 - Servidor montado dentro del codigo del juego. Es ejecutable sin necesidad de iniciar el juego mismo
   
-### Cliente
+## Cliente
 ### Added
 - Logica para que el cliente funcione
 - Tutorial añadido en el menu principal, cubre las funciones basicas del juego
