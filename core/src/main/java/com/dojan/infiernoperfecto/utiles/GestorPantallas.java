@@ -20,6 +20,7 @@ public class GestorPantallas {
 
     /**
      * Cambia a una nueva pantalla y guarda la actual en el historial
+     * @param nuevaPantalla La pantalla a la que cambiar
      */
     public void irAPantalla(Screen nuevaPantalla) {
         Screen pantallaActual = Render.app.getScreen();
@@ -27,7 +28,7 @@ public class GestorPantallas {
         // Solo guardar si hay una pantalla actual y no es null
         if (pantallaActual != null) {
             historialPantallas.push(pantallaActual);
-            // NO hacer hide() ni dispose() porque volveremos a ella
+            pantallaActual.hide(); // Pausar pero NO eliminar
         }
 
         Render.app.setScreen(nuevaPantalla);
@@ -38,15 +39,18 @@ public class GestorPantallas {
      */
     public void volverAtras() {
         if (!historialPantallas.isEmpty()) {
-            Screen pantallaAnterior = historialPantallas.pop();
-
-            // Dispose de la pantalla actual (la enciclopedia)
+            // Dispose de la pantalla actual (opciones/enciclopedia)
             Screen pantallaActual = Render.app.getScreen();
             if (pantallaActual != null) {
                 pantallaActual.dispose();
             }
 
+            // Recuperar la pantalla anterior
+            Screen pantallaAnterior = historialPantallas.pop();
+
+            // Volver a activarla
             Render.app.setScreen(pantallaAnterior);
+            pantallaAnterior.show(); // Reactivar
         }
     }
 

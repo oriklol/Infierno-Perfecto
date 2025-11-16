@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.enciclopedia;
+package com.dojan.infiernoperfecto.pantallas.enciclopedia;
 
 import com.badlogic.gdx.graphics.Color;
 

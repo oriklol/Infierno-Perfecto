@@ -23,7 +23,7 @@ public class PantallaMenu implements Screen {
     private final Imagen[] pantallasEspera = new Imagen[4];
     final private Texto opciones[] = new Texto[5];
     String textos[] = {
-        "Nueholava Partida",
+        "Nueva Partida",
         "Multijugador",
         "Opciones",
         "Tutorial",

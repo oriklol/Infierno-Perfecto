@@ -1,6 +1,5 @@
-package com.dojan.infiernoperfecto.enciclopedia;
+package com.dojan.infiernoperfecto.pantallas.enciclopedia;
 
-import com.badlogic.gdx.graphics.Color;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

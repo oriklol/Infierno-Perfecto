@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.enciclopedia;
+package com.dojan.infiernoperfecto.pantallas.enciclopedia;
 
 public enum ClaseEnciclopedia {
     PELEADOR("Peleador", "Un guerrero que lucha con espada y valentía"),

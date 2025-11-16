@@ -18,11 +18,8 @@ import com.dojan.infiernoperfecto.logica.ResultadoCombate;
 import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
 import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
 import com.dojan.infiernoperfecto.pantallas.batalla.ControladorBatallaLocal;
-import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControladorJuego;
-import com.dojan.infiernoperfecto.utiles.Random;
-import com.dojan.infiernoperfecto.utiles.Recursos;
-import com.dojan.infiernoperfecto.utiles.Render;
+import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
+import com.dojan.infiernoperfecto.utiles.*;
 
 import io.Entradas;
 
@@ -69,6 +66,8 @@ public class PantallaLujuria implements Screen {
     private ControladorBatallaLocal controladorBatalla;
     private ResultadoCombate ultimoResultado;
 
+    private boolean esperandoEsc = false;
+
     @Override
     public void show() {
 
@@ -100,6 +99,15 @@ public class PantallaLujuria implements Screen {
             arena = new Imagen(Recursos.FONDOARENA3);
         }
         */
+
+        // resetear estados
+        esperandoEsc = false;
+        esperandoInput = false;
+        tiempo = 0;
+
+        entradas = new Entradas(); // ← Esto limpia todos los inputs previos
+        Gdx.input.setInputProcessor(entradas);
+        System.out.println("esperandoEsc reseteado a: " + esperandoEsc);
     }
 
     private void inicializarRecursos() {
@@ -255,6 +263,26 @@ public class PantallaLujuria implements Screen {
             vidaEnemigoTexto.dibujar();
         }
         Render.batch.end();
+
+        // otras pantallas
+
+        if (!esperandoEsc && entradas.isEnciclopedia()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
+            esperandoEsc = true;
+        }
+
+        if (!esperandoEsc && entradas.isEsc()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaOpciones(true)); // ✅ true = en batalla
+            System.out.println("entrando opciones desde batalla");
+            esperandoEsc = true;
+        }
+
+        if (!entradas.isEsc() && !entradas.isEnciclopedia()) {
+            if (esperandoEsc) {
+                System.out.println("Reseteando esperandoEsc porque tecla soltada"); // ← DEBUG
+            }
+            esperandoEsc = false;
+        }
 
         tiempo += delta;
 

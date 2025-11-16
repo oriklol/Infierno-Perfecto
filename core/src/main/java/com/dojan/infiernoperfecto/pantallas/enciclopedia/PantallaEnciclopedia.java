@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.enciclopedia;
+package com.dojan.infiernoperfecto.pantallas.enciclopedia;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
-import com.dojan.infiernoperfecto.enciclopedia.CategoriaEnciclopedia;
-import com.dojan.infiernoperfecto.enciclopedia.EntradaEnciclopedia;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 import com.dojan.infiernoperfecto.utiles.Recursos;

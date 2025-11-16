@@ -13,7 +13,7 @@ import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
-import com.dojan.infiernoperfecto.enciclopedia.PantallaEnciclopedia;
+import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.entidades.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo1;
 import com.dojan.infiernoperfecto.entidades.enemigos.EnemigoLimbo2;
@@ -73,8 +73,12 @@ public class PantallaLimbo implements Screen {
     private ControladorBatallaLocal controladorBatalla;
     private ResultadoCombate ultimoResultado;
 
+    private boolean esperandoEsc = false;
+
     @Override
     public void show() {
+        System.out.println("PantallaLimbo.show() ejecutado");
+
         musicaFondo = new Musica(Recursos.MUSICABATALLA);
         ControlAudio.setMusicaActual(musicaFondo);
 
@@ -93,6 +97,7 @@ public class PantallaLimbo implements Screen {
         if (batalla == null && Config.personajeSeleccionado != null) {
             reiniciarNivel(1, 1);
         }
+
         // Crear personaje de prueba
         // Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
 
@@ -105,6 +110,17 @@ public class PantallaLimbo implements Screen {
             arena = new Imagen(Recursos.FONDOARENA3);
         }
         */
+        // resetear estados
+        esperandoEsc = false;
+        esperandoInput = false;
+        tiempo = 0;
+
+        // ✅ CRÍTICO: Crear NUEVO InputProcessor para limpiar estado
+        entradas = new Entradas(); // ← Esto limpia todos los inputs previos
+        Gdx.input.setInputProcessor(entradas);
+        System.out.println("esperandoEsc reseteado a: " + esperandoEsc);
+
+
     }
 
     private void inicializarRecursos() {
@@ -266,13 +282,22 @@ public class PantallaLimbo implements Screen {
         // otras pantallas
 
 
-        if (entradas.isEnciclopedia()) {
+        if (!esperandoEsc && entradas.isEnciclopedia()) {
             GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
+            esperandoEsc = true;
         }
 
+        if (!esperandoEsc && entradas.isEsc()) {
+            GestorPantallas.getInstance().irAPantalla(new PantallaOpciones(true)); // ✅ true = en batalla
+            System.out.println("entrando opciones desde batalla");
+            esperandoEsc = true;
+        }
 
-        if (entradas.isEsc()) {
-            GestorPantallas.getInstance().irAPantalla(new PantallaOpciones());
+        if (!entradas.isEsc() && !entradas.isEnciclopedia()) {
+            if (esperandoEsc) {
+                System.out.println("Reseteando esperandoEsc porque tecla soltada"); // ← DEBUG
+            }
+            esperandoEsc = false;
         }
 
         tiempo += delta;
@@ -550,9 +575,7 @@ public class PantallaLimbo implements Screen {
         /*
         Deberia ser una clase "PantallaOpcionesInGame" y que el volver te deje al punto de la partida donde estabas
          */
-        if (entradas.isEsc()){
-            Render.app.setScreen(new PantallaOpciones());
-        }
+
 
 
     }
