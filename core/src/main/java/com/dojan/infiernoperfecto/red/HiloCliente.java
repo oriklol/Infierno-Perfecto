@@ -22,6 +22,7 @@ public class HiloCliente extends Thread {
     private static final long TIMEOUT_REENVIO = 2000; // 2 segundos
 
     public HiloCliente() {
+        this.setDaemon(true);  // ✅ DAEMON THREAD: Se termina automáticamente al cerrar la JVM
         try {
             // Usar broadcast para descubrir el servidor
             ipServer = InetAddress.getByName("255.255.255.255");
@@ -113,7 +114,13 @@ public class HiloCliente extends Thread {
 
     private void cerrarConexion() {
         if (conexion != null && !conexion.isClosed()) {
-            conexion.close();
+            try {
+                conexion.close();
+                System.out.println("Cliente: Socket cerrado correctamente");
+            } catch (Exception e) {
+                System.err.println("Cliente: Error al cerrar socket - " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

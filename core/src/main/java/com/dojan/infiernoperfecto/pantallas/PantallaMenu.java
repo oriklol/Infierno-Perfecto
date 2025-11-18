@@ -167,6 +167,7 @@ public class PantallaMenu implements Screen {
                 if (cliente == null) {
                     cliente = new HiloCliente();  // ← ESTO ES LO QUE HACE LA CONEXIÓN
                     cliente.start();
+                    app.setCliente(cliente);  // ✅ REGISTRAR EL CLIENTE EN LA APLICACIÓN
                 }
 
             }else if(((opc==3)&&(entradas.isEnter())) || ((opc==3)&&(entradas.isClick())&&(mouseClick))){
