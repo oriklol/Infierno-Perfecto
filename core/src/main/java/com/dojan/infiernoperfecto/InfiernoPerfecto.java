@@ -3,7 +3,7 @@ package com.dojan.infiernoperfecto;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
+import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
 import com.dojan.infiernoperfecto.serverred.HiloServidor;
 import com.dojan.infiernoperfecto.utiles.Render;
 
@@ -17,19 +17,14 @@ public class InfiernoPerfecto extends Game {
         Render.app = this;
         Render.batch = new SpriteBatch();
         
-        // Iniciar el servidor de red en un hilo separado
+        // ✅ CAMBIO: No iniciar el servidor automáticamente
+        // Se iniciará cuando el usuario presione "Iniciar Servidor" en el menú
         System.out.println("=================================");
         System.out.println("   SERVIDOR - INFIERNO PERFECTO  ");
         System.out.println("=================================");
-        System.out.println("Iniciando servidor en puerto 6666...");
+        System.out.println("Esperando que se inicie el servidor...");
         
-        hiloServidor = new HiloServidor();
-        hiloServidor.start();
-        
-        System.out.println("✓ Servidor iniciado correctamente.");
-        System.out.println("✓ Esperando conexiones de clientes...");
-        
-        this.setScreen(new PantallaCreditos()); // PantallaMenu debe ser reemplazado por PantallaCreditos si se desea iniciar en la pantalla de créditos
+        this.setScreen(new PantallaMenu());
     }
 
     @Override
@@ -41,15 +36,46 @@ public class InfiernoPerfecto extends Game {
 
     }
 
+    // ✅ NUEVO: Método para iniciar el servidor desde el menú
+    public void iniciarServidor() {
+        if (hiloServidor == null || !hiloServidor.isAlive()) {
+            System.out.println("=================================");
+            System.out.println("Iniciando servidor en puerto 6666...");
+            System.out.println("=================================");
+            
+            hiloServidor = new HiloServidor();
+            hiloServidor.start();
+            
+            System.out.println("✓ Servidor iniciado correctamente.");
+            System.out.println("✓ Esperando conexiones de clientes...");
+        } else {
+            System.out.println("El servidor ya está en ejecución.");
+        }
+    }
+
+    // ✅ NUEVO: Método para verificar si el servidor está en ejecución
+    public boolean isServidorActivo() {
+        return hiloServidor != null && hiloServidor.isAlive();
+    }
+
     private void update(){
 
     }
 
     @Override
     public void dispose() {
-        // Detener servidor de red
+        // ✅ Detener servidor de red correctamente
         if (hiloServidor != null) {
-            hiloServidor.detener();
+            try {
+                hiloServidor.detener();
+                // Dar tiempo para que el hilo se cierre
+                hiloServidor.join(2000);
+                System.out.println("Servidor: HiloServidor detenido");
+            } catch (InterruptedException e) {
+                System.err.println("Servidor: Error al esperar detencion de HiloServidor - " + e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+            hiloServidor = null;
         }
         
         // dispose global rendering resources

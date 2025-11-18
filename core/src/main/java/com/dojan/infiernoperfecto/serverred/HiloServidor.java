@@ -1,7 +1,11 @@
 package com.dojan.infiernoperfecto.serverred;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +16,7 @@ public class HiloServidor extends Thread {
     private static final int MAX_CLIENTES = 2;
 
     public HiloServidor() {
+        this.setDaemon(true);  // ✅ DAEMON THREAD: Se termina automáticamente al cerrar la JVM
         try {
             conexion = new DatagramSocket(6666);
             conexion.setSoTimeout(1000); // Timeout para poder verificar fin
@@ -107,7 +112,13 @@ public class HiloServidor extends Thread {
 
     private void cerrarConexion() {
         if (conexion != null && !conexion.isClosed()) {
-            conexion.close();
+            try {
+                conexion.close();
+                System.out.println("Servidor: Socket cerrado correctamente");
+            } catch (Exception e) {
+                System.err.println("Servidor: Error al cerrar socket - " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 }

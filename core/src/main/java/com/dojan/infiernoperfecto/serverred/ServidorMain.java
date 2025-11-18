@@ -25,6 +25,17 @@ public class ServidorMain {
         } catch (InterruptedException e) {
             System.out.println("Servidor interrumpido.");
             servidor.detener();
+        } finally {
+            // ✅ Garantizar que el servidor se detiene correctamente
+            System.out.println("Deteniendo servidor...");
+            servidor.detener();
+            try {
+                servidor.join(2000);
+                System.out.println("Servidor detenido correctamente.");
+            } catch (InterruptedException e) {
+                System.err.println("Forzando cierre del servidor...");
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }

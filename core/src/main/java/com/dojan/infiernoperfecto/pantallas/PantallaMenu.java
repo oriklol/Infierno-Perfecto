@@ -18,11 +18,10 @@ import io.Entradas;
 public class PantallaMenu implements Screen {
     private Musica musicaFondo;
     private Imagen menu;
-    final private Texto opciones[] = new Texto[4];
+    final private Texto opciones[] = new Texto[3];
     String textos[] = {
-        "Nueva Partida",
+        "Iniciar Servidor",
         "Opciones",
-        "Turorial",
         "Salir"
     };
     private int opc = 1;
@@ -123,8 +122,10 @@ public class PantallaMenu implements Screen {
 
         if(entradas.isEnter() || entradas.isClick()){
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
+                // ✅ Iniciar servidor en lugar de ir a otra pantalla
+                app.iniciarServidor();
                 ControlAudio.pararMusica();
-                app.setScreen(new PantallaHistoria());
+                app.setScreen(new PantallaServidorActivo());
             }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
                 app.setScreen(new PantallaOpciones());
             }else if(((opc==3)&&(entradas.isEnter())) || ((opc==3)&&(entradas.isClick())&&(mouseClick))){
