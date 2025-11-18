@@ -1,6 +1,15 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+## [0.8.3] - 2025-11-18
+## Servidor 
+### Changed
+- Se re-penso la clase HiloServidor para que se pueda jugar en computadoras distintas
+- Se creo una clase llamada PantallaServidorActivo que funciona especificamente para iniciar el servidor
+## Cliente
+### Changed
+- El HiloCliente ahora tambien esta pensado para que se ejecute en distintos dispositivos
+
 ## [0.8.2] - 2025-11-16
 ## Cliente
 ### Added
