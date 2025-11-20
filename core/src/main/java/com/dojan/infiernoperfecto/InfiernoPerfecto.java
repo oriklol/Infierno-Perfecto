@@ -16,14 +16,14 @@ public class InfiernoPerfecto extends Game {
     public void create() {
         Render.app = this;
         Render.batch = new SpriteBatch();
-        
+
         // ✅ CAMBIO: No iniciar el servidor automáticamente
         // Se iniciará cuando el usuario presione "Iniciar Servidor" en el menú
         System.out.println("=================================");
         System.out.println("   SERVIDOR - INFIERNO PERFECTO  ");
         System.out.println("=================================");
         System.out.println("Esperando que se inicie el servidor...");
-        
+
         this.setScreen(new PantallaMenu());
     }
 
@@ -42,10 +42,10 @@ public class InfiernoPerfecto extends Game {
             System.out.println("=================================");
             System.out.println("Iniciando servidor en puerto 6666...");
             System.out.println("=================================");
-            
+
             hiloServidor = new HiloServidor();
             hiloServidor.start();
-            
+
             System.out.println("✓ Servidor iniciado correctamente.");
             System.out.println("✓ Esperando conexiones de clientes...");
         } else {
@@ -77,7 +77,7 @@ public class InfiernoPerfecto extends Game {
             }
             hiloServidor = null;
         }
-        
+
         // dispose global rendering resources
         try{
             if (Render.batch != null) {
