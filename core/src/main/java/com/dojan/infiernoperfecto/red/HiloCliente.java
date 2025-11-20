@@ -11,22 +11,32 @@ import java.net.SocketTimeoutException;
 public class HiloCliente extends Thread {
 
     private DatagramSocket socket;
-    private InetAddress ipBroadcast;
-    private InetAddress ipServidor; // ✅ Guardar IP real del servidor una vez conectado
-    private static final int PUERTO_SERVIDOR = 6666;
+    private InetAddress ipServidor; // IP real del servidor
+    private static final int PUERTO_SERVIDOR = 6666; // Puerto donde escucha el servidor
+    private static final int PUERTO_CLIENTE = 6667;  // ✅ Puerto donde ESTE cliente escucha broadcasts
     private boolean fin = false;
     private boolean conectado = false;
+    private boolean servidorCaido = false; // ✅ Nueva bandera
     private int jugadoresConectados = 0;
     private long tiempoUltimoMensaje = 0;
+    private long tiempoUltimoHeartbeat = 0; // ✅ Última vez que recibimos heartbeat
     private static final long TIMEOUT_REENVIO = 2000;
+    private static final long TIMEOUT_SERVIDOR = 8000; // ✅ Si no recibimos nada en 8 segundos, servidor caído
 
     public HiloCliente() {
         this.setDaemon(true);
         try {
-            ipBroadcast = InetAddress.getByName("255.255.255.255");
-            socket = new DatagramSocket();
-            socket.setSoTimeout(1000); // Timeout de 1 segundo
-            System.out.println("Cliente: Socket creado en puerto local " + socket.getLocalPort());
+            // ✅ Intentar puerto fijo primero, si falla usar puerto aleatorio
+            try {
+                socket = new DatagramSocket(PUERTO_CLIENTE);
+                System.out.println("Cliente: Socket creado escuchando en puerto " + PUERTO_CLIENTE);
+            } catch (Exception e) {
+                // Puerto ocupado, usar puerto aleatorio (para testing en misma PC)
+                socket = new DatagramSocket(0); // 0 = puerto aleatorio
+                System.out.println("Cliente: Puerto 6667 ocupado, usando puerto aleatorio " + socket.getLocalPort());
+            }
+            socket.setBroadcast(true);
+            socket.setSoTimeout(1000);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,19 +44,19 @@ public class HiloCliente extends Thread {
 
     @Override
     public void run() {
-        // ✅ Enviar el primer mensaje DENTRO del run, cuando ya estamos escuchando
-        enviarMensaje("Conexion");
+        // Enviar el primer mensaje de conexión
+        enviarMensajeAlServidor("Conexion");
         tiempoUltimoMensaje = System.currentTimeMillis();
 
         do {
-            // ✅ Reenviar si no está conectado y pasó el timeout
+            // Reenviar si no está conectado y pasó el timeout
             if (!conectado && (System.currentTimeMillis() - tiempoUltimoMensaje) > TIMEOUT_REENVIO) {
                 System.out.println("Cliente: Reenviando mensaje de conexión...");
-                enviarMensaje("Conexion");
+                enviarMensajeAlServidor("Conexion");
                 tiempoUltimoMensaje = System.currentTimeMillis();
             }
 
-            // ✅ Escuchar respuestas del servidor
+            // Escuchar respuestas (unicast del servidor Y broadcasts)
             byte[] buffer = new byte[1024];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
@@ -62,14 +72,22 @@ public class HiloCliente extends Thread {
         cerrarConexion();
     }
 
-    private void enviarMensaje(String msg) {
+    // ✅ Envía mensajes UNICAST al servidor (puerto 6666)
+    private void enviarMensajeAlServidor(String msg) {
         try {
             byte[] mensaje = msg.getBytes();
-            // Si ya conocemos la IP del servidor, enviar directo. Si no, broadcast
-            InetAddress destino = (ipServidor != null) ? ipServidor : ipBroadcast;
+            InetAddress destino;
+
+            // Si conocemos la IP del servidor, enviar directo. Si no, broadcast
+            if (ipServidor != null) {
+                destino = ipServidor;
+            } else {
+                destino = InetAddress.getByName("255.255.255.255");
+            }
+
             DatagramPacket dp = new DatagramPacket(mensaje, mensaje.length, destino, PUERTO_SERVIDOR);
             socket.send(dp);
-            System.out.println("Cliente: Enviado '" + msg + "' a " + destino.getHostAddress());
+            System.out.println("Cliente: Enviado '" + msg + "' a " + destino.getHostAddress() + ":" + PUERTO_SERVIDOR);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,17 +95,18 @@ public class HiloCliente extends Thread {
 
     private void procesarMensaje(DatagramPacket dp) {
         String msg = new String(dp.getData(), 0, dp.getLength()).trim();
-        InetAddress servidorIP = dp.getAddress();
-        int servidorPuerto = dp.getPort();
+        InetAddress origenIP = dp.getAddress();
+        int origenPuerto = dp.getPort();
 
-        System.out.println("Cliente: Recibido '" + msg + "' de " + servidorIP.getHostAddress() + ":" + servidorPuerto);
+        System.out.println("Cliente: Recibido '" + msg + "' de " + origenIP.getHostAddress() + ":" + origenPuerto);
 
         if (msg.equals("OK")) {
             conectado = true;
-            // ✅ Guardar la IP real del servidor
-            this.ipServidor = servidorIP;
+            // Guardar la IP real del servidor para futuros mensajes
+            this.ipServidor = origenIP;
             jugadoresConectados = 1;
-            System.out.println("Cliente: ✅ CONECTADO al servidor en " + servidorIP.getHostAddress());
+            System.out.println("Cliente: ✅ CONECTADO al servidor en " + origenIP.getHostAddress());
+
         } else if (msg.startsWith("ESPERANDO:")) {
             try {
                 jugadoresConectados = Integer.parseInt(msg.split(":")[1]);
@@ -95,14 +114,17 @@ public class HiloCliente extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         } else if (msg.equals("INICIAR")) {
             System.out.println("Cliente: ========================================");
             System.out.println("Cliente: ¡¡¡MENSAJE INICIAR RECIBIDO!!!");
             System.out.println("Cliente: ========================================");
             Config.empiezaPartida = true;
             jugadoresConectados = 2;
+
         } else if (msg.equals("SERVIDOR_LLENO")) {
             System.out.println("Cliente: ⚠️ El servidor está lleno");
+            conectado = false;
             fin = true;
         }
     }
@@ -115,17 +137,27 @@ public class HiloCliente extends Thread {
         return jugadoresConectados;
     }
 
+    // ✅ Método para desconectar cuando el jugador sale del lobby
     public void desconectar() {
         if (conectado) {
-            enviarMensaje("Desconexion");
+            System.out.println("Cliente: Enviando mensaje de desconexión...");
+            enviarMensajeAlServidor("Desconexion");
+            conectado = false;
         }
         fin = true;
     }
 
     private void cerrarConexion() {
         if (socket != null && !socket.isClosed()) {
+            if (conectado) {
+                enviarMensajeAlServidor("Desconexion");
+            }
             socket.close();
         }
         System.out.println("Cliente: Socket cerrado");
+    }
+
+    public boolean isServidorCaido() {
+        return servidorCaido;
     }
 }

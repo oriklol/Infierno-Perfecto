@@ -95,6 +95,10 @@ public class PantallaMenu implements Screen {
         fitViewport.apply();
         ControlAudio.reproducirMusica();
 
+        if(cliente != null && cliente.isServidorCaido() ){
+
+        }
+
         // Si estamos mostrando pantallas de espera
         if (mostrandoEspera) {
             renderPantallasEspera(delta);
@@ -207,6 +211,7 @@ public class PantallaMenu implements Screen {
         // Permitir cancelar con ESC
         if (entradas.isEsc()) {
             cancelarEspera();
+            cliente.desconectar();
             return;
         }
 
