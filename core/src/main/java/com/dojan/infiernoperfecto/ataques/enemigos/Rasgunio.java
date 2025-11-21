@@ -4,6 +4,6 @@ import com.dojan.infiernoperfecto.ataques.Ataque;
 
 public class Rasgunio extends Ataque {
     public Rasgunio() {
-        super("Rasgunio", 50, 100,20);
+        super("Rasgunio", 15, 100, 20);
     }
 }

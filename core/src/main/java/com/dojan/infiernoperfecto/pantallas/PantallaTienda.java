@@ -93,11 +93,11 @@ public class PantallaTienda implements Screen {
     private ItemCura generarItemRandom() {
         int itemRandom = Random.generarEntero(1, 3);
         if(itemRandom==1){
-            return new ItemCura(20,30, "Vino medio vacio",Recursos.ITEMCURA1);
+            return new ItemCura(20,40, "Vino medio vacio",Recursos.ITEMCURA1);
         } else if (itemRandom==2) {
-            return new ItemCura(30,40, "Pequeño angel bostezando",Recursos.ITEMCURA2);
+            return new ItemCura(35,70, "Pequeño angel bostezando",Recursos.ITEMCURA2);
         } else if (itemRandom==3) {
-            return new ItemCura(50,70, "Zanahoria interdimensional",Recursos.ITEMCURA3);
+            return new ItemCura(60,120, "Zanahoria interdimensional",Recursos.ITEMCURA3);
         }
         return null;
     }

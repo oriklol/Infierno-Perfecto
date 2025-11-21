@@ -5,6 +5,6 @@ import com.dojan.infiernoperfecto.ataques.Ataque;
 public class DobleGolpe extends Ataque {
 
     public DobleGolpe() {
-        super("Doble Golpe", 80, 95, 20);
+        super("Doble Golpe", 35, 85, 10);
     }
 }

@@ -1,7 +1,7 @@
 package com.dojan.infiernoperfecto.logica;
 
 import com.dojan.infiernoperfecto.ataques.Ataque;
-import com.dojan.infiernoperfecto.entidades.Enemigo;
+import com.dojan.infiernoperfecto.entidades.enemigos.Enemigo;
 import com.dojan.infiernoperfecto.entidades.Personaje;
 import com.dojan.infiernoperfecto.entidades.ResultadoAtaque;
 

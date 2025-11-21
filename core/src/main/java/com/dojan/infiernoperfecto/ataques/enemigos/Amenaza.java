@@ -6,6 +6,8 @@ import com.dojan.infiernoperfecto.ataques.efectos.TipoEstadistica;
 
 public class Amenaza extends Ataque {
     public Amenaza() {
-        super("Amenaza", 0, 70, 20, new ModificacionEstadistica(TipoEstadistica.DANIO,20,40,100,2,4));
+        super("Amenaza", 0, 80, 10,
+            new ModificacionEstadistica(TipoEstadistica.DANIO, 15, 25, 100, 2, 3));
+        // Reduce daño del jugador 15-25% por 2-3 turnos
     }
 }

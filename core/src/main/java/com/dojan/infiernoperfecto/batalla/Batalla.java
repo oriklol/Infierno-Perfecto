@@ -3,8 +3,7 @@ package com.dojan.infiernoperfecto.batalla;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dojan.infiernoperfecto.entidades.Enemigo;
-import com.dojan.infiernoperfecto.entidades.Jugador;
+import com.dojan.infiernoperfecto.entidades.enemigos.Enemigo;
 import com.dojan.infiernoperfecto.entidades.Personaje;
 import com.dojan.infiernoperfecto.entidades.ResultadoAtaque;
 import com.dojan.infiernoperfecto.utiles.Random;

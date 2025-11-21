@@ -4,6 +4,6 @@ import com.dojan.infiernoperfecto.ataques.Ataque;
 
 public class HechizoBasico extends Ataque {
     public HechizoBasico() {
-        super("Hechizo Basico", 60, 90, 50);
+        super("Hechizo Basico", 30, 90, 25);  // Daño 30, 90% precisión, 25 usos
     }
 }
