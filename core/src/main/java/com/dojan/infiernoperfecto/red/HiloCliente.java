@@ -11,28 +11,26 @@ import java.net.SocketTimeoutException;
 public class HiloCliente extends Thread {
 
     private DatagramSocket socket;
-    private InetAddress ipServidor; // IP real del servidor
-    private static final int PUERTO_SERVIDOR = 6666; // Puerto donde escucha el servidor
-    private static final int PUERTO_CLIENTE = 6667;  // ✅ Puerto donde ESTE cliente escucha broadcasts
+    private InetAddress ipServidor;
+    private static final int PUERTO_SERVIDOR = 6666;
+    private static final int PUERTO_CLIENTE = 6667;
     private boolean fin = false;
     private boolean conectado = false;
-    private boolean servidorCaido = false; // ✅ Nueva bandera
+    private boolean servidorCaido = false; // ✅ Bandera para detectar cierre
     private int jugadoresConectados = 0;
     private long tiempoUltimoMensaje = 0;
-    private long tiempoUltimoHeartbeat = 0; // ✅ Última vez que recibimos heartbeat
+    private long tiempoUltimoHeartbeat = 0; // ✅ Para detectar timeout
     private static final long TIMEOUT_REENVIO = 2000;
-    private static final long TIMEOUT_SERVIDOR = 8000; // ✅ Si no recibimos nada en 8 segundos, servidor caído
+    private static final long TIMEOUT_SERVIDOR = 8000; // ✅ 8 segundos sin heartbeat = servidor caído
 
     public HiloCliente() {
         this.setDaemon(true);
         try {
-            // ✅ Intentar puerto fijo primero, si falla usar puerto aleatorio
             try {
                 socket = new DatagramSocket(PUERTO_CLIENTE);
                 System.out.println("Cliente: Socket creado escuchando en puerto " + PUERTO_CLIENTE);
             } catch (Exception e) {
-                // Puerto ocupado, usar puerto aleatorio (para testing en misma PC)
-                socket = new DatagramSocket(0); // 0 = puerto aleatorio
+                socket = new DatagramSocket(0);
                 System.out.println("Cliente: Puerto 6667 ocupado, usando puerto aleatorio " + socket.getLocalPort());
             }
             socket.setBroadcast(true);
@@ -44,9 +42,9 @@ public class HiloCliente extends Thread {
 
     @Override
     public void run() {
-        // Enviar el primer mensaje de conexión
         enviarMensajeAlServidor("Conexion");
         tiempoUltimoMensaje = System.currentTimeMillis();
+        tiempoUltimoHeartbeat = System.currentTimeMillis(); // ✅ Inicializar heartbeat
 
         do {
             // Reenviar si no está conectado y pasó el timeout
@@ -56,7 +54,15 @@ public class HiloCliente extends Thread {
                 tiempoUltimoMensaje = System.currentTimeMillis();
             }
 
-            // Escuchar respuestas (unicast del servidor Y broadcasts)
+            // ✅ DETECTAR TIMEOUT: Si estamos conectados y no recibimos nada en 8 segundos
+            if (conectado && (System.currentTimeMillis() - tiempoUltimoHeartbeat) > TIMEOUT_SERVIDOR) {
+                System.out.println("Cliente: ⚠️ TIMEOUT - Servidor no responde");
+                servidorCaido = true;
+                conectado = false;
+                // No cerramos el hilo para que la UI pueda leer servidorCaido
+            }
+
+            // Escuchar respuestas
             byte[] buffer = new byte[1024];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
@@ -72,13 +78,11 @@ public class HiloCliente extends Thread {
         cerrarConexion();
     }
 
-    // ✅ Envía mensajes UNICAST al servidor (puerto 6666)
     private void enviarMensajeAlServidor(String msg) {
         try {
             byte[] mensaje = msg.getBytes();
             InetAddress destino;
 
-            // Si conocemos la IP del servidor, enviar directo. Si no, broadcast
             if (ipServidor != null) {
                 destino = ipServidor;
             } else {
@@ -100,9 +104,11 @@ public class HiloCliente extends Thread {
 
         System.out.println("Cliente: Recibido '" + msg + "' de " + origenIP.getHostAddress() + ":" + origenPuerto);
 
+        // ✅ Actualizar heartbeat con CUALQUIER mensaje del servidor
+        tiempoUltimoHeartbeat = System.currentTimeMillis();
+
         if (msg.equals("OK")) {
             conectado = true;
-            // Guardar la IP real del servidor para futuros mensajes
             this.ipServidor = origenIP;
             jugadoresConectados = 1;
             System.out.println("Cliente: ✅ CONECTADO al servidor en " + origenIP.getHostAddress());
@@ -126,6 +132,16 @@ public class HiloCliente extends Thread {
             System.out.println("Cliente: ⚠️ El servidor está lleno");
             conectado = false;
             fin = true;
+
+        } else if (msg.equals("HEARTBEAT")) {
+            // Solo actualizar el tiempo (ya lo hicimos arriba)
+            // System.out.println("Cliente: ❤️ Heartbeat recibido");
+
+        } else if (msg.equals("SERVIDOR_CERRANDO")) {
+            // ✅ DETECTAR CIERRE EXPLÍCITO
+            System.out.println("Cliente: 🚨 SERVIDOR SE ESTÁ CERRANDO");
+            servidorCaido = true;
+            conectado = false;
         }
     }
 
@@ -137,7 +153,10 @@ public class HiloCliente extends Thread {
         return jugadoresConectados;
     }
 
-    // ✅ Método para desconectar cuando el jugador sale del lobby
+    public boolean isServidorCaido() {
+        return servidorCaido;
+    }
+
     public void desconectar() {
         if (conectado) {
             System.out.println("Cliente: Enviando mensaje de desconexión...");
@@ -155,9 +174,5 @@ public class HiloCliente extends Thread {
             socket.close();
         }
         System.out.println("Cliente: Socket cerrado");
-    }
-
-    public boolean isServidorCaido() {
-        return servidorCaido;
     }
 }

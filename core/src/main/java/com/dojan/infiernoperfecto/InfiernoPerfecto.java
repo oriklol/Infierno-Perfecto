@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
 import com.dojan.infiernoperfecto.red.HiloCliente;
+import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.Render;
 
 
@@ -21,6 +22,15 @@ public class InfiernoPerfecto extends Game {
 
     @Override
     public void render() {
+        if (cliente != null && cliente.isServidorCaido()) {
+            System.out.println("Servidor caído detectado globalmente");
+            cliente = null;
+            Config.empiezaPartida = false;
+            setScreen(new PantallaMenu());
+            // Podrías mostrar un diálogo aquí
+        }
+
+
         super.render();
 
 //        Gdx.gl.glClearColor(136f / 255f, 0f, 21f / 255f, 1f);
