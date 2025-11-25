@@ -1,6 +1,15 @@
 # CHANGELOG
 Aqui llevaremos constancia de todas las actualizaciones y modificaciones que se hagan en el juego, tanto como en el github, como en el codigo
 
+## [0.8.4] - 2025-11-18
+## Servidor 
+### Changed
+- Se finalizo la funcion de heartbeat en HiloServidor
+## Cliente
+### Changed
+- La clase InfiernoPerfecto.java ahora dentro del render tiene una funcion que verifica el estado del servidor
+- HiloCLiente esta preparado ahora para recibir el mensaje del heartbeat del servidor
+
 ## [0.8.3] - 2025-11-18
 ## Servidor 
 ### Changed
