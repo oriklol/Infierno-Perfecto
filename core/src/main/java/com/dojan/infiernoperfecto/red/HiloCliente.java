@@ -166,7 +166,7 @@ public class HiloCliente extends Thread {
         fin = true;
     }
 
-    private void cerrarConexion() {
+    public void cerrarConexion() {
         if (socket != null && !socket.isClosed()) {
             if (conectado) {
                 enviarMensajeAlServidor("Desconexion");

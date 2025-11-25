@@ -24,6 +24,8 @@ public class InfiernoPerfecto extends Game {
     public void render() {
         if (cliente != null && cliente.isServidorCaido()) {
             System.out.println("Servidor caído detectado globalmente");
+            cliente.desconectar();
+            System.out.println("Cerrando Socket Cliente");
             cliente = null;
             Config.empiezaPartida = false;
             setScreen(new PantallaMenu());

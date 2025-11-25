@@ -162,18 +162,27 @@ public class PantallaMenu implements Screen {
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
                 app.setScreen(new PantallaHistoria());
                 ControlAudio.pararMusica();
-            }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
+            }// En el render(), opción Multijugador
+            else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
                 // Iniciar pantallas de espera
                 mostrandoEspera = true;
                 tiempoEspera = 0f;
                 indiceEspera = 0;
 
-                if (cliente == null) {
-                    cliente = new HiloCliente();  // ← ESTO ES LO QUE HACE LA CONEXIÓN
-                    cliente.start();
-                    app.setCliente(cliente);  // ✅ REGISTRAR EL CLIENTE EN LA APLICACIÓN
+                // ✅ SIEMPRE cerrar el cliente anterior si existe
+                if (cliente != null) {
+                    try {
+                        cliente.desconectar();
+                    } catch (Exception e) {
+                        System.out.println("Error al cerrar cliente anterior: " + e.getMessage());
+                    }
                 }
 
+                // ✅ SIEMPRE crear un cliente NUEVO
+                cliente = new HiloCliente();
+                cliente.start();
+                app.setCliente(cliente);
+                System.out.println("PantallaMenu: Nuevo cliente creado y conectando...");
             }else if(((opc==3)&&(entradas.isEnter())) || ((opc==3)&&(entradas.isClick())&&(mouseClick))){
                 app.setScreen(new PantallaOpciones());
             }else if(((opc==4)&&(entradas.isEnter())) || ((opc==4)&&(entradas.isClick())&&(mouseClick))){
@@ -235,10 +244,16 @@ public class PantallaMenu implements Screen {
         tiempoEspera = 0f;
         indiceEspera = 0;
 
-        // Desconectar del servidor si ya estaba conectado
-        // tuCliente.disconnect();
+        // ✅ Desconectar del servidor si ya estaba conectado
+        if (cliente != null) {
+            try {
+                cliente.desconectar();
+            } catch (Exception e) {
+                System.out.println("Error al desconectar: " + e.getMessage());
+            }
+            cliente = null; // ✅ Limpiar referencia
+        }
 
-        // Resetear Config si es necesario
         Config.empiezaPartida = false;
     }
 
@@ -269,6 +284,15 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void dispose() {
+        if (cliente != null) {
+            try {
+                cliente.desconectar();
+            } catch (Exception e) {
+                System.out.println("Error al cerrar cliente en dispose: " + e.getMessage());
+            }
+            cliente = null;
+        }
+
         if (musicaFondo != null) {
             try{ musicaFondo.dispose(); }catch(Exception e){}
             musicaFondo = null;
