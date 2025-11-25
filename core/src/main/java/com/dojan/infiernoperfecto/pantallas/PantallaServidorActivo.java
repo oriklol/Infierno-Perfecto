@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
+import com.dojan.infiernoperfecto.serverred.HiloServidor;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import static com.dojan.infiernoperfecto.utiles.Render.app;
@@ -25,7 +26,7 @@ public class PantallaServidorActivo implements Screen {
     @Override
     public void show() {
         fitViewport = new FitViewport(800, 600);
-        
+
         fondo = new Imagen(Recursos.FONDOOPCIONES);
         fondo.setSize(Config.ANCHO, Config.ALTO);
 
@@ -79,8 +80,10 @@ public class PantallaServidorActivo implements Screen {
         // Volver al menú con ESC
         if (entradas.isEsc()) {
             // Aquí puedes detener el servidor si lo deseas
-            // app.detenerServidor();
+            HiloServidor servidor = app.getServidor();
+            servidor.detener();
             app.setScreen(new PantallaMenu());
+            System.out.println("Servidor detenido por el usuario");
         }
     }
 

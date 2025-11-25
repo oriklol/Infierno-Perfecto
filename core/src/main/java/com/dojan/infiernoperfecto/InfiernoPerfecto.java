@@ -46,6 +46,7 @@ public class InfiernoPerfecto extends Game {
             hiloServidor = new HiloServidor();
             hiloServidor.start();
 
+
             System.out.println("✓ Servidor iniciado correctamente.");
             System.out.println("✓ Esperando conexiones de clientes...");
         } else {
@@ -99,5 +100,9 @@ public class InfiernoPerfecto extends Game {
 
         // dispose audio control
         com.dojan.infiernoperfecto.utiles.ControlAudio.dispose();
+    }
+
+    public HiloServidor getServidor() {
+        return hiloServidor;
     }
 }
