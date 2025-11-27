@@ -38,8 +38,8 @@ public class PantallaMenu implements Screen {
     private float tiempoEspera = 0f;
     private boolean mostrandoEspera = false;
     private int indiceEspera = 0;
-    private float duracionPorPantalla = 1.5f; // segundos por pantalla
-    private float tiempoMaximoEspera = 30f; // segundos antes de volver al menú
+    private float duracionPorPantalla = 1.5f;
+    private float tiempoMaximoEspera = 30f;
     private Texto textoEspera;
     private Texto textoCancelar;
 
@@ -52,6 +52,9 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void show() {
+        // ✅ RESETEAR TODA LA INFORMACIÓN DEL CLIENTE AL ENTRAR AL MENÚ
+        limpiarCliente();
+
         fitViewport = new FitViewport(800,600);
         musicaFondo = new Musica(Recursos.MUSICAMENU);
         ControlAudio.setMusicaActual(musicaFondo);
@@ -94,10 +97,6 @@ public class PantallaMenu implements Screen {
     public void render(float delta) {
         fitViewport.apply();
         ControlAudio.reproducirMusica();
-
-        if(cliente != null && cliente.isServidorCaido() ){
-
-        }
 
         // Si estamos mostrando pantallas de espera
         if (mostrandoEspera) {
@@ -162,23 +161,16 @@ public class PantallaMenu implements Screen {
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
                 app.setScreen(new PantallaHistoria());
                 ControlAudio.pararMusica();
-            }// En el render(), opción Multijugador
-            else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
+            }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
                 // Iniciar pantallas de espera
                 mostrandoEspera = true;
                 tiempoEspera = 0f;
                 indiceEspera = 0;
 
-                // ✅ SIEMPRE cerrar el cliente anterior si existe
-                if (cliente != null) {
-                    try {
-                        cliente.desconectar();
-                    } catch (Exception e) {
-                        System.out.println("Error al cerrar cliente anterior: " + e.getMessage());
-                    }
-                }
+                // ✅ Limpiar cliente anterior si existe
+                limpiarCliente();
 
-                // ✅ SIEMPRE crear un cliente NUEVO
+                // ✅ Crear cliente NUEVO
                 cliente = new HiloCliente();
                 cliente.start();
                 app.setCliente(cliente);
@@ -211,16 +203,14 @@ public class PantallaMenu implements Screen {
         // Mostrar tiempo restante
         int tiempoRestante = (int)(tiempoMaximoEspera - tiempoEspera);
         if (tiempoRestante > 0) {
-            String tiempoTexto = "Tiempo restante: " + tiempoRestante + "s";
             textoEspera.setTexto("Esperando jugadores... (" + tiempoRestante + "s)");
             textoEspera.setPosition((int)(Config.ANCHO/2 - textoEspera.getAncho()/2), 100);
         }
         batch.end();
 
-        // Permitir cancelar con ESC
+        // ✅ Permitir cancelar con ESC (CORREGIDO)
         if (entradas.isEsc()) {
-            cancelarEspera();
-            cliente.desconectar();
+            cancelarEspera(); // Ya maneja la desconexión internamente
             return;
         }
 
@@ -234,7 +224,6 @@ public class PantallaMenu implements Screen {
         // Timeout: volver al menú si se acaba el tiempo
         if (tiempoEspera >= tiempoMaximoEspera) {
             cancelarEspera();
-            // Opcional: mostrar un mensaje de error
             System.out.println("Tiempo de espera agotado. No se encontraron jugadores.");
         }
     }
@@ -244,24 +233,44 @@ public class PantallaMenu implements Screen {
         tiempoEspera = 0f;
         indiceEspera = 0;
 
-        // ✅ Desconectar del servidor si ya estaba conectado
-        if (cliente != null) {
-            try {
-                cliente.desconectar();
-            } catch (Exception e) {
-                System.out.println("Error al desconectar: " + e.getMessage());
-            }
-            cliente = null; // ✅ Limpiar referencia
-        }
+        // ✅ Desconectar y limpiar el cliente
+        limpiarCliente();
 
         Config.empiezaPartida = false;
     }
 
-    // Método que deberías implementar para verificar la conexión
+    // ✅ MÉTODO CENTRALIZADO para limpiar el cliente
+    private void limpiarCliente() {
+        // Limpiar cliente local
+        if (cliente != null) {
+            try {
+                cliente.desconectar();
+                System.out.println("Cliente local desconectado y limpiado");
+            } catch (Exception e) {
+                System.out.println("Error al desconectar cliente local: " + e.getMessage());
+            }
+            cliente = null;
+        }
+
+        // Limpiar cliente de la aplicación global
+        HiloCliente clienteGlobal = app.getCliente();
+        if (clienteGlobal != null) {
+            try {
+                clienteGlobal.desconectar();
+                System.out.println("Cliente global desconectado y limpiado");
+            } catch (Exception e) {
+                System.out.println("Error al desconectar cliente global: " + e.getMessage());
+            }
+            app.setCliente(null);
+        }
+
+        // Resetear configuración
+        Config.empiezaPartida = false;
+
+        System.out.println("✅ Información del cliente completamente reseteada");
+    }
+
     private boolean verificarDosJugadoresConectados() {
-        // Aquí verificas el estado de tu conexión de red
-        // Por ejemplo:
-        // return tuClienteRed != null && tuClienteRed.getNumeroJugadores() >= 2;
         return false; // Por ahora retorna false
     }
 
@@ -284,14 +293,8 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void dispose() {
-        if (cliente != null) {
-            try {
-                cliente.desconectar();
-            } catch (Exception e) {
-                System.out.println("Error al cerrar cliente en dispose: " + e.getMessage());
-            }
-            cliente = null;
-        }
+        // ✅ Limpiar cliente al destruir la pantalla
+        limpiarCliente();
 
         if (musicaFondo != null) {
             try{ musicaFondo.dispose(); }catch(Exception e){}

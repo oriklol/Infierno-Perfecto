@@ -32,6 +32,16 @@ public class InfiernoPerfecto extends Game {
             // Podrías mostrar un diálogo aquí
         }
 
+        if (cliente != null && cliente.isClienteExternoDesconectado()) {
+            System.out.println("Cliente externo desconectado detectado globalmente");
+            cliente.desconectar();
+            System.out.println("Cerrando Socket Cliente");
+            cliente = null;
+            Config.empiezaPartida = false;
+            setScreen(new PantallaMenu());
+            // Opcional: Mostrar un mensaje al usuario
+        }
+
 
         super.render();
 
@@ -80,7 +90,11 @@ public class InfiernoPerfecto extends Game {
         com.dojan.infiernoperfecto.utiles.ControlAudio.dispose();
     }
 
-    // ✅ Método para que PantallaMenu pueda acceder a la referencia del cliente
+
+    public HiloCliente getCliente() {
+        return cliente;
+    }
+
     public void setCliente(HiloCliente hiloCliente) {
         this.cliente = hiloCliente;
     }

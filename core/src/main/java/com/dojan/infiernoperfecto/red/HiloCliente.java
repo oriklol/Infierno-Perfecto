@@ -16,12 +16,13 @@ public class HiloCliente extends Thread {
     private static final int PUERTO_CLIENTE = 6667;
     private boolean fin = false;
     private boolean conectado = false;
-    private boolean servidorCaido = false; // ✅ Bandera para detectar cierre
+    private boolean servidorCaido = false;
+    private boolean clienteExternoDesconectado = false;
     private int jugadoresConectados = 0;
     private long tiempoUltimoMensaje = 0;
-    private long tiempoUltimoHeartbeat = 0; // ✅ Para detectar timeout
+    private long tiempoUltimoHeartbeat = 0;
     private static final long TIMEOUT_REENVIO = 2000;
-    private static final long TIMEOUT_SERVIDOR = 8000; // ✅ 8 segundos sin heartbeat = servidor caído
+    private static final long TIMEOUT_SERVIDOR = 8000;
 
     public HiloCliente() {
         this.setDaemon(true);
@@ -44,25 +45,21 @@ public class HiloCliente extends Thread {
     public void run() {
         enviarMensajeAlServidor("Conexion");
         tiempoUltimoMensaje = System.currentTimeMillis();
-        tiempoUltimoHeartbeat = System.currentTimeMillis(); // ✅ Inicializar heartbeat
+        tiempoUltimoHeartbeat = System.currentTimeMillis();
 
         do {
-            // Reenviar si no está conectado y pasó el timeout
             if (!conectado && (System.currentTimeMillis() - tiempoUltimoMensaje) > TIMEOUT_REENVIO) {
                 System.out.println("Cliente: Reenviando mensaje de conexión...");
                 enviarMensajeAlServidor("Conexion");
                 tiempoUltimoMensaje = System.currentTimeMillis();
             }
 
-            // ✅ DETECTAR TIMEOUT: Si estamos conectados y no recibimos nada en 8 segundos
             if (conectado && (System.currentTimeMillis() - tiempoUltimoHeartbeat) > TIMEOUT_SERVIDOR) {
                 System.out.println("Cliente: ⚠️ TIMEOUT - Servidor no responde");
                 servidorCaido = true;
                 conectado = false;
-                // No cerramos el hilo para que la UI pueda leer servidorCaido
             }
 
-            // Escuchar respuestas
             byte[] buffer = new byte[1024];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             try {
@@ -104,7 +101,6 @@ public class HiloCliente extends Thread {
 
         System.out.println("Cliente: Recibido '" + msg + "' de " + origenIP.getHostAddress() + ":" + origenPuerto);
 
-        // ✅ Actualizar heartbeat con CUALQUIER mensaje del servidor
         tiempoUltimoHeartbeat = System.currentTimeMillis();
 
         if (msg.equals("OK")) {
@@ -135,12 +131,15 @@ public class HiloCliente extends Thread {
 
         } else if (msg.equals("HEARTBEAT")) {
             // Solo actualizar el tiempo (ya lo hicimos arriba)
-            // System.out.println("Cliente: ❤️ Heartbeat recibido");
 
         } else if (msg.equals("SERVIDOR_CERRANDO")) {
-            // ✅ DETECTAR CIERRE EXPLÍCITO
             System.out.println("Cliente: 🚨 SERVIDOR SE ESTÁ CERRANDO");
             servidorCaido = true;
+            conectado = false;
+
+        } else if (msg.contains("COMPANIERO_DESCONECTADO")) {
+            System.out.println("Cliente: 🚨 EL OTRO CLIENTE SE DESCONECTÓ");
+            clienteExternoDesconectado = true;
             conectado = false;
         }
     }
@@ -155,6 +154,11 @@ public class HiloCliente extends Thread {
 
     public boolean isServidorCaido() {
         return servidorCaido;
+    }
+
+
+    public boolean isClienteExternoDesconectado() {
+        return clienteExternoDesconectado;
     }
 
     public void desconectar() {
