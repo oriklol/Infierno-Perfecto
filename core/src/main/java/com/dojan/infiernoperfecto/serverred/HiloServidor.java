@@ -65,9 +65,21 @@ public class HiloServidor extends Thread {
 
     private void enviarAlOtroCliente(String msg, InetAddress ipExcluir, int puertoExcluir) {
         System.out.println("Servidor: Enviando al otro cliente: '" + msg + "'");
+        System.out.println("Servidor: Cliente a EXCLUIR: " + ipExcluir.getHostAddress() + ":" + puertoExcluir);
+        System.out.println("Servidor: Total clientes en lista: " + clientesConectados.size());
+
         for (DireccionRed cliente : clientesConectados) {
-            if (!cliente.getIp().equals(ipExcluir) || cliente.getPuerto() != puertoExcluir) {
+            System.out.println("Servidor: Evaluando cliente: " + cliente.getIp().getHostAddress() + ":" + cliente.getPuerto());
+
+            boolean esElClienteQueSeDesconecto = cliente.getIp().equals(ipExcluir) && cliente.getPuerto() == puertoExcluir;
+
+            System.out.println("Servidor: ¿Es el que se desconectó? " + esElClienteQueSeDesconecto);
+
+            if (!esElClienteQueSeDesconecto) {
                 enviarUnicast(msg, cliente.getIp(), cliente.getPuerto());
+                System.out.println("Servidor: ✅ Mensaje enviado al cliente restante");
+            } else {
+                System.out.println("Servidor: ❌ Cliente excluido (el que se desconectó)");
             }
         }
     }
@@ -164,19 +176,12 @@ public class HiloServidor extends Thread {
         }
 
         if (clienteAEliminar != null) {
-            clientesConectados.remove(clienteAEliminar);
-            System.out.println("Servidor: ❌ Cliente desconectado. Total: " + clientesConectados.size() + "/" + MAX_CLIENTES);
-
-            // Confirmar desconexión al cliente que se va
-            enviarUnicast("DESCONECTADO", clienteIP, clientePuerto);
-
-            // ✅ SI LA PARTIDA YA HABÍA INICIADO, notificar al otro jugador
-            if (partidaIniciada && clientesConectados.size() == 1) {
+            // ✅ SI LA PARTIDA YA HABÍA INICIADO
+            if (partidaIniciada && clientesConectados.size() == 2) {
                 System.out.println("Servidor: 🚨 JUGADOR SE DESCONECTÓ DURANTE LA PARTIDA");
-                System.out.println("Servidor: Notificando al otro jugador...");
+                System.out.println("Servidor: Notificando al otro jugador y cerrando la partida...");
 
-
-                // Enviar mensaje al cliente restante
+                // Enviar mensaje al otro cliente
                 for (int i = 0; i < 3; i++) {
                     enviarAlOtroCliente("COMPANIERO_DESCONECTADO", clienteIP, clientePuerto);
                     try {
@@ -186,11 +191,24 @@ public class HiloServidor extends Thread {
                     }
                 }
 
-                partidaIniciada = false; // Resetear estado de partida
-            }
-            // Si no había iniciado la partida, solo actualizar contadores
-            else if (clientesConectados.size() > 0) {
-                enviarATodos("ESPERANDO:" + clientesConectados.size());
+                // ✅ LIMPIAR COMPLETAMENTE - Desconectar a AMBOS clientes
+                System.out.println("Servidor: Limpiando todos los clientes de la partida...");
+                clientesConectados.clear(); // Eliminar TODOS los clientes
+                partidaIniciada = false;
+                System.out.println("Servidor: ✅ Partida terminada. Total clientes: " + clientesConectados.size() + "/2");
+
+            } else {
+                // Si no había iniciado la partida, solo eliminar el cliente normal
+                clientesConectados.remove(clienteAEliminar);
+                System.out.println("Servidor: ❌ Cliente desconectado. Total: " + clientesConectados.size() + "/" + MAX_CLIENTES);
+
+                // Confirmar desconexión al cliente que se va
+                enviarUnicast("DESCONECTADO", clienteIP, clientePuerto);
+
+                // Actualizar contadores para el otro cliente
+                if (clientesConectados.size() > 0) {
+                    enviarATodos("ESPERANDO:" + clientesConectados.size());
+                }
             }
         } else {
             System.out.println("Servidor: ⚠️ Cliente no encontrado para desconectar");
