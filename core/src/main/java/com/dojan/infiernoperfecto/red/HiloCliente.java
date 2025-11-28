@@ -141,6 +141,7 @@ public class HiloCliente extends Thread {
             System.out.println("Cliente: 🚨 EL OTRO CLIENTE SE DESCONECTÓ");
             clienteExternoDesconectado = true;
             conectado = false;
+            fin = true; // detiene el hilo
         }
     }
 
