@@ -5,6 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.GestorPantallas;
@@ -26,7 +27,6 @@ public class PantallaConfirmacion implements Screen {
     private boolean saliendo = false;
     private Entradas entradas;
 
-    // ✅ Acción a ejecutar si confirma
     private Runnable accionConfirmar;
 
     /**
@@ -37,7 +37,6 @@ public class PantallaConfirmacion implements Screen {
     public PantallaConfirmacion(String textoTitulo, String textoMensaje, Runnable accionConfirmar) {
         this.accionConfirmar = accionConfirmar;
 
-        // Inicializar textos
         titulo = new Texto(Recursos.FUENTEMENU, 70, Color.RED, true);
         titulo.setTexto(textoTitulo);
 
@@ -69,7 +68,6 @@ public class PantallaConfirmacion implements Screen {
         mensaje.setPosition((int)(Config.ANCHO / 2 - mensaje.getAncho() / 2),
             (int)(Config.ALTO / 2));
 
-        // Opciones lado a lado
         int espacioEntreOpciones = 200;
         int centroX = Config.ANCHO / 2;
 
@@ -79,7 +77,7 @@ public class PantallaConfirmacion implements Screen {
         opciones[1].setPosition(centroX + espacioEntreOpciones - (int)(opciones[1].getAncho() / 2),
             (int)(Config.ALTO / 3));
 
-        opc = 0; // Iniciar en "NO" por seguridad
+        opc = 0;
         tiempo = 0;
         esperandoInput = false;
         saliendo = false;
@@ -94,6 +92,9 @@ public class PantallaConfirmacion implements Screen {
         // Limpiar pantalla
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Esto hace que dibuje en coordenadas 800x600 sin importar la resolución real
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
 
         // Fondo semi-transparente oscuro
         Gdx.gl.glEnable(GL20.GL_BLEND);
@@ -139,13 +140,17 @@ public class PantallaConfirmacion implements Screen {
             }
         }
 
-        // Detección de mouse
+        // Navegación con ratón
+        int mouseX = entradas.getMouseX();
+        int mouseY = entradas.getMouseY();
+
         int cont = 0;
         for (int i = 0; i < opciones.length; i++) {
-            if ((entradas.getMouseX() >= opciones[i].getX()) &&
-                (entradas.getMouseX() <= (opciones[i].getX() + opciones[i].getAncho()))) {
-                if ((entradas.getMouseY() >= opciones[i].getY() - opciones[i].getAlto()) &&
-                    (entradas.getMouseY() <= opciones[i].getY())) {
+            // ✅ Ahora mouseX y mouseY ya están en coordenadas 800x600
+            if ((mouseX >= opciones[i].getX()) &&
+                (mouseX <= (opciones[i].getX() + opciones[i].getAncho()))) {
+                if ((mouseY >= opciones[i].getY() - opciones[i].getAlto()) &&
+                    (mouseY <= opciones[i].getY())) {
                     opc = i;
                     cont++;
                 }
@@ -171,13 +176,11 @@ public class PantallaConfirmacion implements Screen {
 
                 if (opc == 1) { // SÍ
                     System.out.println("Confirmado: SÍ - Ejecutando acción");
-                    // Ejecutar la acción y salir
                     if (accionConfirmar != null) {
                         accionConfirmar.run();
                     }
                 } else { // NO
                     System.out.println("Confirmado: NO - Volviendo atrás");
-                    // ✅ SIMPLEMENTE VOLVER ATRÁS
                     GestorPantallas.getInstance().volverAtras();
                 }
                 return;
@@ -188,11 +191,10 @@ public class PantallaConfirmacion implements Screen {
             esperandoInput = false;
         }
 
-        // ESC = cancelar (igual que presionar NO)
+        // ESC = cancelar
         if (!esperandoInput && entradas.isEsc()) {
             System.out.println("Cancelado con ESC - Volviendo atrás");
             saliendo = true;
-            // ✅ SIMPLEMENTE VOLVER ATRÁS
             GestorPantallas.getInstance().volverAtras();
             return;
         }
@@ -200,6 +202,7 @@ public class PantallaConfirmacion implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        // ✅ El resize se maneja globalmente en InfiernoPerfecto
     }
 
     @Override

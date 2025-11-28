@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.entidades.Jugador;
@@ -39,42 +40,42 @@ public class PantallaClases implements Screen {
         seleccionFondo = new Imagen(Recursos.FONDOSELECCION);
         Gdx.input.setInputProcessor(entradas);
         shapeRenderer = new ShapeRenderer();
+
         for(int i = 0; i<clases.length;i++){
             clases[i] = new Texto(Recursos.FUENTEMENU,70, Color.WHITE,true);
             clases[i].setTexto(textos[i]);
         }
-
     }
 
     @Override
     public void render(float delta) {
+        // ✅ El viewport ya se aplica en InfiernoPerfecto.render()
+
         Render.batch.begin();
-            seleccionFondo.dibujar();
-            for(int i = 0;i<clases.length;i++){
-                //float espacioEntreTextos = (Config.ANCHO / (clases.length + 1f));
-                float espacioEntreTextos = clases[0].getAncho()+(i*11);
-                float centroX = espacioEntreTextos * (i +0.9f);
+        seleccionFondo.dibujar();
+        for(int i = 0;i<clases.length;i++){
+            float espacioEntreTextos = clases[0].getAncho()+(i*11);
+            float centroX = espacioEntreTextos * (i +0.9f);
 
-                float posX = centroX - clases[i].getAncho() / 1.5f;
-                float posY = Config.ALTO / 8f;
+            float posX = centroX - clases[i].getAncho() / 1.5f;
+            float posY = Config.ALTO / 8f;
 
-                //clases[i].setPosition((int)((clases[i].getAncho()/4)+((i)*clases[0].getAncho())),((int) ((Config.ALTO)/8f)));
-                clases[i].setPosition((int) posX, (int) posY);
-                clases[i].dibujar();
-            }
+            clases[i].setPosition((int) posX, (int) posY);
+            clases[i].dibujar();
+        }
         Render.batch.end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line); // o .Filled si querés un fondo lleno
+        // ShapeRenderer debe usar la misma matriz de proyección
+        shapeRenderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.GOLDENROD);
-
 
         int x = clases[opc-1].getX();
         int y = (int) ((clases[opc-1].getY())/2f);
         int ancho = (int)clases[opc-1].getAncho();
         int alto = (int)clases[opc-1].getAlto();
 
-
-        int margen =25;
+        int margen = 25;
 
         shapeRenderer.rect(x - margen, y - margen, ancho + margen * 2, (alto + margen) * 7);
         shapeRenderer.end();
@@ -101,15 +102,17 @@ public class PantallaClases implements Screen {
             }
         }
 
+        // ✅ CORRECCIÓN: Ya no necesitas invertir mouseY ni usar Gdx.graphics.getHeight()
+        // Entradas.java ya transforma las coordenadas correctamente
         int mouseX = entradas.getMouseX();
-        int mouseY = Gdx.graphics.getHeight() - entradas.getMouseY(); // invertir eje Y
+        int mouseY = entradas.getMouseY();
 
         int cont = 0;
         for (int i = 0; i < clases.length; i++) {
             if ((mouseX >= clases[i].getX()) &&
                 (mouseX <= clases[i].getX() + clases[i].getAncho())) {
 
-                int yBase = (int) (clases[i].getY() / 2f); // mismo cálculo que el rectángulo
+                int yBase = (int) (clases[i].getY() / 2f);
                 int altoEquivalente = (int) ((clases[i].getAlto() + 25) * 7);
 
                 if ((mouseY >= yBase) && (mouseY <= yBase + altoEquivalente)) {
@@ -120,12 +123,6 @@ public class PantallaClases implements Screen {
         }
 
         mouseClick = cont > 0;
-
-        if(cont >0){
-                mouseClick = true;
-            }else{
-                mouseClick = false;
-            }
 
         for(int i=0; i<clases.length;i++){
             if(i==(opc-1)){
@@ -150,23 +147,20 @@ public class PantallaClases implements Screen {
     }
 
     @Override
-    public void resize(int i, int i1) {
-
+    public void resize(int width, int height) {
+        // ✅ El resize se maneja globalmente en InfiernoPerfecto
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
@@ -104,6 +105,8 @@ public class PantallaTienda implements Screen {
 
     @Override
     public void render(float delta) {
+        //usar camara desde infiernoperfecto
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         fondoTienda.dibujar();
 
@@ -160,6 +163,26 @@ public class PantallaTienda implements Screen {
             renderer.end();
         }
 
+        int mouseX = entradas.getMouseX();
+        int mouseY = entradas.getMouseY();
+
+        int cont = 0;
+        for (int i = 0; i < items.length; i++) {
+            // ✅ Ahora mouseX y mouseY ya están en coordenadas 800x600
+            if ((mouseX >= items[i].getX()) &&
+                (mouseX <= (items[i].getX() + items[i].getAncho()))) {
+                if ((mouseY >= items[i].getY() - items[i].getAlto()) &&
+                    (mouseY <= items[i].getY())) {
+                    opc = i +1;
+                    cont++;
+                }
+            }
+        }
+
+        mouseClick = (cont > 0);
+
+
+
         // Navegación
         tiempo += delta;
 
@@ -183,6 +206,7 @@ public class PantallaTienda implements Screen {
         } else {
             continuarPartida.setColor(Color.WHITE);
         }
+
 
 
         if((entradas.isEnter() || entradas.isClick()) && tiempo > 0.3f) {

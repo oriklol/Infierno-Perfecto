@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.ataques.Ataque;
 import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
@@ -232,6 +233,9 @@ public class PantallaLujuria implements Screen {
 
     @Override
     public void render(float delta) {
+
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
+
         // Dibujar fondo y arena
         Render.batch.begin();
         fondo.dibujar();
@@ -298,8 +302,8 @@ public class PantallaLujuria implements Screen {
                     if (enemigoSeleccionado < 0) enemigoSeleccionado = 0;
 
                     // Detección de mouse sobre los enemigos
-                    int mouseX = Gdx.input.getX();
-                    int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // invertir Y
+                    int mouseX = entradas.getMouseX();
+                    int mouseY = entradas.getMouseY();
                     for (int i = 0; i < enemigos.size(); i++) {
                         Imagen spr = enemigoSpr.get(i);
                         int x = (int) spr.getX();
@@ -345,7 +349,10 @@ public class PantallaLujuria implements Screen {
                 Render.batch.begin();
                 Texto textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
                 textoEnemigoSeleccionado.setTexto("Selecciona a un enemigo");
-                textoEnemigoSeleccionado.setPosition((Gdx.graphics.getWidth() - (Gdx.graphics.getWidth() / 2) - ((int) textoEnemigoSeleccionado.getAncho() / 2)), 120);
+                textoEnemigoSeleccionado.setPosition(
+                    (Config.ANCHO / 2 - ((int) textoEnemigoSeleccionado.getAncho() / 2)),
+                    120
+                );
                 textoEnemigoSeleccionado.dibujar();
                 Render.batch.end();
 
@@ -356,8 +363,8 @@ public class PantallaLujuria implements Screen {
                     int feActual = Config.personajeSeleccionado.getFeActual();
 
                     // Detección de mouse sobre los ataques
-                    int mouseX = Gdx.input.getX();
-                    int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+                    int mouseX = entradas.getMouseX();
+                    int mouseY = entradas.getMouseY();
                     for (int i = 0; i < textoAtaques.length; i++) {
                         Texto textoAtaque = textoAtaques[i];
                         int x = textoAtaque.getX();

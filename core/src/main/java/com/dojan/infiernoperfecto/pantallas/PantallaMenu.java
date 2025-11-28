@@ -45,23 +45,30 @@ public class PantallaMenu implements Screen {
 
     HiloCliente cliente;
 
+    Entradas entradas = new Entradas();
+
     public PantallaMenu(){
     }
 
-    Entradas entradas = new Entradas();
-
     @Override
     public void show() {
-        // ✅ RESETEAR TODA LA INFORMACIÓN DEL CLIENTE AL ENTRAR AL MENÚ
+        // DECLARACION DE RECURSOS
+        // resetear el cliente al mostrar el menú
         limpiarCliente();
 
+        // viewport para mantener la relacion de aspecto
         fitViewport = new FitViewport(800,600);
+
+        // musica
         musicaFondo = new Musica(Recursos.MUSICAMENU);
         ControlAudio.setMusicaActual(musicaFondo);
 
+
+        // menu
         menu = new Imagen(Recursos.FONDOMENU);
         menu.setSize(Config.ANCHO, Config.ALTO);
 
+        // pantallas lobby
         pantallasEspera[0] = new Imagen(Recursos.FONDOESPERA1);
         pantallasEspera[1] = new Imagen(Recursos.FONDOESPERA2);
         pantallasEspera[2] = new Imagen(Recursos.FONDOESPERA3);
@@ -70,6 +77,7 @@ public class PantallaMenu implements Screen {
             pantallasEspera[i].setSize(Config.ANCHO, Config.ALTO);
         }
 
+        // entradas
         Gdx.input.setInputProcessor(entradas);
 
         int avanceY = 30;
@@ -95,7 +103,7 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        fitViewport.apply();
+
         ControlAudio.reproducirMusica();
 
         // Si estamos mostrando pantallas de espera
@@ -159,29 +167,33 @@ public class PantallaMenu implements Screen {
         // Manejo de selección
         if(entradas.isEnter() || entradas.isClick()){
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
+                // iniciar juego un jugador
                 app.setScreen(new PantallaHistoria());
                 ControlAudio.pararMusica();
             }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
-                // Iniciar pantallas de espera
+                // Iniciar pantallas de espera para juego multijugador
                 mostrandoEspera = true;
                 tiempoEspera = 0f;
                 indiceEspera = 0;
 
-                // ✅ Limpiar cliente anterior si existe
+                // Limpiar cliente anterior si existe
                 limpiarCliente();
 
-                // ✅ Crear cliente NUEVO
+                // Crear cliente NUEVO
                 cliente = new HiloCliente();
                 cliente.start();
                 app.setCliente(cliente);
                 System.out.println("PantallaMenu: Nuevo cliente creado y conectando...");
             }else if(((opc==3)&&(entradas.isEnter())) || ((opc==3)&&(entradas.isClick())&&(mouseClick))){
+                // entra en opciones
                 app.setScreen(new PantallaOpciones());
             }else if(((opc==4)&&(entradas.isEnter())) || ((opc==4)&&(entradas.isClick())&&(mouseClick))){
+                // entra en tutorial
                 app.setScreen(new PantallaTutorial());
                 ControlAudio.pararMusica();
             }
             else if(((opc==5)&&(entradas.isEnter())) || ((opc==5)&&(entradas.isClick())&&(mouseClick))){
+                // salir del juego
                 Gdx.app.exit();
             }
         }
@@ -276,7 +288,7 @@ public class PantallaMenu implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        fitViewport.update(width, height);
+        //se maneja en infiernoperfecto
     }
 
     @Override

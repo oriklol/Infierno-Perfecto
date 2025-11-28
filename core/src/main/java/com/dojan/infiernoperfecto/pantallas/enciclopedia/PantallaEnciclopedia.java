@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.utiles.Config;
@@ -19,7 +20,7 @@ public class PantallaEnciclopedia implements Screen {
 
     private Imagen fondo;
     private Texto titulo;
-    private Texto textoVolver; // ← NUEVO
+    private Texto textoVolver;
     private Texto[] textosCategorias;
     private Texto[] textosEntradas;
     private Texto textoDetalle;
@@ -33,6 +34,8 @@ public class PantallaEnciclopedia implements Screen {
     private float tiempo = 0;
 
     private Entradas entradas = new Entradas();
+    private boolean mouseClickCategoria = false; // ✅ SEPARAR detección de categorías
+    private boolean mouseClickEntrada = false;   // ✅ SEPARAR detección de entradas
     private ShapeRenderer shapeRenderer;
 
     // Posiciones de layout
@@ -44,17 +47,14 @@ public class PantallaEnciclopedia implements Screen {
     public void show() {
         fondo = new Imagen(Recursos.FONDOOPCIONES);
 
-        // ✅ Crear nuevo InputProcessor
         entradas = new Entradas();
         Gdx.input.setInputProcessor(entradas);
 
-        // ✅ Asegurar que existe el renderer global
         if (Render.renderer == null) {
             Render.renderer = new ShapeRenderer();
         }
-        shapeRenderer = Render.renderer; // ← Usar el global
+        shapeRenderer = Render.renderer;
 
-        // Título
         titulo = new Texto(Recursos.FUENTEMENU, 70, Color.GOLDENROD, true);
         titulo.setTexto("ENCICLOPEDIA");
         titulo.setPosition(
@@ -62,7 +62,6 @@ public class PantallaEnciclopedia implements Screen {
             Config.ALTO - 20
         );
 
-        // Texto para volver
         textoVolver = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, true);
         textoVolver.setTexto("Presiona ESC para volver");
         textoVolver.setPosition(
@@ -70,33 +69,27 @@ public class PantallaEnciclopedia implements Screen {
             50
         );
 
-        // Obtener categorías
         categorias = Arrays.asList(CategoriaEnciclopedia.values());
         categoriaSeleccionada = 0;
         categoriaActual = categorias.get(0);
 
-        // ✅ PRIMERO filtrar entradas
         entradasFiltradas = EntradaEnciclopedia.filtrarPorCategoria(categoriaActual);
         entradaSeleccionada = 0;
 
-        // ✅ CREAR textos de categorías CON TEXTO
         textosCategorias = new Texto[categorias.size()];
         for (int i = 0; i < categorias.size(); i++) {
             textosCategorias[i] = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
-            textosCategorias[i].setTexto(categorias.get(i).getNombre()); // ← AGREGAR ESTO
+            textosCategorias[i].setTexto(categorias.get(i).getNombre());
             textosCategorias[i].setPosition(
                 MARGEN,
                 Config.ALTO - 100 - (i * 50)
             );
         }
 
-        // Texto de detalle
         textoDetalle = new Texto(Recursos.FUENTEMENU, 25, Color.WHITE, false);
 
-        // ✅ Inicializar textos de entradas
         actualizarListaEntradas();
 
-        // ✅ Resetear tiempo
         tiempo = 0;
     }
 
@@ -108,9 +101,8 @@ public class PantallaEnciclopedia implements Screen {
     }
 
     private void actualizarListaEntradas() {
-        // ✅ Validar que hay entradas
         if (entradasFiltradas == null || entradasFiltradas.isEmpty()) {
-            textosEntradas = new Texto[0]; // Array vacío
+            textosEntradas = new Texto[0];
             return;
         }
 
@@ -139,16 +131,16 @@ public class PantallaEnciclopedia implements Screen {
     public void render(float delta) {
         Render.limpiarPantalla(0.1f, 0.1f, 0.15f);
 
-        // Dibujar fondo
+        // ✅ Configurar ShapeRenderer con la cámara del viewport
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
+
         Render.batch.begin();
         fondo.dibujar();
         titulo.dibujar();
         textoVolver.dibujar();
         Render.batch.end();
 
-        // ✅ VALIDAR antes de actualizar
         if (textosCategorias != null && textosCategorias.length > 0) {
-            // Actualizar colores de categorías
             for (int i = 0; i < textosCategorias.length; i++) {
                 if (i == categoriaSeleccionada) {
                     textosCategorias[i].setColor(categorias.get(i).getColor());
@@ -157,14 +149,12 @@ public class PantallaEnciclopedia implements Screen {
                 }
             }
 
-            // Dibujar categorías
             Render.batch.begin();
             for (Texto texto : textosCategorias) {
                 texto.dibujar();
             }
             Render.batch.end();
 
-            // Dibujar rectángulo de selección de categoría
             if (Render.renderer != null) {
                 Render.renderer.begin(ShapeRenderer.ShapeType.Line);
                 Render.renderer.setColor(Color.GOLDENROD);
@@ -178,9 +168,7 @@ public class PantallaEnciclopedia implements Screen {
             }
         }
 
-        // ✅ VALIDAR antes de dibujar entradas
         if (textosEntradas != null && textosEntradas.length > 0) {
-            // Actualizar colores de entradas
             for (int i = 0; i < textosEntradas.length; i++) {
                 if (i == entradaSeleccionada) {
                     textosEntradas[i].setColor(Color.GOLDENROD);
@@ -189,14 +177,12 @@ public class PantallaEnciclopedia implements Screen {
                 }
             }
 
-            // Dibujar entradas
             Render.batch.begin();
             for (Texto texto : textosEntradas) {
                 texto.dibujar();
             }
             Render.batch.end();
 
-            // Dibujar rectángulo de selección de entrada
             if (Render.renderer != null) {
                 Render.renderer.begin(ShapeRenderer.ShapeType.Line);
                 Render.renderer.setColor(Color.GOLDENROD);
@@ -209,13 +195,11 @@ public class PantallaEnciclopedia implements Screen {
                 Render.renderer.end();
             }
 
-            // Dibujar panel de detalle
             if (entradasFiltradas != null && !entradasFiltradas.isEmpty()) {
                 dibujarPanelDetalle();
             }
         }
 
-        // Controles
         manejarEntrada(delta);
     }
 
@@ -237,7 +221,6 @@ public class PantallaEnciclopedia implements Screen {
             Render.renderer.end();
         }
 
-        // ✅ VALIDAR índice
         if (entradaSeleccionada >= 0 && entradaSeleccionada < entradasFiltradas.size()) {
             EntradaEnciclopedia entrada = entradasFiltradas.get(entradaSeleccionada);
             textoDetalle.setTexto(entrada.getTextoCompleto());
@@ -252,6 +235,46 @@ public class PantallaEnciclopedia implements Screen {
     private void manejarEntrada(float delta) {
         tiempo += delta;
 
+        // ✅ Coordenadas del mouse ya transformadas por el viewport
+        int mouseX = entradas.getMouseX();
+        int mouseY = entradas.getMouseY();
+
+        // ✅ DETECCIÓN DE CATEGORÍAS CON EL MOUSE
+        int contCategorias = 0;
+        for (int i = 0; i < textosCategorias.length; i++) {
+            if ((mouseX >= textosCategorias[i].getX()) &&
+                (mouseX <= (textosCategorias[i].getX() + textosCategorias[i].getAncho()))) {
+                if ((mouseY >= textosCategorias[i].getY() - textosCategorias[i].getAlto()) &&
+                    (mouseY <= textosCategorias[i].getY())) {
+                    // ✅ Cambiar la categoría seleccionada cuando el mouse pasa por encima
+                    if (categoriaSeleccionada != i) {
+                        categoriaSeleccionada = i;
+                        actualizarFiltro();
+                    }
+                    contCategorias++;
+                }
+            }
+        }
+        mouseClickCategoria = (contCategorias > 0);
+
+        // ✅ DETECCIÓN DE ENTRADAS CON EL MOUSE
+        if (textosEntradas != null && textosEntradas.length > 0) {
+            int contEntradas = 0;
+            for (int i = 0; i < textosEntradas.length; i++) {
+                if ((mouseX >= textosEntradas[i].getX()) &&
+                    (mouseX <= (textosEntradas[i].getX() + textosEntradas[i].getAncho()))) {
+                    if ((mouseY >= textosEntradas[i].getY() - textosEntradas[i].getAlto()) &&
+                        (mouseY <= textosEntradas[i].getY())) {
+                        // ✅ Cambiar la entrada seleccionada cuando el mouse pasa por encima
+                        entradaSeleccionada = i;
+                        contEntradas++;
+                    }
+                }
+            }
+            mouseClickEntrada = (contEntradas > 0);
+        }
+
+        // ✅ CONTROLES DE TECLADO (con cooldown)
         if (tiempo > 0.15f) {
             if (entradas.isArriba()) {
                 categoriaSeleccionada--;
@@ -283,7 +306,6 @@ public class PantallaEnciclopedia implements Screen {
                 tiempo = 0;
             }
 
-            // ← MODIFICADO: Volver con ESC
             if (entradas.isEsc()) {
                 GestorPantallas.getInstance().volverAtras();
                 tiempo = 0;
@@ -347,8 +369,6 @@ public class PantallaEnciclopedia implements Screen {
             textoDetalle = null;
         }
 
-        // ❌ NO disponer el renderer global
-        // shapeRenderer ya no es propio, es Render.renderer
         shapeRenderer = null;
     }
 }

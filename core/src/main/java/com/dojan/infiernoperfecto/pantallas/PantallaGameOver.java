@@ -3,6 +3,7 @@ package com.dojan.infiernoperfecto.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
@@ -52,6 +53,7 @@ public class PantallaGameOver implements Screen {
     @Override
     public void render(float delta) {
         ControlAudio.reproducirMusica();
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         gameOver.dibujar();
         for(int i = 0; i<opciones.length;i++){

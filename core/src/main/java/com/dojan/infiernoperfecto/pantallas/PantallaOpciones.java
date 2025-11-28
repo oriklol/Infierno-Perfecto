@@ -5,7 +5,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.utiles.*;
@@ -51,7 +52,6 @@ public class PantallaOpciones implements Screen {
     private boolean mouseClick = false;
     private float tiempo;
     private float tiempoCooldown;
-    private FitViewport fitViewport;
 
     private boolean esperandoInputEsc = false;
     private boolean esperandoInputVolver = false;
@@ -68,7 +68,10 @@ public class PantallaOpciones implements Screen {
         System.out.println("saliendo ANTES de resetear: " + saliendo);
         System.out.println("============================================");
 
-        fitViewport = new FitViewport(800, 600);
+
+        if (Render.renderer == null) {
+            Render.renderer = new ShapeRenderer();
+        }
         if (fondo != null) {
             try { fondo.dispose(); } catch(Exception e) {}
         }
@@ -141,9 +144,10 @@ public class PantallaOpciones implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         int avanceX = 0;
-        fitViewport.apply();
 
         System.out.println("Dibujando fondo...");
+        //usar camara desde infiernoperfecto
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         fondo.dibujar();
         titulo.dibujar();
@@ -189,14 +193,18 @@ public class PantallaOpciones implements Screen {
             esperandoInputEsc = false;
         }
 
-        // CUESTION MOUSE
+        // mouse ahora se maneja desde entradas y es responsive al viewport
+        int mouseX = entradas.getMouseX();
+        int mouseY = entradas.getMouseY();
+
         int cont = 0;
         for (int i = 0; i < opciones.length; i++) {
-            if ((entradas.getMouseX() >= opciones[i].getX()) &&
-                (entradas.getMouseX() <= (opciones[i].getX() + opciones[i].getAncho()))) {
-                if ((entradas.getMouseY() >= opciones[i].getY() - opciones[i].getAlto()) &&
-                    (entradas.getMouseY() <= opciones[i].getY())) {
-                    opc = i + 1;
+            // ✅ Ahora mouseX y mouseY ya están en coordenadas 800x600
+            if ((mouseX >= opciones[i].getX()) &&
+                (mouseX <= (opciones[i].getX() + opciones[i].getAncho()))) {
+                if ((mouseY >= opciones[i].getY() - opciones[i].getAlto()) &&
+                    (mouseY <= opciones[i].getY())) {
+                    opc = i +1 ;
                     cont++;
                 }
             }
@@ -274,7 +282,6 @@ public class PantallaOpciones implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        fitViewport.update(width, height);
     }
 
     @Override

@@ -2,6 +2,8 @@ package io;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.utiles.Config;
 
 public class Entradas implements InputProcessor {
@@ -16,56 +18,12 @@ public class Entradas implements InputProcessor {
     private boolean enterPresionado = false;
     private boolean enciclopedia;
 
+    private Vector2 mousePos = new Vector2();
+
     public Entradas(){
 
     }
 
-    public boolean isAbajo() {
-        return abajo;
-    }
-
-    public boolean isArriba() {
-        return arriba;
-    }
-
-    public boolean isEnter() {
-        return enter;
-    }
-
-    public boolean isClick() {
-        return click;
-    }
-
-    public boolean isEnciclopedia() {
-        return enciclopedia;
-    }
-
-    public boolean isDerecha() {
-        return derecha;
-    }
-
-    public boolean isIzquierda() {
-        return izquierda;
-    }
-
-    public boolean isEsc() {
-        return esc;
-    }
-
-    public boolean isEnterPresionado() {
-        if (enterPresionado) {
-            enterPresionado = false; //
-            return true;
-        }
-        return false;
-    }
-//    public boolean isCambioHecho() {
-//        return cambioHecho;
-//    }
-//
-//    public void setCambioHecho(boolean cambioHecho) {
-//        this.cambioHecho = cambioHecho;
-//    }
 
     @Override
     public boolean keyDown(int keycode) {
@@ -153,12 +111,26 @@ public class Entradas implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // transformar coordenadas de pantalla a coordenadas del viewport
+        mousePos.set(screenX, screenY);
+        InfiernoPerfecto.viewport.unproject(mousePos);
+
+        this.mouseX = (int) mousePos.x;
+        this.mouseY = (int) mousePos.y;
+
         click = true;
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        // transformar coordenadas de pantalla a coordenadas del viewport
+        mousePos.set(screenX, screenY);
+        InfiernoPerfecto.viewport.unproject(mousePos);
+
+        this.mouseX = (int) mousePos.x;
+        this.mouseY = (int) mousePos.y;
+
         click = false;
         return false;
     }
@@ -170,13 +142,25 @@ public class Entradas implements InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        // transformar coordenadas de pantalla a coordenadas del viewport
+        mousePos.set(screenX, screenY);
+        InfiernoPerfecto.viewport.unproject(mousePos);
+
+        this.mouseX = (int) mousePos.x;
+        this.mouseY = (int) mousePos.y;
+
         return false;
     }
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        mouseX = screenX;
-        mouseY = Config.ALTO - screenY;
+        // transformar coordenadas de pantalla a coordenadas del viewport
+        mousePos.set(screenX, screenY);
+        InfiernoPerfecto.viewport.unproject(mousePos);
+
+        this.mouseX = (int) mousePos.x;
+        this.mouseY = (int) mousePos.y;
+
         return false;
     }
 
@@ -192,4 +176,51 @@ public class Entradas implements InputProcessor {
     public boolean scrolled(float amountX, float amountY) {
         return false;
     }
+
+    public boolean isAbajo() {
+        return abajo;
+    }
+
+    public boolean isArriba() {
+        return arriba;
+    }
+
+    public boolean isEnter() {
+        return enter;
+    }
+
+    public boolean isClick() {
+        return click;
+    }
+
+    public boolean isEnciclopedia() {
+        return enciclopedia;
+    }
+
+    public boolean isDerecha() {
+        return derecha;
+    }
+
+    public boolean isIzquierda() {
+        return izquierda;
+    }
+
+    public boolean isEsc() {
+        return esc;
+    }
+
+    public boolean isEnterPresionado() {
+        if (enterPresionado) {
+            enterPresionado = false; //
+            return true;
+        }
+        return false;
+    }
+//    public boolean isCambioHecho() {
+//        return cambioHecho;
+//    }
+//
+//    public void setCambioHecho(boolean cambioHecho) {
+//        this.cambioHecho = cambioHecho;
+//    }
 }

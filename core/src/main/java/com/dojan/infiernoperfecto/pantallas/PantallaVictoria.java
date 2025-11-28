@@ -3,6 +3,8 @@ package com.dojan.infiernoperfecto.pantallas;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.dojan.infiernoperfecto.InfiernoPerfecto;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
@@ -33,6 +35,10 @@ public class PantallaVictoria implements Screen {
         ControlAudio.setMusicaActual(musicaFondo);
         Gdx.input.setInputProcessor(entradas);
 
+        if (Render.renderer == null) {
+            Render.renderer = new ShapeRenderer();
+        }
+
         for(int i = 0; i < opciones.length; i++){
             opciones[i] = new Texto(Recursos.FUENTEMENU, 90, Color.WHITE, true);
             opciones[i].setTexto(textos[i]);
@@ -51,6 +57,7 @@ public class PantallaVictoria implements Screen {
     @Override
     public void render(float delta) {
         ControlAudio.reproducirMusica();
+        Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         gameOver.dibujar();
         for(int i = 0; i<opciones.length;i++){
@@ -59,6 +66,23 @@ public class PantallaVictoria implements Screen {
         Render.batch.end();
 
 
+        int mouseX = entradas.getMouseX();
+        int mouseY = entradas.getMouseY();
+
+        int cont = 0;
+        for (int i = 0; i < opciones.length; i++) {
+            // ✅ Ahora mouseX y mouseY ya están en coordenadas 800x600
+            if ((mouseX >= opciones[i].getX()) &&
+                (mouseX <= (opciones[i].getX() + opciones[i].getAncho()))) {
+                if ((mouseY >= opciones[i].getY() - opciones[i].getAlto()) &&
+                    (mouseY <= opciones[i].getY())) {
+                    opc = i +1;
+                    cont++;
+                }
+            }
+        }
+
+        mouseClick = (cont > 0);
 
         tiempo+= delta;
 
