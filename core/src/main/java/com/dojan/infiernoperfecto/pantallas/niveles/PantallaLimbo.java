@@ -468,11 +468,11 @@ public class PantallaLimbo implements Screen {
                 }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    if (ultimoResultado.isObjetivoMurio()) {
-                        eliminarEnemigo(enemigoSeleccionado);
-                    }
-                    
-                    for (Integer index : batalla.getEnemigosMuertosEsteTurno()) {
+                    // Ordenar índices de mayor a menor para evitar problemas al eliminar
+                    List<Integer> muertos = new ArrayList<>(batalla.getEnemigosMuertosEsteTurno());
+                    muertos.sort(java.util.Collections.reverseOrder());
+
+                    for (Integer index : muertos) {
                         eliminarEnemigo(index);
                     }
 
