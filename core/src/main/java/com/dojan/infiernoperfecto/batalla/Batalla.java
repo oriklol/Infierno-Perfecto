@@ -13,6 +13,7 @@ public class Batalla {
     private final List<Enemigo> enemigos;
     private int turno = 0;
     private String logCombate = "";
+    private final List<Integer> enemigosMuertosEsteturno = new ArrayList<>();
 
     public Batalla(Personaje jugador, List<Enemigo> enemigos){
         this.jugador = jugador;
@@ -30,6 +31,7 @@ public class Batalla {
     El primer turno (turno==0) es del jugador, los siguientes de los enemigos.
      */
     public boolean avanzarTurno(int opcE, int opcA) {
+        enemigosMuertosEsteturno.clear();
         logCombate = ""; // Limpiar log al inicio del turno
 
         if (turno == 0) {
@@ -71,7 +73,7 @@ public class Batalla {
 
         if(!objetivo.sigueVivo()){
             System.out.println("murio el objetivo: "+objetivo.getNombre());
-            enemigos.remove(objetivo);
+            enemigosMuertosEsteturno.add(opcE);
         }
     }
 
@@ -100,6 +102,10 @@ public class Batalla {
 
     public int getTurno() {
         return turno;
+    }
+
+    public List<Integer> getEnemigosMuertosEsteTurno() {
+        return new ArrayList<>(enemigosMuertosEsteturno);
     }
 
     public Personaje getJugador() {

@@ -526,6 +526,13 @@ public class PantallaCodicia implements Screen {
                 }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
+                    // Eliminar enemigos muertos de forma segura
+                    List<Integer> muertos = new ArrayList<>(batalla.getEnemigosMuertosEsteTurno());
+                    muertos.sort(java.util.Collections.reverseOrder());
+                    for (Integer index : muertos) {
+                        eliminarEnemigo(index);
+                    }
+
                     // Verificar fin de batalla
                     if (controladorBatalla.estaTerminada()) {
                         estadoActual = EstadoBatalla.FIN_BATALLA;
