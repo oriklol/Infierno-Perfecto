@@ -121,4 +121,21 @@ public class Batalla {
     public List<Integer> getEnemigosMuertosEsteturno() {
         return enemigosMuertosEsteturno;
     }
+
+    /**
+     * Elimina los enemigos muertos de la lista interna.
+     * Debe ser llamado después de procesar los resultados del combate.
+     */
+    public void limpiarEnemigosMuertos() {
+        // Ordenar índices de mayor a menor para evitar problemas al eliminar
+        List<Integer> muertos = new ArrayList<>(enemigosMuertosEsteturno);
+        muertos.sort(java.util.Collections.reverseOrder());
+
+        for (Integer index : muertos) {
+            if (index >= 0 && index < enemigos.size()) {
+                Enemigo removido = enemigos.remove(index.intValue());
+                System.out.println("Enemigo eliminado de Batalla: " + removido.getNombre());
+            }
+        }
+    }
 }
