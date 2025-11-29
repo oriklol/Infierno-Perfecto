@@ -13,7 +13,6 @@ public class Batalla {
     private final List<Enemigo> enemigos;
     private int turno = 0;
     private String logCombate = "";
-    private final List<Integer> enemigosMuertosEsteturno = new ArrayList<>(); // ← NUEVO
 
     public Batalla(Personaje jugador, List<Enemigo> enemigos){
         this.jugador = jugador;
@@ -31,7 +30,6 @@ public class Batalla {
     El primer turno (turno==0) es del jugador, los siguientes de los enemigos.
      */
     public boolean avanzarTurno(int opcE, int opcA) {
-        enemigosMuertosEsteturno.clear(); // ← NUEVO: Limpiar la lista al inicio del turno
         logCombate = ""; // Limpiar log al inicio del turno
 
         if (turno == 0) {
@@ -64,7 +62,7 @@ public class Batalla {
     private void turnoJugador(int opcE, int opcA) {
         Enemigo objetivo = enemigos.get(opcE);
 
-    ResultadoAtaque resultado = jugador.atacar(objetivo, opcA);
+        ResultadoAtaque resultado = jugador.atacar(objetivo, opcA);
         float danioReal = resultado.getDanio();
         logCombate = "Atacaste a " + objetivo.getNombre() + " he hiciste " + danioReal + " de daño.\n";
         if (resultado.getEfectoMensaje() != null && !resultado.getEfectoMensaje().isEmpty()) {
@@ -73,8 +71,7 @@ public class Batalla {
 
         if(!objetivo.sigueVivo()){
             System.out.println("murio el objetivo: "+objetivo.getNombre());
-            enemigosMuertosEsteturno.add(opcE); // ← NUEVO: Guardar el índice en lugar de eliminar
-            // NO ELIMINAR AQUÍ: enemigos.remove(objetivo);
+            enemigos.remove(objetivo);
         }
     }
 
@@ -105,37 +102,11 @@ public class Batalla {
         return turno;
     }
 
-    // ← NUEVO: Método para obtener los enemigos que murieron este turno
-    public List<Integer> getEnemigosMuertosEsteTurno() {
-        return new ArrayList<>(enemigosMuertosEsteturno);
-    }
-
     public Personaje getJugador() {
         return jugador;
     }
 
     public List<Enemigo> getEnemigos() {
         return enemigos;
-    }
-
-    public List<Integer> getEnemigosMuertosEsteturno() {
-        return enemigosMuertosEsteturno;
-    }
-
-    /**
-     * Elimina los enemigos muertos de la lista interna.
-     * Debe ser llamado después de procesar los resultados del combate.
-     */
-    public void limpiarEnemigosMuertos() {
-        // Ordenar índices de mayor a menor para evitar problemas al eliminar
-        List<Integer> muertos = new ArrayList<>(enemigosMuertosEsteturno);
-        muertos.sort(java.util.Collections.reverseOrder());
-
-        for (Integer index : muertos) {
-            if (index >= 0 && index < enemigos.size()) {
-                Enemigo removido = enemigos.remove(index.intValue());
-                System.out.println("Enemigo eliminado de Batalla: " + removido.getNombre());
-            }
-        }
     }
 }

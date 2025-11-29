@@ -519,16 +519,11 @@ public class PantallaLujuria implements Screen {
                 }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    // Eliminar enemigos muertos
-                    // Limpiar enemigos muertos de la batalla
-                    batalla.limpiarEnemigosMuertos();
-
                     // Verificar fin de batalla
                     if (controladorBatalla.estaTerminada()) {
                         estadoActual = EstadoBatalla.FIN_BATALLA;
                     } else if (batalla.getTurno() != 0) {
                         // Turno enemigo
-                        // AQUÍ TENDRÍAS QUE ADAPTAR LA LÓGICA DEL ENEMIGO TAMBIÉN
                         batalla.avanzarTurno(0, 0);
                     } else {
                         estadoActual = EstadoBatalla.SELECCION_ENEMIGO;

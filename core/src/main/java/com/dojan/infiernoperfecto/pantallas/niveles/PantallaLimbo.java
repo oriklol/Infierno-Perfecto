@@ -468,9 +468,6 @@ public class PantallaLimbo implements Screen {
                 }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    // Limpiar enemigos muertos de la batalla
-                    batalla.limpiarEnemigosMuertos();
-
                     if (controladorBatalla.estaTerminada()) {
                         estadoActual = EstadoBatalla.FIN_BATALLA;
                     } else if (batalla.getTurno() != 0) {
