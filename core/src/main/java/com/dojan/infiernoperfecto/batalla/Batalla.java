@@ -32,6 +32,7 @@ public class Batalla {
      */
     public boolean avanzarTurno(int opcE, int opcA) {
         enemigosMuertosEsteturno.clear(); // ← NUEVO: Limpiar la lista al inicio del turno
+        logCombate = ""; // Limpiar log al inicio del turno
 
         if (turno == 0) {
             turnoJugador(opcE, opcA);

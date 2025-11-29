@@ -9,11 +9,11 @@ import com.dojan.infiernoperfecto.utiles.Config;
 public class Lwjgl3Launcher {
     public static void main(String[] args) {
         if (StartupHelper.startNewJvmIfRequired()) return;
-    }
         createApplication();
+    }
 
-    private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new InfiernoPerfecto(), getDefaultConfiguration());
+    private static void createApplication() {
+        new Lwjgl3Application(new InfiernoPerfecto(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

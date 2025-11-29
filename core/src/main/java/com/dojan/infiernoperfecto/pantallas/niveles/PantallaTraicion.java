@@ -515,6 +515,7 @@ public class PantallaTraicion implements Screen {
                         batalla.avanzarTurno(0, 0);
                     } else {
                         estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
+                        tiempo = 0;
                     }
 
                     esperandoInput = true;
