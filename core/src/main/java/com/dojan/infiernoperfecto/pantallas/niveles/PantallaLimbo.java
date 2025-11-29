@@ -418,6 +418,7 @@ public class PantallaLimbo implements Screen {
                             ultimoResultado = controladorBatalla.procesarComando(comando);
 
                             if (ultimoResultado.isValido()) {
+                                batalla.saltarTurnoJugador();
                                 estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
                                 tiempoDanio = 0;
                                 esperandoInput = true;
@@ -455,11 +456,24 @@ public class PantallaLimbo implements Screen {
                 break;
 
             case RESULTADOS_COMBATE:
-                mostrarResultado(ultimoResultado);
+                if (batalla.getTurno() == 1) {
+                    mostrarResultado(ultimoResultado);
+                } else {
+                    logTexto.setTexto(batalla.getLogCombate());
+                    logTexto.setPosition(50, 150);
+
+                    Render.batch.begin();
+                    logTexto.dibujar();
+                    Render.batch.end();
+                }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
                     if (ultimoResultado.isObjetivoMurio()) {
                         eliminarEnemigo(enemigoSeleccionado);
+                    }
+                    
+                    for (Integer index : batalla.getEnemigosMuertosEsteTurno()) {
+                        eliminarEnemigo(index);
                     }
 
                     if (controladorBatalla.estaTerminada()) {

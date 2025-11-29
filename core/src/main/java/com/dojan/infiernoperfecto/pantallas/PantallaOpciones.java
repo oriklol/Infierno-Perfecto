@@ -52,10 +52,13 @@ public class PantallaOpciones implements Screen {
     private boolean mouseClick = false;
     private float tiempo;
     private float tiempoCooldown;
+    private float tiempoUltimaAccion;
 
     private boolean esperandoInputEsc = false;
     private boolean esperandoInputVolver = false;
     private boolean saliendo = false;
+
+    private static final float COOLDOWN_ACCION = 0.3f;
 
     Entradas entradas = new Entradas();
     Config config = new Config();
@@ -120,6 +123,7 @@ public class PantallaOpciones implements Screen {
 
         tiempo = 0;
         tiempoCooldown = 0;
+        tiempoUltimaAccion = 0;
         esperandoInputEsc = false;
         esperandoInputVolver = false;
         saliendo = false;
@@ -133,10 +137,8 @@ public class PantallaOpciones implements Screen {
 
     @Override
     public void render(float delta) {
-        System.out.println("PantallaOpciones.render() - saliendo: " + saliendo); // ← Agregar esto
 
         if (saliendo) {
-            System.out.println("RENDER BLOQUEADO porque saliendo=true");
             return;
         }
 
@@ -145,7 +147,6 @@ public class PantallaOpciones implements Screen {
 
         int avanceX = 0;
 
-        System.out.println("Dibujando fondo...");
         //usar camara desde infiernoperfecto
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
@@ -159,9 +160,9 @@ public class PantallaOpciones implements Screen {
             opciones[i].dibujar();
         }
         Render.batch.end();
-        System.out.println("Fondo dibujado OK"); // ← Agregar esto
 
         tiempo += delta;
+        tiempoUltimaAccion += delta;
 
         if (entradas.isAbajo()) {
             if (tiempo > 0.15f) {
@@ -220,14 +221,26 @@ public class PantallaOpciones implements Screen {
             }
         }
 
+        boolean puedeActuar = tiempoUltimaAccion > COOLDOWN_ACCION;
+
+        // ✅ Detectar si el usuario PRESIONÓ (no solo mantiene)
+        boolean inputPresionado = entradas.isEnter() || entradas.isClick();
+
         tiempoCooldown += delta;
 
-        if (entradas.isEnter() || entradas.isClick()) {
-            if ((opc == 1) && entradas.isEnterPresionado()) {
-                ControlAudio.cicloVolumenMusica();
-            } else if ((opc == 2) && entradas.isEnterPresionado()) {
-                ControlAudio.cicloVolumenSFX();
-            } else if ((opc == 3) && entradas.isEnterPresionado()) {
+        if (puedeActuar && inputPresionado) {
+            if (opc == 1) {
+                if(entradas.isEnter() || (entradas.isClick() && mouseClick)) {
+                    ControlAudio.cicloVolumenMusica();
+                    tiempoUltimaAccion = 0;
+                }
+
+            } else if (opc == 2) {
+                if (entradas.isEnter() || (entradas.isClick() && mouseClick)){
+                    ControlAudio.cicloVolumenSFX();
+                    tiempoUltimaAccion = 0;
+                }
+            } else if ((opc == 3) && entradas.isEnterPresionado()) { // no se como resolverlo
                 if (tiempoCooldown > 0.4) {
                     if (!Gdx.graphics.isFullscreen()) {
                         Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());

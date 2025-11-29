@@ -20,6 +20,12 @@ public class Batalla {
         this.enemigos = enemigos;
     }
 
+    public void saltarTurnoJugador() {
+        if (turno == 0) {
+            turno = 1;
+        }
+    }
+
     /*
     Procesa un solo turno de la batalla. Retorna true si la batalla sigue, false si terminó.
     El primer turno (turno==0) es del jugador, los siguientes de los enemigos.

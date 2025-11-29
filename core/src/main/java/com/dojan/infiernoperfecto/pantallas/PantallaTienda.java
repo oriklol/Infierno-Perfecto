@@ -23,7 +23,7 @@ public class PantallaTienda implements Screen {
     private Musica musicaFondo;
 
     private ItemCura[] items = new ItemCura[2];
-    private boolean[] itemsComprados = new boolean[2]; // Track de items comprados
+    private boolean[] itemsComprados = new boolean[2];
 
     private Texto infoPersonaje[] = new Texto[2];
 
@@ -36,6 +36,7 @@ public class PantallaTienda implements Screen {
 
     Entradas entradas = new Entradas();
     private boolean mouseClick = false;
+    private boolean mouseClickContinuar = false; // ✅ Separar detección de "Continuar"
 
     @Override
     public void show() {
@@ -46,16 +47,13 @@ public class PantallaTienda implements Screen {
 
         Gdx.input.setInputProcessor(entradas);
 
-        // ← RESETEAR items y estado de compra cada vez que se muestra la tienda
         for(int i = 0; i < items.length; i++) {
             items[i] = generarItemRandom();
-            itemsComprados[i] = false;  // ← Resetear a false
+            itemsComprados[i] = false;
         }
 
-        // ← Resetear la opción seleccionada
         opc = 0;
 
-        // Info del personaje
         for(int i = 0; i < infoPersonaje.length; i++){
             infoPersonaje[i] = new Texto(Recursos.FUENTEMENU, 50, Color.WHITE, true);
 
@@ -66,7 +64,6 @@ public class PantallaTienda implements Screen {
             infoPersonaje[i].setPosition(x, y);
         }
 
-        // Título
         titulo = new Texto(Recursos.FUENTEMENU, 70, Color.WHITE, true);
         titulo.setTexto("TIENDA");
         float anchoTitulo = titulo.getAncho();
@@ -74,16 +71,13 @@ public class PantallaTienda implements Screen {
         int x = (int)(centroX - anchoTitulo / 2);
         titulo.setPosition(x, (int)(Config.ALTO * 0.85f));
 
-        // Continuar partida
         continuarPartida = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, true);
         continuarPartida.setTexto("Continuar partida");
         float anchoContinuar = continuarPartida.getAncho();
         continuarPartida.setPosition((int)(Config.ANCHO / 1.5 - anchoContinuar / 2), (int)(Config.ALTO * 0.15f));
 
-        // Info item
         infoItem = new Texto(Recursos.FUENTEMENU, 50, Color.GOLDENROD, true);
 
-        // Posición items
         int espacioEntreItems = 210;
         centroX = (int) (Config.ANCHO / 1.5);
 
@@ -105,12 +99,12 @@ public class PantallaTienda implements Screen {
 
     @Override
     public void render(float delta) {
-        //usar camara desde infiernoperfecto
+        // ✅ Configurar ShapeRenderer con la cámara del viewport
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
+
         Render.batch.begin();
         fondoTienda.dibujar();
 
-        // Actualizar y dibujar info del personaje
         for (int i = 0; i < infoPersonaje.length; i++){
             if(i == 0){
                 infoPersonaje[i].setTexto("Vida: " + Config.personajeSeleccionado.getVidaActual());
@@ -120,7 +114,6 @@ public class PantallaTienda implements Screen {
             infoPersonaje[i].dibujar();
         }
 
-        // Dibujar solo items NO comprados
         for(int i = 0; i < items.length; i++) {
             if(!itemsComprados[i]) {
                 items[i].dibujar();
@@ -129,7 +122,6 @@ public class PantallaTienda implements Screen {
 
         titulo.dibujar();
 
-        // Dibujar info del item seleccionado (solo si no está comprado)
         if(opc >= 0 && opc < items.length && !itemsComprados[opc]) {
             ItemCura itemSeleccionado = items[opc];
             String info = itemSeleccionado.getNombre() + " - $" + itemSeleccionado.getPrecio();
@@ -145,7 +137,6 @@ public class PantallaTienda implements Screen {
 
         Render.batch.end();
 
-        // Dibujar cuadrado de selección (solo si el item no está comprado)
         if(opc >= 0 && opc < items.length && !itemsComprados[opc]) {
             ItemCura itemSeleccionado = items[opc];
 
@@ -163,25 +154,37 @@ public class PantallaTienda implements Screen {
             renderer.end();
         }
 
+        // ✅ CORRECCIÓN: Usar coordenadas transformadas del viewport
         int mouseX = entradas.getMouseX();
         int mouseY = entradas.getMouseY();
 
-        int cont = 0;
+        // ✅ DETECCIÓN DE ITEMS (solo los no comprados)
+        int contItems = 0;
         for (int i = 0; i < items.length; i++) {
-            // ✅ Ahora mouseX y mouseY ya están en coordenadas 800x600
-            if ((mouseX >= items[i].getX()) &&
-                (mouseX <= (items[i].getX() + items[i].getAncho()))) {
-                if ((mouseY >= items[i].getY() - items[i].getAlto()) &&
-                    (mouseY <= items[i].getY())) {
-                    opc = i +1;
-                    cont++;
+            if (!itemsComprados[i]) { // Solo detectar items disponibles
+                if ((mouseX >= items[i].getX()) &&
+                    (mouseX <= (items[i].getX() + items[i].getAncho()))) {
+                    if ((mouseY >= items[i].getY()) &&
+                        (mouseY <= items[i].getY() + items[i].getAlto())) {
+                        opc = i; // ✅ CORRECCIÓN: Ahora opc va de 0 a 1 (índices de items)
+                        contItems++;
+                    }
                 }
             }
         }
+        mouseClick = (contItems > 0);
 
-        mouseClick = (cont > 0);
-
-
+        // ✅ DETECCIÓN DE "CONTINUAR PARTIDA"
+        int contContinuar = 0;
+        if ((mouseX >= continuarPartida.getX()) &&
+            (mouseX <= (continuarPartida.getX() + continuarPartida.getAncho()))) {
+            if ((mouseY >= continuarPartida.getY() - continuarPartida.getAlto()) &&
+                (mouseY <= continuarPartida.getY())) {
+                opc = 2; // ✅ Opción "Continuar" es 2
+                contContinuar++;
+            }
+        }
+        mouseClickContinuar = (contContinuar > 0);
 
         // Navegación
         tiempo += delta;
@@ -207,37 +210,35 @@ public class PantallaTienda implements Screen {
             continuarPartida.setColor(Color.WHITE);
         }
 
-
-
+        // ✅ CORRECCIÓN: Validar clicks correctamente
         if((entradas.isEnter() || entradas.isClick()) && tiempo > 0.3f) {
-            tiempo = 0; // Resetear timer
+            tiempo = 0;
 
+            // Click en items (opc 0 o 1)
             if(opc >= 0 && opc < items.length && !itemsComprados[opc]) {
-                // Comprar item
-                boolean compraExitosa = Config.personajeSeleccionado.comprar(items[opc]);
+                // Solo procesar si realmente está clickeando un item
+                if (entradas.isEnter() || (entradas.isClick() && mouseClick)) {
+                    boolean compraExitosa = Config.personajeSeleccionado.comprar(items[opc]);
 
-                if(compraExitosa) {
-                    itemsComprados[opc] = true; // Marcar como comprado
-
-                    // Mover a la siguiente opción disponible
-                    opc = siguienteOpcionDisponible(opc, true);
+                    if(compraExitosa) {
+                        itemsComprados[opc] = true;
+                        opc = siguienteOpcionDisponible(opc, true);
+                    }
                 }
-            } else if(opc == 2) {
-                ControladorJuego.getInstance().avanzarNivel();
+            }
+            // Click en "Continuar partida" (opc 2)
+            else if(opc == 2) {
+                if (entradas.isEnter() || (entradas.isClick() && mouseClickContinuar)) {
+                    ControladorJuego.getInstance().avanzarNivel();
+                }
             }
         }
     }
 
-    /**
-     * Encuentra la siguiente opción disponible (que no esté comprada)
-     * @param opcActual opción actual
-     * @param adelante true para avanzar, false para retroceder
-     * @return índice de la siguiente opción disponible
-     */
     private int siguienteOpcionDisponible(int opcActual, boolean adelante) {
         int nuevaOpc = opcActual;
         int intentos = 0;
-        int maxOpciones = items.length + 1; // items + continuar
+        int maxOpciones = items.length + 1;
 
         do {
             if(adelante) {
@@ -250,9 +251,8 @@ public class PantallaTienda implements Screen {
 
             intentos++;
 
-            // Evitar loop infinito si todas las opciones están compradas
             if(intentos > maxOpciones) {
-                return 2; // Ir a "Continuar partida"
+                return 2;
             }
 
         } while(nuevaOpc < items.length && itemsComprados[nuevaOpc]);
@@ -262,22 +262,18 @@ public class PantallaTienda implements Screen {
 
     @Override
     public void resize(int i, int i1) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
@@ -324,7 +320,5 @@ public class PantallaTienda implements Screen {
                 }
             }
         }
-
-        // No se debe disponer del renderer global aquí (lo gestiona la aplicación central).
     }
 }

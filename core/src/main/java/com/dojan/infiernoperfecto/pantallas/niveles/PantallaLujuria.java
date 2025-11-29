@@ -465,6 +465,7 @@ public class PantallaLujuria implements Screen {
 
                             // 3. Verificar si fue válido
                             if (ultimoResultado.isValido()) {
+                                batalla.saltarTurnoJugador();
                                 estadoActual = EstadoBatalla.EJECUTAR_BATALLA;
                                 tiempoDanio = 0; // ← RESETEAR el contador de tiempo de animación
                                 esperandoInput = true;
@@ -506,21 +507,25 @@ public class PantallaLujuria implements Screen {
                 break;
 
             case RESULTADOS_COMBATE:
-                /* antes de red
-                Texto logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
-                logTexto.setTexto(batalla.getLogCombate());
-                logTexto.setPosition(50, 150);
-                Render.batch.begin();
-                logTexto.dibujar();
-                Render.batch.end();
-                */
-                // after red
-                mostrarResultado(ultimoResultado);
+                if (batalla.getTurno() == 1) {
+                    mostrarResultado(ultimoResultado);
+                } else {
+                    logTexto.setTexto(batalla.getLogCombate());
+                    logTexto.setPosition(50, 150);
+
+                    Render.batch.begin();
+                    logTexto.dibujar();
+                    Render.batch.end();
+                }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
                     // Eliminar enemigos muertos
                     if (ultimoResultado.isObjetivoMurio()) {
                         eliminarEnemigo(enemigoSeleccionado);
+                    }
+                    
+                    for (Integer index : batalla.getEnemigosMuertosEsteTurno()) {
+                        eliminarEnemigo(index);
                     }
 
                     // Verificar fin de batalla
