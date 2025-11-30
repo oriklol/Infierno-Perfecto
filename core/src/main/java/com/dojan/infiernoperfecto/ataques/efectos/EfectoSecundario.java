@@ -4,14 +4,18 @@ import com.dojan.infiernoperfecto.entidades.Personaje;
 
 public abstract class EfectoSecundario {
     protected TipoEstadistica tipoEstadistica;
+    protected TipoEfecto tipoEfecto;  // ← NUEVO
     protected int porcentajeMin;
     protected int porcentajeMax;
     protected int probabilidad;
     protected int turnosMin;
     protected int turnosMax;
 
-    public EfectoSecundario(TipoEstadistica tipoEstadistica,int porcentajeMin, int porcentajeMax, int probabilidad, int turnosMin, int turnosMax) {
+    // Constructor para efectos con estadísticas (buffs/debuffs)
+    public EfectoSecundario(TipoEstadistica tipoEstadistica, int porcentajeMin, int porcentajeMax,
+                            int probabilidad, int turnosMin, int turnosMax) {
         this.tipoEstadistica = tipoEstadistica;
+        this.tipoEfecto = TipoEfecto.MODIFICACION_STAT;
         this.porcentajeMin = porcentajeMin;
         this.porcentajeMax = porcentajeMax;
         this.probabilidad = probabilidad;
@@ -19,10 +23,23 @@ public abstract class EfectoSecundario {
         this.turnosMax = turnosMax;
     }
 
-    // Aplica el efecto en el objetivo y retorna una descripción del efecto para logs (o cadena vacía si no aplica)
+    // Constructor para efectos especiales (curación, AOE, etc) ← NUEVO
+    public EfectoSecundario(TipoEfecto tipoEfecto, int valorMin, int valorMax, int probabilidad) {
+        this.tipoEfecto = tipoEfecto;
+        this.porcentajeMin = valorMin;
+        this.porcentajeMax = valorMax;
+        this.probabilidad = probabilidad;
+        this.turnosMin = 0;
+        this.turnosMax = 0;
+    }
+
     public abstract String aplicar(Personaje objetivo);
 
     public int getProbabilidad() {
         return probabilidad;
+    }
+
+    public TipoEfecto getTipoEfecto() {
+        return tipoEfecto;
     }
 }

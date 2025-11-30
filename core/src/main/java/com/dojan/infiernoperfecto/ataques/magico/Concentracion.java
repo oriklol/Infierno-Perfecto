@@ -1,10 +1,11 @@
 package com.dojan.infiernoperfecto.ataques.magico;
 
 import com.dojan.infiernoperfecto.ataques.Ataque;
+import com.dojan.infiernoperfecto.ataques.efectos.RecuperarFe;
 
 public class Concentracion extends Ataque {
     public Concentracion() {
-        super("Concentracion", 0, 100, 5);
-        // TODO: Implementar recuperación de 20-30 Fe
+        // Recupera 20-30 Fe, sin costo
+        super("Concentracion", 0, 100, 5, new RecuperarFe(20, 30));
     }
 }

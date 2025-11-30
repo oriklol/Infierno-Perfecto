@@ -514,6 +514,7 @@ public class PantallaCodicia implements Screen {
                 break;
 
             case RESULTADOS_COMBATE:
+                // Mostrar el log del combate
                 if (batalla.getTurno() == 1) {
                     mostrarResultado(ultimoResultado);
                 } else {
@@ -526,18 +527,19 @@ public class PantallaCodicia implements Screen {
                 }
 
                 if (!esperandoInput && (entradas.isEnter() || entradas.isClick())) {
-                    // Eliminar enemigos muertos de forma segura
-                    List<Integer> muertos = new ArrayList<>(batalla.getEnemigosMuertosEsteTurno());
-                    muertos.sort(java.util.Collections.reverseOrder());
-                    for (Integer index : muertos) {
-                        eliminarEnemigo(index);
+                    // Eliminar enemigos muertos de AMBAS listas
+                    for (int i = enemigos.size() - 1; i >= 0; i--) {
+                        if (!enemigos.get(i).sigueVivo()) {
+                            System.out.println("Eliminando enemigo muerto en índice: " + i + " (" + enemigos.get(i).getNombre() + ")");
+                            eliminarEnemigo(i);
+                        }
                     }
 
-                    // Verificar fin de batalla
-                    if (controladorBatalla.estaTerminada()) {
+                    // Verificar si terminó
+                    if (controladorBatalla.estaTerminada() || enemigos.isEmpty()) {
                         estadoActual = EstadoBatalla.FIN_BATALLA;
+                        tiempo = 0;
                     } else if (batalla.getTurno() != 0) {
-                        // Turno enemigo
                         batalla.avanzarTurno(0, 0);
                     } else {
                         estadoActual = EstadoBatalla.SELECCION_ENEMIGO;
@@ -545,6 +547,36 @@ public class PantallaCodicia implements Screen {
                     }
 
                     esperandoInput = true;
+                }
+
+                // Mostrar victoria si no quedan enemigos
+                if (enemigos.isEmpty()) {
+                    Render.batch.begin();
+
+                    Texto textoVictoria = new Texto(Recursos.FUENTEMENU, 80, Color.GOLD, false);
+                    textoVictoria.setTexto("¡VICTORIA!");
+                    textoVictoria.setPosition(
+                        Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
+                        Config.ALTO / 2 + 50
+                    );
+                    textoVictoria.dibujar();
+
+                    if ((int)(tiempo * 2) % 2 == 0) {
+                        Texto textoContinuar = new Texto(Recursos.FUENTEMENU, 40, Color.WHITE, false);
+                        textoContinuar.setTexto("Click para continuar");
+                        textoContinuar.setPosition(
+                            Config.ANCHO / 2 - (int)(textoContinuar.getAncho() / 2),
+                            Config.ALTO / 2 - 20
+                        );
+                        textoContinuar.dibujar();
+                    }
+
+                    Render.batch.end();
+
+                    if (tiempo > 5.0f || (!esperandoInput && (entradas.isEnter() || entradas.isClick()))) {
+                        estadoActual = EstadoBatalla.FIN_BATALLA;
+                        tiempo = 0;
+                    }
                 }
 
                 if (!(entradas.isEnter() || entradas.isClick())) {
@@ -579,6 +611,22 @@ public class PantallaCodicia implements Screen {
         Deberia ser una clase "PantallaOpcionesInGame" y que el volver te deje al punto de la partida donde estabas
          */
 
+    }
+
+    private void sincronizarSprites() {
+        // Eliminar sprites de enemigos que ya no están en batalla
+        while (enemigoSpr.size() > batalla.getEnemigos().size()) {
+            Imagen sprite = enemigoSpr.remove(enemigoSpr.size() - 1);
+            sprite.dispose();
+        }
+
+        // Ajustar índices si están fuera de rango
+        if (enemigoSeleccionado >= batalla.getEnemigos().size() && batalla.getEnemigos().size() > 0) {
+            enemigoSeleccionado = batalla.getEnemigos().size() - 1;
+        }
+        if (opc >= batalla.getEnemigos().size() && batalla.getEnemigos().size() > 0) {
+            opc = batalla.getEnemigos().size() - 1;
+        }
     }
 
     private void mostrarResultado(ResultadoCombate resultado) {

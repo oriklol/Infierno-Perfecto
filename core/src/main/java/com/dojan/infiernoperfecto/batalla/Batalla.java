@@ -32,12 +32,11 @@ public class Batalla {
      */
     public boolean avanzarTurno(int opcE, int opcA) {
         enemigosMuertosEsteturno.clear();
-        logCombate = ""; // Limpiar log al inicio del turno
+        logCombate = "";
 
         if (turno == 0) {
             turnoJugador(opcE, opcA);
         } else {
-            // Ajustar el índice porque pueden haber muerto enemigos
             int indiceEnemigo = turno - 1;
             if (indiceEnemigo < enemigos.size()) {
                 Enemigo enemigo = enemigos.get(indiceEnemigo);
@@ -48,12 +47,14 @@ public class Batalla {
         }
 
         turno++;
-        // Cuando termina la ronda de enemigos, antes de volver al jugador, verifica si la batalla termino
+
+        // Al final de cada ronda completa, eliminar enemigos muertos
         if (turno > enemigos.size()) {
+            //enemigos.removeIf(enemigo -> !enemigo.sigueVivo());
             turno = 0;
             return !jugador.sigueVivo() || enemigos.isEmpty();
         }
-        // Mientras se ejecutan los turnos enemigos, nunca termina la batalla
+
         return false;
     }
 

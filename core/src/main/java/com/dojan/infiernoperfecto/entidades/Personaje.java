@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.dojan.infiernoperfecto.ataques.Ataque;
 import com.dojan.infiernoperfecto.ataques.efectos.EfectoSecundario;
+import com.dojan.infiernoperfecto.ataques.efectos.ModificacionEstadistica;
+import com.dojan.infiernoperfecto.ataques.efectos.TipoEfecto;
 import com.dojan.infiernoperfecto.entidades.clases.Clase;
 import com.dojan.infiernoperfecto.entidades.estados.EstadoAlterado;
 import com.dojan.infiernoperfecto.entidades.estados.EstadoEstadisticaModificada;
@@ -75,7 +77,6 @@ public abstract class Personaje {
             estado.mostrarInformacion();
         }
 
-
         int precisionOriginal = ataques.get(ataqueElegido).getProbabilidadAcierto();
         int precisionModificada = precisionOriginal - porcentajeReduccionPrecision;
         precisionModificada = Math.max(0, Math.min(100, precisionModificada));
@@ -107,21 +108,58 @@ public abstract class Personaje {
             this.ataques.get(ataqueElegido).restarUso();
             if (acierta){
                 float danioBaseAtaque = ataques.get(ataqueElegido).getDanio();
-                float danioReducido = danioBaseAtaque * (1 - porcentajeReduccionAtaque / 100.0f);
-                float danioHecho = this.danioBase + danioReducido;
-                float danioFinal = Math.max(0, danioHecho - objetivo.getDefensaBase());
-                // talvez, solo talvez, repensarlo
-                objetivo.recibirDanio(danioFinal);
-                System.out.println("daño final: "+danioFinal);
-                System.out.println("El danio a "+objetivo.getNombre()+" es de "+danioFinal);
-                // Capturar mensaje de efecto si existe
+
+                // ============================================================
+                // ← AQUÍ EMPIEZA EL CÓDIGO NUEVO (REEMPLAZA LA SECCIÓN VIEJA)
+                // ============================================================
+
                 EfectoSecundario efecto = ataques.get(ataqueElegido).getEfectoSecundario();
                 String mensajeEfecto = null;
-                if(efecto!=null){
-                    if(Random.verificarAcierto(efecto.getProbabilidad())){
+
+                if(efecto != null && Random.verificarAcierto(efecto.getProbabilidad())){
+                    TipoEfecto tipoEfecto = efecto.getTipoEfecto();
+
+                    // Si es un buff/debuff (MODIFICACION_STAT)
+                    if (tipoEfecto == TipoEfecto.MODIFICACION_STAT) {
+                        // Determinar si es buff (se aplica al atacante) o debuff (al objetivo)
+                        if (efecto instanceof ModificacionEstadistica) {
+                            ModificacionEstadistica modEfecto = (ModificacionEstadistica) efecto;
+                            // Si el porcentaje es NEGATIVO, es un BUFF que se aplica al atacante
+                            if (modEfecto.getPorcentajeMin() < 0) {
+                                mensajeEfecto = efecto.aplicar(this); // Aplicar al atacante
+                            } else {
+                                // Si es POSITIVO, es un DEBUFF que se aplica al objetivo
+                                mensajeEfecto = efecto.aplicar(objetivo);
+                            }
+                        }
+                    }
+                    // Curaciones, recuperación de Fe, etc. siempre al atacante
+                    else if (tipoEfecto == TipoEfecto.CURACION ||
+                        tipoEfecto == TipoEfecto.RECUPERAR_FE ||
+                        tipoEfecto == TipoEfecto.LIMPIAR_ESTADO) {
+                        mensajeEfecto = efecto.aplicar(this);
+                    }
+                    // Por defecto, aplicar al objetivo
+                    else {
                         mensajeEfecto = efecto.aplicar(objetivo);
                     }
                 }
+
+                // ============================================================
+                // ← AQUÍ TERMINA EL CÓDIGO NUEVO
+                // ============================================================
+
+                // Calcular daño si el ataque lo tiene
+                float danioFinal = 0;
+                if (danioBaseAtaque > 0) {
+                    float danioReducido = danioBaseAtaque * (1 - porcentajeReduccionAtaque / 100.0f);
+                    float danioHecho = this.danioBase + danioReducido;
+                    danioFinal = Math.max(0, danioHecho - objetivo.getDefensaBase());
+                    objetivo.recibirDanio(danioFinal);
+                    System.out.println("daño final: "+danioFinal);
+                    System.out.println("El danio a "+objetivo.getNombre()+" es de "+danioFinal);
+                }
+
                 return new ResultadoAtaque(danioFinal, mensajeEfecto);
             }else{
                 System.out.println("Fallaste el ataque");
@@ -137,11 +175,38 @@ public abstract class Personaje {
             }
         }
 
-    return ResultadoAtaque.empty();
+        return ResultadoAtaque.empty();
     }
 
     public void recibirDanio(float cantidad){
         this.vidaActual -= cantidad;
+    }
+
+    // curacion de vida
+    public void curar(int cantidad) {
+        this.vidaActual += cantidad;
+        if (this.vidaActual > this.vidaBase) {
+            this.vidaActual = this.vidaBase;
+        }
+    }
+
+    // recuperacion de fe
+    public void recuperarFe(int cantidad) {
+        this.feActual += cantidad;
+        if (this.feActual > this.feBase) {
+            this.feActual = this.feBase;
+        }
+    }
+
+    public boolean tieneEstadoAlterado() {
+        return this.estadoAlterado != null;
+    }
+
+    // limpiar estado alterado
+    public void limpiarEstadosAlterados() {
+        if (this.estadoAlterado != null) {
+            this.estadoAlterado = null;
+        }
     }
 
 
