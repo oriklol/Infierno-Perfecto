@@ -9,7 +9,7 @@ import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.red.HiloCliente;
 import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControlAudio;
+import com.dojan.infiernoperfecto.utiles.ControladorAudio;
 import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import static com.dojan.infiernoperfecto.utiles.Render.app;
@@ -61,7 +61,7 @@ public class PantallaMenu implements Screen {
 
         // musica
         musicaFondo = new Musica(Recursos.MUSICAMENU);
-        ControlAudio.setMusicaActual(musicaFondo);
+        ControladorAudio.setMusicaActual(musicaFondo);
 
 
         // menu
@@ -104,7 +104,7 @@ public class PantallaMenu implements Screen {
     @Override
     public void render(float delta) {
 
-        ControlAudio.reproducirMusica();
+        ControladorAudio.reproducirMusica();
 
         // Si estamos mostrando pantallas de espera
         if (mostrandoEspera) {
@@ -169,7 +169,7 @@ public class PantallaMenu implements Screen {
             if(((opc==1)&&(entradas.isEnter())) || ((opc==1)&&(entradas.isClick())&&(mouseClick))){
                 // iniciar juego un jugador
                 app.setScreen(new PantallaHistoria());
-                ControlAudio.pararMusica();
+                ControladorAudio.pararMusica();
             }else if(((opc==2)&&(entradas.isEnter())) || ((opc==2)&&(entradas.isClick())&&(mouseClick))){
                 // Iniciar pantallas de espera para juego multijugador
                 mostrandoEspera = true;
@@ -190,7 +190,7 @@ public class PantallaMenu implements Screen {
             }else if(((opc==4)&&(entradas.isEnter())) || ((opc==4)&&(entradas.isClick())&&(mouseClick))){
                 // entra en tutorial
                 app.setScreen(new PantallaTutorial());
-                ControlAudio.pararMusica();
+                ControladorAudio.pararMusica();
             }
             else if(((opc==5)&&(entradas.isEnter())) || ((opc==5)&&(entradas.isClick())&&(mouseClick))){
                 // salir del juego
@@ -228,7 +228,7 @@ public class PantallaMenu implements Screen {
 
         // Verificar si hay dos jugadores conectados
         if (Config.empiezaPartida || verificarDosJugadoresConectados()) {
-            ControlAudio.pararMusica();
+            ControladorAudio.pararMusica();
             app.setScreen(new PantallaHistoria());
             return;
         }

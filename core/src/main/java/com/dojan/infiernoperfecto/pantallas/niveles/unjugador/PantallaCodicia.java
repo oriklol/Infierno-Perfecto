@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.pantallas.niveles;
+package com.dojan.infiernoperfecto.pantallas.niveles.unjugador;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,21 +13,21 @@ import com.dojan.infiernoperfecto.batalla.Batalla;
 import com.dojan.infiernoperfecto.comandos.ComandoAtacar;
 import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Texto;
+import com.dojan.infiernoperfecto.entidades.enemigos.Enemigo;
 import com.dojan.infiernoperfecto.entidades.enemigos.codicia.EnemigoCodicia1;
 import com.dojan.infiernoperfecto.entidades.enemigos.codicia.EnemigoCodicia2;
 import com.dojan.infiernoperfecto.entidades.enemigos.codicia.MiniBossCodicia;
-import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
-import com.dojan.infiernoperfecto.entidades.enemigos.Enemigo;
 import com.dojan.infiernoperfecto.logica.ResultadoCombate;
 import com.dojan.infiernoperfecto.pantallas.EstadoBatalla;
 import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
 import com.dojan.infiernoperfecto.pantallas.batalla.ControladorBatallaLocal;
+import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.utiles.Config;
 import com.dojan.infiernoperfecto.utiles.ControladorJuego;
+import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 import com.dojan.infiernoperfecto.utiles.Random;
 import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
-import com.dojan.infiernoperfecto.utiles.GestorPantallas;
 
 import io.Entradas;
 

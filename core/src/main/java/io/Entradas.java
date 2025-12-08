@@ -18,6 +18,7 @@ public class Entradas implements InputProcessor {
     private boolean enterPresionado = false;
     private boolean enciclopedia;
 
+    // vector para almacenar la posición del ratón transformada por las coordeanadas del viewport
     private Vector2 mousePos = new Vector2();
 
     public Entradas(){
@@ -113,6 +114,8 @@ public class Entradas implements InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // transformar coordenadas de pantalla a coordenadas del viewport
         mousePos.set(screenX, screenY);
+        // viewport.unproject para convertir las coordenadas de pantalla física a las coordenadas del juego original
+        // tambien invierte las coordenadas del mouse
         InfiernoPerfecto.viewport.unproject(mousePos);
 
         this.mouseX = (int) mousePos.x;
@@ -209,6 +212,7 @@ public class Entradas implements InputProcessor {
         return esc;
     }
 
+    // funcion para verificar si enter fue presionado y resetear el estado
     public boolean isEnterPresionado() {
         if (enterPresionado) {
             enterPresionado = false; //

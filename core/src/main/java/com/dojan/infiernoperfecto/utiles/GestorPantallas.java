@@ -4,13 +4,17 @@ import com.badlogic.gdx.Screen;
 import java.util.Stack;
 
 public class GestorPantallas {
+    // Singleton para gestionar las pantallas y su historial
     private static GestorPantallas instancia;
+    // Pila para almacenar el historial de pantallas
     private Stack<Screen> historialPantallas;
 
+    // Constructor privado para el singleton
     private GestorPantallas() {
         historialPantallas = new Stack<>();
     }
 
+    // Funcion para obtener la instancia del singleton
     public static GestorPantallas getInstance() {
         if (instancia == null) {
             instancia = new GestorPantallas();
@@ -18,10 +22,7 @@ public class GestorPantallas {
         return instancia;
     }
 
-    /**
-     * Cambia a una nueva pantalla y guarda la actual en el historial
-     * @param nuevaPantalla La pantalla a la que cambiar
-     */
+    // Cambia a una nueva pantalla y guarda la actual en el historial
     public void irAPantalla(Screen nuevaPantalla) {
         Screen pantallaActual = Render.app.getScreen();
 
@@ -34,9 +35,8 @@ public class GestorPantallas {
         Render.app.setScreen(nuevaPantalla);
     }
 
-    /**
-     * Vuelve a la pantalla anterior
-     */
+
+    // Vuelve a la pantalla anterior
     public void volverAtras() {
         if (!historialPantallas.isEmpty()) {
             // Dispose de la pantalla actual (opciones/enciclopedia)
@@ -54,9 +54,7 @@ public class GestorPantallas {
         }
     }
 
-    /**
-     * Limpia el historial (usar al volver al menú principal)
-     */
+    // Limpia el historial de pantallas
     public void limpiarHistorial() {
         // Dispose de todas las pantallas guardadas
         while (!historialPantallas.isEmpty()) {
@@ -69,16 +67,12 @@ public class GestorPantallas {
         }
     }
 
-    /**
-     * Verifica si hay pantallas en el historial
-     */
+    // Verifica si hay historial disponible
     public boolean hayHistorial() {
         return !historialPantallas.isEmpty();
     }
 
-    /**
-     * Obtiene el tamaño del historial
-     */
+    // Obtiene el tamaño del historial
     public int tamañoHistorial() {
         return historialPantallas.size();
     }

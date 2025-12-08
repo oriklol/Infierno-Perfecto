@@ -38,7 +38,7 @@ public class PantallaLimbo implements Screen {
 
     private Texto lugar;
     private Texto textoEnemigoSeleccionado;
-    
+
     // UI Reutilizable
     private Texto textoSeleccionTitulo;
     private Texto textoVictoria;
@@ -79,7 +79,7 @@ public class PantallaLimbo implements Screen {
         System.out.println("PantallaLimbo.show() ejecutado");
 
         musicaFondo = new Musica(Recursos.MUSICABATALLA);
-        ControlAudio.setMusicaActual(musicaFondo);
+        ControladorAudio.setMusicaActual(musicaFondo);
 
         if (!inicializado) {
             inicializarRecursos();
@@ -118,19 +118,19 @@ public class PantallaLimbo implements Screen {
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
 
         textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
-        
+
         // Inicializar textos estáticos
         textoSeleccionTitulo = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
         textoSeleccionTitulo.setTexto("Selecciona a un enemigo");
         textoSeleccionTitulo.setPosition((Config.ANCHO / 2 - ((int) textoSeleccionTitulo.getAncho() / 2)), 120);
-        
+
         textoVictoria = new Texto(Recursos.FUENTEMENU, 80, Color.GOLD, false);
         textoVictoria.setTexto("¡VICTORIA!");
         textoVictoria.setPosition(
             Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
             Config.ALTO / 2 + 50
         );
-        
+
         textoContinuar = new Texto(Recursos.FUENTEMENU, 40, Color.WHITE, false);
         textoContinuar.setTexto("Click para continuar");
         textoContinuar.setPosition(
@@ -154,7 +154,7 @@ public class PantallaLimbo implements Screen {
         enemigos.clear();
         for(Imagen spr : enemigoSpr) if(spr!=null) spr.dispose();
         enemigoSpr.clear();
-        
+
         // Limpiar textos viejos
         for(Texto t : textosVidasEnemigos) if(t!=null) t.dispose();
         textosVidasEnemigos.clear();
@@ -167,12 +167,12 @@ public class PantallaLimbo implements Screen {
 
             enemigos.add(miniboss);
             enemigoSpr.add(spriteMiniboss);
-            
+
             // Texto vida boss
             Texto tVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
             tVida.setTexto("HP: " + miniboss.getVidaActual() + " - " + miniboss.getVidaBase());
             // Posición se ajustará en render, pero inicializamos:
-            tVida.setPosition(0,0); 
+            tVida.setPosition(0,0);
             textosVidasEnemigos.add(tVida);
 
             System.out.println("¡MINIBOSS DEL PISO " + piso + " HA APARECIDO!");
@@ -191,7 +191,7 @@ public class PantallaLimbo implements Screen {
                 }
                 enemigos.add(enemigo);
                 enemigoSpr.add(sprite);
-                
+
                 // Texto vida enemigo
                 Texto tVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
                 tVida.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
@@ -239,7 +239,7 @@ public class PantallaLimbo implements Screen {
                 Texto t = textosVidasEnemigos.remove(indice);
                 if(t != null) t.dispose();
             }
-            
+
             if (enemigoSeleccionado >= enemigos.size() && enemigos.size() > 0) {
                 enemigoSeleccionado = enemigos.size() - 1;
             }
@@ -251,7 +251,7 @@ public class PantallaLimbo implements Screen {
 
     @Override
     public void render(float delta) {
-        ControlAudio.reproducirMusica();
+        ControladorAudio.reproducirMusica();
 
         // ✅ CRÍTICO: Configurar ShapeRenderer con la cámara del viewport
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
@@ -280,10 +280,10 @@ public class PantallaLimbo implements Screen {
             if (i < textosVidasEnemigos.size() && i < enemigos.size() && i < enemigoSpr.size()) {
                 Enemigo enemigo = enemigos.get(i);
                 Texto tVida = textosVidasEnemigos.get(i);
-                
+
                 // Actualizar texto (barato comparado con new)
                 tVida.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
-                
+
                 // Actualizar posición
                 tVida.setPosition(
                     (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - tVida.getAncho() / 2),
@@ -555,7 +555,7 @@ public class PantallaLimbo implements Screen {
                 // Mostrar victoria si no quedan enemigos
                 if (enemigos.isEmpty()) {
                     Render.batch.begin();
-                    
+
                     if (textoVictoria != null) textoVictoria.dibujar();
 
                     if ((int)(tiempo * 2) % 2 == 0) {
