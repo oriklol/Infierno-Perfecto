@@ -32,7 +32,7 @@ public class PantallaVictoria implements Screen {
     public void show() {
         gameOver = new Imagen(Recursos.FONDOGANAR);
         musicaFondo = new Musica(Recursos.MUSICAMUERTE);
-        ControlAudio.setMusicaActual(musicaFondo);
+        ControladorAudio.setMusicaActual(musicaFondo);
         Gdx.input.setInputProcessor(entradas);
 
         if (Render.renderer == null) {
@@ -56,7 +56,7 @@ public class PantallaVictoria implements Screen {
 
     @Override
     public void render(float delta) {
-        ControlAudio.reproducirMusica();
+        ControladorAudio.reproducirMusica();
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         gameOver.dibujar();
@@ -118,7 +118,7 @@ public class PantallaVictoria implements Screen {
 
         if(entradas.isEnter() || entradas.isClick()) {
             if (((opc == 2) && (entradas.isEnter())) || ((opc == 2) && (entradas.isClick()) && (mouseClick))) {
-                ControlAudio.pararMusica();
+                ControladorAudio.pararMusica();
                 app.setScreen(new PantallaMenu());
             }
         }

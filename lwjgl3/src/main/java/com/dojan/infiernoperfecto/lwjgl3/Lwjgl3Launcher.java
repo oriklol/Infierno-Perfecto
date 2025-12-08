@@ -30,7 +30,7 @@ public class Lwjgl3Launcher {
         // iniciar en fullscreen
         //configuration.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
 
-        // ✅ Atajo Alt+Enter para cambiar a fullscreen en tiempo de ejecución
+        // alt+enter para cambiar a fullscreen en tiempo de ejecución
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 
         return configuration;

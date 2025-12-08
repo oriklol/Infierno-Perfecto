@@ -32,7 +32,7 @@ public class PantallaGameOver implements Screen {
     public void show() {
         gameOver = new Imagen(Recursos.FONDOPERDER);
         musicaFondo = new Musica(Recursos.MUSICAMUERTE);
-        ControlAudio.setMusicaActual(musicaFondo);
+        ControladorAudio.setMusicaActual(musicaFondo);
         Gdx.input.setInputProcessor(entradas);
 
         for(int i = 0; i < opciones.length; i++){
@@ -52,7 +52,7 @@ public class PantallaGameOver implements Screen {
 
     @Override
     public void render(float delta) {
-        ControlAudio.reproducirMusica();
+        ControladorAudio.reproducirMusica();
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
         Render.batch.begin();
         gameOver.dibujar();
@@ -97,7 +97,7 @@ public class PantallaGameOver implements Screen {
 
         if(entradas.isEnter() || entradas.isClick()) {
             if (((opc == 2) && (entradas.isEnter())) || ((opc == 2) && (entradas.isClick()) && (mouseClick))) {
-                ControlAudio.pararMusica();
+                ControladorAudio.pararMusica();
                 app.setScreen(new PantallaMenu());
             }
         }

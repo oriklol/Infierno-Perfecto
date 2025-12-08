@@ -38,8 +38,8 @@ public class PantallaOpciones implements Screen {
 
     public String getTextoOpcion(int opc) {
         switch (opc) {
-            case 0: return "Volumen Musica: " + (ControlAudio.volumenMusica * 10) + "%";
-            case 1: return "Volumen Efectos: " + (ControlAudio.volumenSFX * 10) + "%";
+            case 0: return "Volumen Musica: " + (ControladorAudio.volumenMusica * 10) + "%";
+            case 1: return "Volumen Efectos: " + (ControladorAudio.volumenSFX * 10) + "%";
             case 2: return "Pantalla Completa: " + Gdx.graphics.isFullscreen();
             case 3: return "Volver";
             case 4: return "Salir al Menu"; // ✅ Nueva opción
@@ -231,13 +231,13 @@ public class PantallaOpciones implements Screen {
         if (puedeActuar && inputPresionado) {
             if (opc == 1) {
                 if(entradas.isEnter() || (entradas.isClick() && mouseClick)) {
-                    ControlAudio.cicloVolumenMusica();
+                    ControladorAudio.cicloVolumenMusica();
                     tiempoUltimaAccion = 0;
                 }
 
             } else if (opc == 2) {
                 if (entradas.isEnter() || (entradas.isClick() && mouseClick)){
-                    ControlAudio.cicloVolumenSFX();
+                    ControladorAudio.cicloVolumenSFX();
                     tiempoUltimaAccion = 0;
                 }
             } else if ((opc == 3) && entradas.isEnterPresionado()) { // no se como resolverlo

@@ -6,16 +6,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.dojan.infiernoperfecto.pantallas.PantallaCreditos;
 import com.dojan.infiernoperfecto.pantallas.PantallaMenu;
-import com.dojan.infiernoperfecto.pantallas.PantallaVictoria;
-import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
 import com.dojan.infiernoperfecto.red.HiloCliente;
 import com.dojan.infiernoperfecto.utiles.Config;
+import com.dojan.infiernoperfecto.utiles.ControladorAudio;
 import com.dojan.infiernoperfecto.utiles.Render;
 
 /** {@link ApplicationListener} implementation shared by all platforms. */
 public class InfiernoPerfecto extends Game {
+    // instancia del cliente. manejara la coexion con el servidor
     private HiloCliente cliente = null;
 
     // relacion de aspecto
@@ -25,6 +24,8 @@ public class InfiernoPerfecto extends Game {
     @Override
     public void create() {
         // crear camara ortográfica
+        // la camara se crea una vez al inicio del juego y se reutiliza en todas las pantallas
+        // mantiene la relacion de aspecto configurada en Config.ANCHO y Config.ALTO
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Config.ANCHO, Config.ALTO);
 
@@ -38,6 +39,8 @@ public class InfiernoPerfecto extends Game {
 
     @Override
     public void render() {
+        // verificar si el servidor se ha desconectado globalmente
+        // desconecta al cliente, lo setea null y vuelve al menu principal
         if (cliente != null && cliente.isServidorCaido()) {
             System.out.println("Servidor caído detectado globalmente");
             cliente.desconectar();
@@ -47,6 +50,8 @@ public class InfiernoPerfecto extends Game {
             setScreen(new PantallaMenu());
         }
 
+        // verificar si el cliente externo se ha desconectado globalmente
+        // desconecta al cliente, lo setea null y vuelve al menu principal
         if (cliente != null && cliente.isClienteExternoDesconectado()) {
             System.out.println("Cliente externo desconectado detectado globalmente");
             cliente.desconectar();
@@ -100,7 +105,7 @@ public class InfiernoPerfecto extends Game {
             try{ getScreen().dispose(); }catch(Exception e){ }
         }
 
-        com.dojan.infiernoperfecto.utiles.ControlAudio.dispose();
+        ControladorAudio.dispose();
     }
 
     public HiloCliente getCliente() {
