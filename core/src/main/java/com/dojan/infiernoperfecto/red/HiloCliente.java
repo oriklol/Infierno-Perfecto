@@ -1,6 +1,7 @@
 package com.dojan.infiernoperfecto.red;
 
 import com.dojan.infiernoperfecto.utiles.Config;
+import com.badlogic.gdx.Gdx;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -52,6 +53,8 @@ public class HiloCliente extends Thread {
     private int feJugador1 = -1;
     private float vidaJugador2 = -1;
     private int feJugador2 = -1;
+    private int monedasJugador1 = -1;
+    private int monedasJugador2 = -1;
 
     public HiloCliente() {
         this.setDaemon(true);
@@ -281,14 +284,45 @@ public class HiloCliente extends Thread {
                 float vida = Float.parseFloat(partes[2]);
                 int fe = Integer.parseInt(partes[3]);
                 
+                int monedas = -1;
+                if (partes.length > 4) {
+                    try {
+                        monedas = Integer.parseInt(partes[4]);
+                    } catch (NumberFormatException e) {
+                        // ignorar si no es numero
+                    }
+                }
+                
                 if (numJug == 1) {
                     vidaJugador1 = vida;
                     feJugador1 = fe;
+                    if (monedas != -1) monedasJugador1 = monedas;
                 } else if (numJug == 2) {
                     vidaJugador2 = vida;
                     feJugador2 = fe;
+                    if (monedas != -1) monedasJugador2 = monedas;
                 }
-                System.out.println("Cliente: Actualización de jugador " + numJug + ": Vida=" + vida + ", Fe=" + fe);
+                
+                // Actualizar DIRECTAMENTE la configuración global si soy ese jugador
+                if (numJug == numeroJugador && Config.personajeSeleccionado != null) {
+                    final int m = monedas;
+                    final float v = vida;
+                    final int f = fe;
+                    
+                    if (Gdx.app != null) {
+                        Gdx.app.postRunnable(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (m != -1) Config.personajeSeleccionado.setMonedasActual(m);
+                                Config.personajeSeleccionado.setVidaActual(v);
+                                Config.personajeSeleccionado.setFeActual(f);
+                            }
+                        });
+                    }
+                }
+
+                String monedasStr = (monedas != -1) ? String.valueOf(monedas) : "N/A";
+                System.out.println("Cliente: Actualización de jugador " + numJug + ": Vida=" + vida + ", Fe=" + fe + ", Monedas=" + monedasStr);
             } catch (Exception e) {
                 System.out.println("Cliente: Error parsing ACTUALIZAR_JUGADOR: " + e.getMessage());
             }
@@ -454,6 +488,7 @@ public class HiloCliente extends Thread {
     public void setBatallaTerminada(boolean v) { this.batallaTerminada = v; }
     public boolean isVictoria() { return victoria; }
     public boolean isIrATienda() { return irATienda; }
+    public void setIrATienda(boolean irATienda) { this.irATienda = irATienda; }
     
     public boolean isTodosListosResultados() { return todosListosResultados; }
     public void setTodosListosResultados(boolean v) { this.todosListosResultados = v; }
@@ -462,6 +497,9 @@ public class HiloCliente extends Thread {
     public float getVidaJugador2() { return vidaJugador2; }
     public int getFeJugador1() { return feJugador1; }
     public int getFeJugador2() { return feJugador2; }
+    public int getMonedasJugador1() { return monedasJugador1; }
+    public int getMonedasJugador2() { return monedasJugador2; }
+
 
     public void resetBatallaFlags() {
         this.batallaTerminada = false;

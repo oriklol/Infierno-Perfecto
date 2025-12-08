@@ -287,6 +287,10 @@ public abstract class Personaje {
         this.monedasActual += monedas;
     }
 
+    public void setMonedasActual(int monedas) {
+        this.monedasActual = monedas;
+    }
+
     public void setVidaActual(float vida) {
         this.vidaActual = vida;
     }

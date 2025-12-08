@@ -60,6 +60,7 @@ public class PantallaLimboMulti implements Screen {
     // Variables para control de input seguro
     private boolean clickPrevio = false;
     private boolean justClicked = false;
+    private boolean disposed = false;
 
     // ============================================================
     // CONTROL Y ESTADO MULTIJUGADOR
@@ -103,16 +104,8 @@ public class PantallaLimboMulti implements Screen {
     // ============================================================
     // ESTADOS DE BATALLA MULTIJUGADOR
     // ============================================================
-    public enum EstadoBatallaMulti {
-        ESPERANDO_CONEXION,
-        ESPERANDO_JUGADORES,
-        ESPERANDO_DATOS_BATALLA,
-        SELECCION_ENEMIGO,
-        SELECCION_ATAQUE,
-        ESPERANDO_OTRO_JUGADOR,
-        RESULTADOS_COMBATE,
-        FIN_BATALLA
-    }
+    // Enum EstadoBatallaMulti movido a archivo externo
+
 
     @Override
     public void show() {
@@ -301,6 +294,8 @@ public class PantallaLimboMulti implements Screen {
             recurso = Recursos.ENEMIGOLIMBO1;
         } else if (nombre.contains("Esbirro") || nombre.contains("esbirro")) {
             recurso = Recursos.ENEMIGOLIMBO2;
+        } else if (nombre.contains("Sabueso") || nombre.contains("sabueso")) {
+            recurso = Recursos.MINIBOSSLIMBO;
         }
         System.out.println("DEBUG SPRITE: Creando sprite para '" + nombre + "' usando recurso: " + recurso);
         return new Imagen(recurso);
@@ -308,6 +303,7 @@ public class PantallaLimboMulti implements Screen {
 
     @Override
     public void render(float delta) {
+        if (disposed) return;
         ControlAudio.reproducirMusica();
 
         // Actualizar lógica de input seguro (Rising Edge Detection)
@@ -319,7 +315,9 @@ public class PantallaLimboMulti implements Screen {
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
 
         // MULTIJUGADOR: Actualizar estado desde servidor
-        actualizarEstadoDesdeServidor();
+        if (actualizarEstadoDesdeServidor()) {
+            return; // Si cambió de pantalla, dejar de renderizar
+        }
 
         // Dibujar fondo
         Render.batch.begin();
@@ -339,11 +337,13 @@ public class PantallaLimboMulti implements Screen {
         if (!esperandoEsc && entradas.isEnciclopedia()) {
             GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
             esperandoEsc = true;
+            return; // IMPORTANT: Return to avoid NPE
         }
 
         if (!esperandoEsc && entradas.isEsc()) {
             GestorPantallas.getInstance().irAPantalla(new PantallaOpciones(true));
             esperandoEsc = true;
+            return; // IMPORTANT: Return to avoid NPE
         }
 
         if (!entradas.isEsc() && !entradas.isEnciclopedia()) {
@@ -453,8 +453,11 @@ public class PantallaLimboMulti implements Screen {
         }
     }
 
-    private void actualizarEstadoDesdeServidor() {
-        if (hiloCliente == null) return;
+    /**
+     * @return true si se cambió de pantalla
+     */
+    private boolean actualizarEstadoDesdeServidor() {
+        if (hiloCliente == null) return false;
 
         // Obtener número de jugador
         if (numeroJugador == 0 && hiloCliente.getNumeroJugador() > 0) {
@@ -474,7 +477,7 @@ public class PantallaLimboMulti implements Screen {
                 estadoActual = EstadoBatallaMulti.SELECCION_ENEMIGO;
                 System.out.println("PantallaLimboMulti: Estado -> SELECCION_ENEMIGO");
             }
-            return;
+            return false;
         }
         
         // 2. MOSTRAR LOG DE BATALLA
@@ -489,7 +492,7 @@ public class PantallaLimboMulti implements Screen {
                 estadoActual = EstadoBatallaMulti.RESULTADOS_COMBATE;
                 tiempo = 0;
                 esperandoInput = false;
-                return;
+                return false;
             }
         }
         
@@ -498,7 +501,7 @@ public class PantallaLimboMulti implements Screen {
             System.out.println("PantallaLimboMulti: Batalla terminada, estado -> FIN_BATALLA");
             estadoActual = EstadoBatallaMulti.FIN_BATALLA;
             tiempo = 0;
-            return;
+            return false;
         }
         
         // 4. SINCRONIZAR VIDA DE ENEMIGOS
@@ -528,11 +531,17 @@ public class PantallaLimboMulti implements Screen {
             if (hiloCliente.getVidaJugador1() != -1) {
                 Config.personajeSeleccionado.setVidaActual(hiloCliente.getVidaJugador1());
                 Config.personajeSeleccionado.setFeActual(hiloCliente.getFeJugador1());
+                if (hiloCliente.getMonedasJugador1() != -1) {
+                    Config.personajeSeleccionado.setMonedasActual(hiloCliente.getMonedasJugador1());
+                }
             }
         } else if (numeroJugador == 2) {
             if (hiloCliente.getVidaJugador2() != -1) {
                 Config.personajeSeleccionado.setVidaActual(hiloCliente.getVidaJugador2());
                 Config.personajeSeleccionado.setFeActual(hiloCliente.getFeJugador2());
+                if (hiloCliente.getMonedasJugador2() != -1) {
+                    Config.personajeSeleccionado.setMonedasActual(hiloCliente.getMonedasJugador2());
+                }
             }
         }
         
@@ -542,6 +551,14 @@ public class PantallaLimboMulti implements Screen {
             System.out.println("PantallaLimboMulti: Es mi turno, estado -> SELECCION_ENEMIGO");
         }
         
+        // 8. VERIFICAR TRANSICIÓN A TIENDA
+        if (hiloCliente.isIrATienda()) {
+            System.out.println("PantallaLimboMulti: Servidor indica IR A TIENDA");
+            hiloCliente.setIrATienda(false); // Consumir flag
+            GestorPantallas.getInstance().irAPantalla(new PantallaTiendaMulti());
+            return true;
+        }
+
         // 7. VERIFICAR SI ESTOY ESPERANDO
         if (hiloCliente.isEsperandoOtroJugador() && 
             estadoActual != EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR &&
@@ -551,6 +568,8 @@ public class PantallaLimboMulti implements Screen {
             estadoActual = EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR;
             System.out.println("PantallaLimboMulti: Esperando otro jugador");
         }
+        
+        return false;
     }
 
     private void dibujarEnemigos() {
@@ -786,6 +805,8 @@ public class PantallaLimboMulti implements Screen {
 
     @Override
     public void dispose() {
+        if (disposed) return;
+        disposed = true;
         System.out.println("PantallaLimboMulti: DISPOSING resources");
         if (musicaFondo != null) musicaFondo.dispose();
         if (fondo != null) fondo.dispose();
