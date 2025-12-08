@@ -24,6 +24,16 @@ public class PantallaMapa implements Screen {
 
         Render.batch.end();
         if (tiempo>1){// en 5 segundos va a la tienda
+            // FASE 5.2: Auto-detectar modo multijugador
+            boolean esMultijugador = com.dojan.infiernoperfecto.red.HiloCliente.hayClienteActivo();
+            
+            if (esMultijugador) {
+                ControladorJuego.getInstance().setModoMultijugador(true);
+                System.out.println("PantallaMapa: Modo MULTIJUGADOR detectado");
+            } else {
+                System.out.println("PantallaMapa: Modo UN JUGADOR");
+            }
+            
             ControladorJuego.getInstance().iniciarJuego();
         }
     }

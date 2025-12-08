@@ -23,6 +23,35 @@ public class HiloCliente extends Thread {
     private long tiempoUltimoHeartbeat = 0;
     private static final long TIMEOUT_REENVIO = 2000;
     private static final long TIMEOUT_SERVIDOR = 8000;
+    // ============================================================
+    // ATRIBUTOS PARA MODO MULTIJUGADOR - FASE 2.2
+    // ============================================================
+    private int numeroJugador = 0;          // Número asignado por el servidor (1 o 2)
+    private String datosBatalla = "";
+    private boolean datosBatallaActualizados = false;       // Datos de enemigos
+    private boolean esMiTurno = false;      // true cuando es el turno del jugador
+    private boolean esperandoOtroJugador = false;  // true cuando ya seleccionó y espera al otro
+    private String logBatalla = "";         // Log de combate
+    private String resultadoBatalla = "";   // Resultado final (VICTORIA/DERROTA)
+    
+    // FASE 1 COMPLETAR PANTALLA: Estado de enemigos
+    private float[] vidasEnemigos = new float[0];  // Vidas actuales de enemigos
+    private boolean[] enemigosMuertos = new boolean[0];  // Estado de muerte de enemigos
+    private int numEnemigos = 0;  // Cantidad de enemigos en batalla
+    
+    // FASE 5.2: Instancia estática para auto-detección
+    private static HiloCliente instanciaActiva = null;
+
+    // FASE 5.3: Variables de estado de batalla faltantes
+    private boolean batallaTerminada = false;
+    private boolean victoria = false;
+    private boolean irATienda = false;
+    private boolean todosListosResultados = false;
+    
+    private float vidaJugador1 = -1;
+    private int feJugador1 = -1;
+    private float vidaJugador2 = -1;
+    private int feJugador2 = -1;
 
     public HiloCliente() {
         this.setDaemon(true);
@@ -36,6 +65,9 @@ public class HiloCliente extends Thread {
             }
             socket.setBroadcast(true);
             socket.setSoTimeout(1000);
+            
+            // Registrar esta instancia como activa
+            instanciaActiva = this;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +107,7 @@ public class HiloCliente extends Thread {
         cerrarConexion();
     }
 
-    private void enviarMensajeAlServidor(String msg) {
+    public void enviarMensajeAlServidor(String msg) {
         try {
             byte[] mensaje = msg.getBytes();
             InetAddress destino;
@@ -98,6 +130,12 @@ public class HiloCliente extends Thread {
         String msg = new String(dp.getData(), 0, dp.getLength()).trim();
         InetAddress origenIP = dp.getAddress();
         int origenPuerto = dp.getPort();
+
+        // FILTRO: Ignorar mensajes de IPs desconocidas (prevenir basura)
+        if (ipServidor != null && !origenIP.equals(ipServidor)) {
+            // Silenciosamente ignorar (no llenar logs con basura)
+            return;
+        }
 
         System.out.println("Cliente: Recibido '" + msg + "' de " + origenIP.getHostAddress() + ":" + origenPuerto);
 
@@ -142,6 +180,145 @@ public class HiloCliente extends Thread {
             clienteExternoDesconectado = true;
             conectado = false;
             fin = true; // detiene el hilo
+        
+        // ============================================================
+        // MENSAJES DE BATALLA MULTIJUGADOR - FASE 2.2
+        // ============================================================
+        } else if (msg.startsWith("ASIGNAR_JUGADOR:")) {
+            try {
+                numeroJugador = Integer.parseInt(msg.split(":")[1]);
+                System.out.println("Cliente: Asignado como Jugador " + numeroJugador);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        
+        } else if (msg.startsWith("DATOS_BATALLA:")) {
+            this.datosBatalla = msg.substring("DATOS_BATALLA:".length());
+            this.datosBatallaActualizados = true;
+            System.out.println("Cliente: Datos de batalla recibidos (FRESCOS): " + datosBatalla);
+            
+            // FASE 1: Inicializar arrays de enemigos
+            // Formato: nivel,nombre1,hp1,nombre2,hp2...
+            String[] partes = datosBatalla.split(",");
+            
+            // Validar formato (offset por nivel)
+            numEnemigos = (partes.length - 1) / 2;
+            vidasEnemigos = new float[numEnemigos];
+            enemigosMuertos = new boolean[numEnemigos];
+            
+            // Parsear vidas iniciales (empezando desde índice 1 del array)
+            for (int i = 0; i < numEnemigos; i++) {
+                // El HP está en: 1 (nivel) + i*2 (iteración) + 1 (nombre) = index + 1
+                // indices:
+                // partes[0] = nivel
+                // partes[1] = nombre 0
+                // partes[2] = hp 0
+                // partes[3] = nombre 1
+                // partes[4] = hp 1
+                try {
+                    vidasEnemigos[i] = Float.parseFloat(partes[2 + (i * 2)]);
+                    enemigosMuertos[i] = false;
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                   System.out.println("HiloCliente: Error parseando HP enemigo " + i);
+                }
+            }
+            System.out.println("Cliente: Inicializados " + numEnemigos + " enemigos (Protocolo v2)");
+        
+        } else if (msg.equals("TU_TURNO")) {
+            esMiTurno = true;
+            esperandoOtroJugador = false;
+            System.out.println("Cliente: ¡Es tu turno!");
+        }// AGREGAR DESPUÉS DE PROCESAR "TU_TURNO"
+        else if (msg.equals("FIN_BATALLA:VICTORIA")) {
+            batallaTerminada = true;
+            victoria = true;
+            System.out.println("Cliente: ¡VICTORIA! Todos los enemigos derrotados");
+        }
+        else if (msg.equals("IR_A_TIENDA")) {
+            irATienda = true;
+            System.out.println("Cliente: Ir a tienda después de este nivel");
+        }else if (msg.equals("VICTORIA_FINAL")) {
+            System.out.println("Cliente: ¡VICTORIA FINAL DEL JUEGO!");
+        } else if (msg.equals("ESPERANDO_OTRO_JUGADOR")) {
+            esperandoOtroJugador = true;
+            esMiTurno = false;
+            System.out.println("Cliente: Esperando a que el otro jugador elija...");
+        
+        } else if (msg.startsWith("LOG_BATALLA:")) {
+            // Acumular mensajes de log de batalla
+            String mensajeLog = msg.substring("LOG_BATALLA:".length());
+            if (logBatalla == null || logBatalla.isEmpty()) {
+                logBatalla = mensajeLog;
+            } else {
+                logBatalla += "\n" + mensajeLog;
+            }
+            System.out.println("Cliente: [BATALLA] " + mensajeLog);
+        
+        } else if (msg.startsWith("ACTUALIZAR_ENEMIGO:")) {
+            try {
+                // Formato: ACTUALIZAR_ENEMIGO:indice:vida,maxVida
+                String[] partes = msg.split(":");
+                int indice = Integer.parseInt(partes[1]);
+                String[] datosVida = partes[2].split(",");
+                float vida = Float.parseFloat(datosVida[0]);
+                
+                if (indice >= 0 && indice < vidasEnemigos.length) {
+                    vidasEnemigos[indice] = vida;
+                }
+                System.out.println("Cliente: Actualización de enemigo: " + msg);
+            } catch (Exception e) {
+                System.out.println("Cliente: Error parsing ACTUALIZAR_ENEMIGO: " + e.getMessage());
+            }
+
+        } else if (msg.equals("TODOS_LISTOS_RESULTADOS")) {
+            todosListosResultados = true;
+            System.out.println("Cliente: Todos listos para salir de resultados");
+        
+        } else if (msg.startsWith("ACTUALIZAR_JUGADOR:")) {
+            try {
+                String[] partes = msg.split(":");
+                int numJug = Integer.parseInt(partes[1]);
+                float vida = Float.parseFloat(partes[2]);
+                int fe = Integer.parseInt(partes[3]);
+                
+                if (numJug == 1) {
+                    vidaJugador1 = vida;
+                    feJugador1 = fe;
+                } else if (numJug == 2) {
+                    vidaJugador2 = vida;
+                    feJugador2 = fe;
+                }
+                System.out.println("Cliente: Actualización de jugador " + numJug + ": Vida=" + vida + ", Fe=" + fe);
+            } catch (Exception e) {
+                System.out.println("Cliente: Error parsing ACTUALIZAR_JUGADOR: " + e.getMessage());
+            }
+        
+        } else if (msg.startsWith("ENEMIGO_MUERTO:")) {
+            // FASE 1: Marcar enemigo como muerto
+            // Formato: ENEMIGO_MUERTO:indice
+            try {
+                int indice = Integer.parseInt(msg.substring("ENEMIGO_MUERTO:".length()));
+                if (indice >= 0 && indice < enemigosMuertos.length) {
+                    enemigosMuertos[indice] = true;
+                    vidasEnemigos[indice] = 0;
+                    System.out.println("Cliente: Enemigo " + indice + " marcado como MUERTO");
+                }
+            } catch (Exception e) {
+                System.out.println("Cliente: Error procesando ENEMIGO_MUERTO: " + e.getMessage());
+            }
+            System.out.println("Cliente: Enemigo eliminado: " + msg);
+
+        // AGREGAR DESPUÉS DE PROCESAR "SELECCIONAR_ATAQUE"
+
+        }else if (msg.startsWith("LOG_BATALLA:")) {
+            String logMensaje = msg.substring("LOG_BATALLA:".length());
+            System.out.println("Cliente: [BATALLA] " + logMensaje);
+
+        } else if (msg.startsWith("FIN_BATALLA:")) {
+            String resultado = msg.substring("FIN_BATALLA:".length());
+            System.out.println("Cliente: ========================================");
+            System.out.println("Cliente: FIN DE BATALLA - " + resultado);
+            System.out.println("Cliente: ========================================");
         }
     }
 
@@ -161,6 +338,50 @@ public class HiloCliente extends Thread {
     public boolean isClienteExternoDesconectado() {
         return clienteExternoDesconectado;
     }
+    
+    // ============================================================
+    // GETTERS PARA MODO MULTIJUGADOR - FASE 2.2
+    // ============================================================
+    
+    public int getNumeroJugador() {
+        return numeroJugador;
+    }
+    
+    public String getDatosBatalla() {
+        return datosBatalla;
+    }
+    
+    public synchronized boolean hasDatosBatallaActualizados() {
+        return datosBatallaActualizados;
+    }
+    
+    public synchronized void consumirDatosBatalla() {
+        datosBatallaActualizados = false;
+        // NO limpiar datosBatalla aquí, se limpia en resetDatosBatalla()
+    }
+    
+    /**
+     * CRÍTICO: Resetear COMPLETAMENTE los datos de batalla
+     * Llamar ANTES de esperar nuevos datos para evitar parsear datos viejos
+     */
+    public synchronized void resetDatosBatalla() {
+        datosBatalla = "";
+        datosBatallaActualizados = false;
+        logBatalla = "";
+        System.out.println("Cliente: Buffer de datos de batalla LIMPIADO");
+    }
+    
+    public boolean isEsMiTurno() {
+        return esMiTurno;
+    }
+    
+    public boolean isEsperandoOtroJugador() {
+        return esperandoOtroJugador;
+    }
+    
+    public void setEsMiTurno(boolean esMiTurno) {
+        this.esMiTurno = esMiTurno;
+    }
 
     public void desconectar() {
         if (conectado) {
@@ -179,5 +400,77 @@ public class HiloCliente extends Thread {
             socket.close();
         }
         System.out.println("Cliente: Socket cerrado");
+    }
+    
+    // FASE 5: Métodos adicionales para PantallaLimboMulti
+    public String getLogBatalla() {
+        return logBatalla;
+    }
+    
+    public String getResultadoBatalla() {
+        return resultadoBatalla;
+    }
+    
+    /**
+     * Verifica si hay un cliente activo y conectado (modo multijugador)
+     */
+    public static boolean hayClienteActivo() {
+        return instanciaActiva != null && instanciaActiva.isConectado();
+    }
+    
+    /**
+     * Obtiene la instancia activa del cliente (para reutilizar en pantallas)
+     */
+    public static HiloCliente getInstanciaActiva() {
+        return instanciaActiva;
+    }
+    
+    // ============================================================
+    // GETTERS PARA ESTADO DE ENEMIGOS - FASE 1
+    // ============================================================
+    
+    /**
+     * Obtiene el array de vidas de enemigos
+     */
+    public float[] getVidasEnemigos() {
+        return vidasEnemigos;
+    }
+    
+    /**
+     * Obtiene el array de estados de muerte de enemigos
+     */
+    public boolean[] getEnemigosMuertos() {
+        return enemigosMuertos;
+    }
+    
+    /**
+     * Obtiene la cantidad de enemigos en batalla
+     */
+    public int getNumEnemigos() {
+        return numEnemigos;
+    }
+
+    public boolean isBatallaTerminada() { return batallaTerminada; }
+    public void setBatallaTerminada(boolean v) { this.batallaTerminada = v; }
+    public boolean isVictoria() { return victoria; }
+    public boolean isIrATienda() { return irATienda; }
+    
+    public boolean isTodosListosResultados() { return todosListosResultados; }
+    public void setTodosListosResultados(boolean v) { this.todosListosResultados = v; }
+    
+    public float getVidaJugador1() { return vidaJugador1; }
+    public float getVidaJugador2() { return vidaJugador2; }
+    public int getFeJugador1() { return feJugador1; }
+    public int getFeJugador2() { return feJugador2; }
+
+    public void resetBatallaFlags() {
+        this.batallaTerminada = false;
+        this.victoria = false;
+        this.irATienda = false;
+        this.todosListosResultados = false;
+    }
+    
+    public void limpiarLogBatalla() {
+        this.logBatalla = "";
     }
 }

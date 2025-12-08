@@ -9,6 +9,7 @@ import com.dojan.infiernoperfecto.pantallas.niveles.PantallaFraude;
 import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLimbo;
 import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLujuria;
 import com.dojan.infiernoperfecto.pantallas.niveles.PantallaTraicion;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaLimboMulti;
 
 public class ControladorJuego {
 
@@ -20,8 +21,12 @@ public class ControladorJuego {
 
     private int nivelActual = 1;
     private int pisoActual = 1;
+    
+    // FASE 5.2: Flag para modo multijugador
+    private boolean esMultijugador = false;
 
     private PantallaLimbo pantallaLimbo;
+    private PantallaLimboMulti pantallaLimboMulti;  // Nueva pantalla multijugador
     private PantallaFraude pantallaFraude;  // ← AGREGAR
     private PantallaCodicia pantallaCodicia;
     private PantallaLujuria pantallaLujuria;
@@ -50,10 +55,18 @@ public class ControladorJuego {
         switch (pisoActual) {
             case 1:
                 // PISO 1: LIMBO
-                if (pantallaLimbo == null) {
-                    pantallaLimbo = new PantallaLimbo();
-                }   pantallaLimbo.reiniciarNivel(pisoActual, nivelActual);
-                Render.app.setScreen(pantallaLimbo);
+                // FASE 5.2: Cargar pantalla multijugador si corresponde
+                if (esMultijugador) {
+                    if (pantallaLimboMulti == null) {
+                        pantallaLimboMulti = new PantallaLimboMulti();
+                    }
+                    Render.app.setScreen(pantallaLimboMulti);
+                } else {
+                    if (pantallaLimbo == null) {
+                        pantallaLimbo = new PantallaLimbo();
+                    }   pantallaLimbo.reiniciarNivel(pisoActual, nivelActual);
+                    Render.app.setScreen(pantallaLimbo);
+                }
                 break;
             case 2:
                 // PISO 2: FRAUDE
@@ -146,7 +159,7 @@ public class ControladorJuego {
         cargarNivel();  // Carga el nivel 1 del nuevo piso
     }
 
-    private void irATienda() {
+    public void irATienda() {
 
         if (pantallaTienda == null) {
             pantallaTienda = new PantallaTienda();
@@ -157,5 +170,25 @@ public class ControladorJuego {
 
     public void gameOver() {
         Render.app.setScreen(new PantallaGameOver());
+    }
+    
+    // ============================================================
+    // FASE 5.2: Métodos para modo multijugador
+    // ============================================================
+    
+    /**
+     * Activa el modo multijugador
+     * Debe llamarse ANTES de iniciarJuego()
+     */
+    public void setModoMultijugador(boolean esMultijugador) {
+        this.esMultijugador = esMultijugador;
+        System.out.println("ControladorJuego: Modo multijugador = " + esMultijugador);
+    }
+    
+    /**
+     * Retorna si está en modo multijugador
+     */
+    public boolean isMultijugador() {
+        return esMultijugador;
     }
 }

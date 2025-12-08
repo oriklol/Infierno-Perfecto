@@ -16,6 +16,9 @@ public class Config {
     public static int ALTO = 600;
 
     public static boolean empiezaPartida = false;
+    
+    // FASE 5.2: Flag para modo multijugador
+    public static boolean esPartidaMultijugador = true;
 
     public void aumentarNivel() {
         if (nivel<4){

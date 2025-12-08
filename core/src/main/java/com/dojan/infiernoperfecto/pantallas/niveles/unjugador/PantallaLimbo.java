@@ -38,7 +38,13 @@ public class PantallaLimbo implements Screen {
 
     private Texto lugar;
     private Texto textoEnemigoSeleccionado;
-    private Texto vidaEnemigoTexto;
+    
+    // UI Reutilizable
+    private Texto textoSeleccionTitulo;
+    private Texto textoVictoria;
+    private Texto textoContinuar;
+    private final ArrayList<Texto> textosVidasEnemigos = new ArrayList<>();
+
     private Texto textoPS;
     private Texto textoFe;
     private Texto textoUsos;
@@ -112,7 +118,26 @@ public class PantallaLimbo implements Screen {
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
 
         textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
-        vidaEnemigoTexto = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+        
+        // Inicializar textos estáticos
+        textoSeleccionTitulo = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
+        textoSeleccionTitulo.setTexto("Selecciona a un enemigo");
+        textoSeleccionTitulo.setPosition((Config.ANCHO / 2 - ((int) textoSeleccionTitulo.getAncho() / 2)), 120);
+        
+        textoVictoria = new Texto(Recursos.FUENTEMENU, 80, Color.GOLD, false);
+        textoVictoria.setTexto("¡VICTORIA!");
+        textoVictoria.setPosition(
+            Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
+            Config.ALTO / 2 + 50
+        );
+        
+        textoContinuar = new Texto(Recursos.FUENTEMENU, 40, Color.WHITE, false);
+        textoContinuar.setTexto("Click para continuar");
+        textoContinuar.setPosition(
+             Config.ANCHO / 2 - (int)(textoContinuar.getAncho() / 2),
+             Config.ALTO / 2 - 20
+        );
+
         textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
         textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
         textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
@@ -127,7 +152,12 @@ public class PantallaLimbo implements Screen {
         }
 
         enemigos.clear();
+        for(Imagen spr : enemigoSpr) if(spr!=null) spr.dispose();
         enemigoSpr.clear();
+        
+        // Limpiar textos viejos
+        for(Texto t : textosVidasEnemigos) if(t!=null) t.dispose();
+        textosVidasEnemigos.clear();
 
         lugar.setTexto(nivel + " - " + piso);
 
@@ -137,6 +167,13 @@ public class PantallaLimbo implements Screen {
 
             enemigos.add(miniboss);
             enemigoSpr.add(spriteMiniboss);
+            
+            // Texto vida boss
+            Texto tVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+            tVida.setTexto("HP: " + miniboss.getVidaActual() + " - " + miniboss.getVidaBase());
+            // Posición se ajustará en render, pero inicializamos:
+            tVida.setPosition(0,0); 
+            textosVidasEnemigos.add(tVida);
 
             System.out.println("¡MINIBOSS DEL PISO " + piso + " HA APARECIDO!");
         } else {
@@ -154,6 +191,13 @@ public class PantallaLimbo implements Screen {
                 }
                 enemigos.add(enemigo);
                 enemigoSpr.add(sprite);
+                
+                // Texto vida enemigo
+                Texto tVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
+                tVida.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
+                // Posición se ajustará en render
+                tVida.setPosition(0,0);
+                textosVidasEnemigos.add(tVida);
             }
         }
 
@@ -190,6 +234,12 @@ public class PantallaLimbo implements Screen {
                 Imagen sprite = enemigoSpr.remove(indice);
                 sprite.dispose();
             }
+            // Eliminar texto asociado
+            if (indice < textosVidasEnemigos.size()) {
+                Texto t = textosVidasEnemigos.remove(indice);
+                if(t != null) t.dispose();
+            }
+            
             if (enemigoSeleccionado >= enemigos.size() && enemigos.size() > 0) {
                 enemigoSeleccionado = enemigos.size() - 1;
             }
@@ -214,25 +264,33 @@ public class PantallaLimbo implements Screen {
 
         Render.batch.begin();
         for (int i = 0; i < enemigos.size(); i++) {
-            int posX;
-
-            if (enemigos.size() == 1) {
-                posX = Config.ANCHO / 2 - (int)(enemigoSpr.get(i).getAncho() / 2);
-            } else {
-                posX = (int) ((Config.ANCHO / 3.5f) * i) + 20;
+            // Dibujar Sprite
+            if (i < enemigoSpr.size()) {
+                int posX;
+                if (enemigoSpr.size() == 1) {
+                    posX = Config.ANCHO / 2 - (int)(enemigoSpr.get(i).getAncho() / 2);
+                } else {
+                    posX = (int) ((Config.ANCHO / 3.5f) * i) + 20;
+                }
+                enemigoSpr.get(i).setPosition(posX, Config.ALTO / 2);
+                enemigoSpr.get(i).dibujar();
             }
 
-            enemigoSpr.get(i).setPosition(posX, Config.ALTO / 2);
-            enemigoSpr.get(i).dibujar();
-
-            Enemigo enemigo = enemigos.get(i);
-            Texto vidaEnemigo = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
-            vidaEnemigo.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
-            vidaEnemigo.setPosition(
-                (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - vidaEnemigo.getAncho() / 2),
-                (int) (enemigoSpr.get(i).getY() - 20)
-            );
-            vidaEnemigo.dibujar();
+            // Dibujar Vida (usando objetos de lista)
+            if (i < textosVidasEnemigos.size() && i < enemigos.size() && i < enemigoSpr.size()) {
+                Enemigo enemigo = enemigos.get(i);
+                Texto tVida = textosVidasEnemigos.get(i);
+                
+                // Actualizar texto (barato comparado con new)
+                tVida.setTexto("HP: " + enemigo.getVidaActual() + " - " + enemigo.getVidaBase());
+                
+                // Actualizar posición
+                tVida.setPosition(
+                    (int) (enemigoSpr.get(i).getX() + enemigoSpr.get(i).getAncho() / 2 - tVida.getAncho() / 2),
+                    (int) (enemigoSpr.get(i).getY() - 20)
+                );
+                tVida.dibujar();
+            }
         }
         Render.batch.end();
 
@@ -269,6 +327,7 @@ public class PantallaLimbo implements Screen {
                     int mouseY = entradas.getMouseY();
 
                     for (int i = 0; i < enemigos.size(); i++) {
+                        if (i >= enemigoSpr.size()) break;
                         Imagen spr = enemigoSpr.get(i);
                         int x = (int) spr.getX();
                         int y = (int) spr.getY();
@@ -310,10 +369,7 @@ public class PantallaLimbo implements Screen {
                 }
 
                 Render.batch.begin();
-                Texto textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
-                textoEnemigoSeleccionado.setTexto("Selecciona a un enemigo");
-                textoEnemigoSeleccionado.setPosition((Config.ANCHO / 2 - ((int) textoEnemigoSeleccionado.getAncho() / 2)), 120);
-                textoEnemigoSeleccionado.dibujar();
+                if(textoSeleccionTitulo != null) textoSeleccionTitulo.dibujar();
                 Render.batch.end();
 
                 break;
@@ -370,23 +426,28 @@ public class PantallaLimbo implements Screen {
                     Ataque ataqueSel = Config.personajeSeleccionado.getClase().getAtaques().get(ataqueSeleccionado);
 
                     Render.batch.begin();
-                    Texto textoPS = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-                    textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
-                    textoPS.setPosition(500, 120);
-                    textoPS.dibujar();
+                    // Usar campos ya existentes (textoPS, textoFe, textoUsos, textoCostoFe)
+                    if (textoPS != null) {
+                        textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
+                        textoPS.setPosition(500, 120);
+                        textoPS.dibujar();
+                    }
 
-                    Texto textoFe = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-                    textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
-                    textoFe.setPosition((int)(textoPS.getX() + textoPS.getAncho() + 20), 120);
-                    textoFe.dibujar();
+                    if (textoFe != null) {
+                        textoFe.setTexto("Fe: " + Config.personajeSeleccionado.getFeActual());
+                        // Calcular posición relativa a textoPS actualizado
+                        int psWidth = (textoPS != null) ? (int)textoPS.getAncho() : 100;
+                        textoFe.setPosition(500 + psWidth + 20, 120); // Aproximado para seguridad
+                        textoFe.dibujar();
+                    }
 
-                    Texto textoUsos = new Texto(Recursos.FUENTEMENU, 40, Color.RED, false);
-                    textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
-                    textoUsos.setPosition(500, 80);
-                    textoUsos.dibujar();
+                    if (textoUsos != null) {
+                        textoUsos.setTexto("Usos: " + ataqueSel.getCantUsos() + "   Daño: " + ataqueSel.getDanio());
+                        textoUsos.setPosition(500, 80);
+                        textoUsos.dibujar();
+                    }
 
-                    if (ataqueSel.getCostoFe() > 0) {
-                        Texto textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
+                    if (ataqueSel.getCostoFe() > 0 && textoCostoFe != null) {
                         textoCostoFe.setTexto("Costo Fe: " + ataqueSel.getCostoFe());
                         textoCostoFe.setPosition(500, 40);
                         textoCostoFe.dibujar();
@@ -494,23 +555,11 @@ public class PantallaLimbo implements Screen {
                 // Mostrar victoria si no quedan enemigos
                 if (enemigos.isEmpty()) {
                     Render.batch.begin();
-
-                    Texto textoVictoria = new Texto(Recursos.FUENTEMENU, 80, Color.GOLD, false);
-                    textoVictoria.setTexto("¡VICTORIA!");
-                    textoVictoria.setPosition(
-                        Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
-                        Config.ALTO / 2 + 50
-                    );
-                    textoVictoria.dibujar();
+                    
+                    if (textoVictoria != null) textoVictoria.dibujar();
 
                     if ((int)(tiempo * 2) % 2 == 0) {
-                        Texto textoContinuar = new Texto(Recursos.FUENTEMENU, 40, Color.WHITE, false);
-                        textoContinuar.setTexto("Click para continuar");
-                        textoContinuar.setPosition(
-                            Config.ANCHO / 2 - (int)(textoContinuar.getAncho() / 2),
-                            Config.ALTO / 2 - 20
-                        );
-                        textoContinuar.dibujar();
+                        if (textoContinuar != null) textoContinuar.dibujar();
                     }
 
                     Render.batch.end();
