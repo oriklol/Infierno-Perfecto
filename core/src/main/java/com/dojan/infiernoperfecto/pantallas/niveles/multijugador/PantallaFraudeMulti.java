@@ -46,7 +46,7 @@ public class PantallaFraudeMulti implements Screen {
     private Texto textoCostoFe;
     private Texto logTexto;
     private Texto textoVictoria;
-    
+
     // UI Info Aliado
     private Texto infoAliadoNombre;
     private Texto infoAliadoVida;
@@ -238,7 +238,7 @@ public class PantallaFraudeMulti implements Screen {
             vidasMaximasEnemigos[i] = vidasEnemigos[i];
 
             Imagen nuevoSpr = crearSpriteEnemigo(nombresEnemigos[i]);
-            
+
             int posX;
             if (numEnemigos == 1) {
                 posX = Config.ANCHO / 2 - (int)(nuevoSpr.getAncho() / 2);
@@ -280,7 +280,7 @@ public class PantallaFraudeMulti implements Screen {
 
     private Imagen crearSpriteEnemigo(String nombre) {
         String recurso = Recursos.ENEMIGOFRAUDE1; // Default: Bebon
-        
+
         if (nombre.equalsIgnoreCase("Bebon")) {
             recurso = Recursos.ENEMIGOFRAUDE1;
         } else if (nombre.equalsIgnoreCase("CangreSaura")) {
@@ -288,7 +288,7 @@ public class PantallaFraudeMulti implements Screen {
         } else if (nombre.equalsIgnoreCase("SinRostro")) {
             recurso = Recursos.MINIBOSSFRAUDE;
         }
-        
+
         System.out.println("DEBUG SPRITE FRAUDE: '" + nombre + "' -> " + recurso);
         return new Imagen(recurso);
     }
@@ -297,7 +297,7 @@ public class PantallaFraudeMulti implements Screen {
     public void render(float delta) {
         ControladorAudio.reproducirMusica();
         if (disposed) return;
-        
+
         Render.limpiarPantalla(0, 0, 0);
 
         boolean clickActual = entradas.isClick();
@@ -307,7 +307,7 @@ public class PantallaFraudeMulti implements Screen {
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
 
         if (actualizarEstadoDesdeServidor()) {
-            return; 
+            return;
         }
 
         Render.batch.begin();
@@ -505,7 +505,7 @@ public class PantallaFraudeMulti implements Screen {
         }
 
         if (hiloCliente.isIrATienda()) {
-            hiloCliente.setIrATienda(false); 
+            hiloCliente.setIrATienda(false);
             GestorPantallas.getInstance().irAPantalla(new PantallaTiendaMulti());
             return true;
         }
@@ -625,7 +625,7 @@ public class PantallaFraudeMulti implements Screen {
                     tiempo = 0;
                 }
             }
-            
+
             if (!(entradas.isEnter() || entradas.isClick())) {
                 esperandoInput = false;
             }
@@ -636,38 +636,38 @@ public class PantallaFraudeMulti implements Screen {
             textoSeleccionarEnemigo.dibujar();
         }
         Render.batch.end();
-        
+
         // NOTA: El rectángulo se dibuja ahora en dibujarEnemigos() para consistencia visual
     }
-    
+
     private void dibujarInfoAliado() {
         if (hiloCliente == null) return;
         int soy = numeroJugador;
         int el = (soy == 1) ? 2 : 1;
-        
+
         String clase = (el == 1) ? hiloCliente.getClaseJugador1() : hiloCliente.getClaseJugador2();
         float vida = (el == 1) ? hiloCliente.getVidaJugador1() : hiloCliente.getVidaJugador2();
         float maxVida = (el == 1) ? hiloCliente.getVidaMaxJugador1() : hiloCliente.getVidaMaxJugador2();
         int fe = (el == 1) ? hiloCliente.getFeJugador1() : hiloCliente.getFeJugador2();
         int maxFe = (el == 1) ? hiloCliente.getFeMaxJugador1() : hiloCliente.getFeMaxJugador2();
         int monedas = (el == 1) ? hiloCliente.getMonedasJugador1() : hiloCliente.getMonedasJugador2();
-        
+
         // Si no hay datos, mostrar espera
         if (clase.equals("---")) return;
 
         // MOVIDO A LA DERECHA Y ABAJO
         int xBase = Config.ANCHO - 250;
-        int yBase = Config.ALTO - 200; 
+        int yBase = Config.ALTO - 200;
 
         infoAliadoNombre.setTexto("Aliado: P" + el + " [" + clase + "]");
         infoAliadoNombre.setPosition(xBase, yBase);
         infoAliadoNombre.dibujar();
-        
-        infoAliadoVida.setTexto("HP: " + (int)vida + "/" + (int)maxVida);
+
+        infoAliadoVida.setTexto("HP: " + (int)vida + "-" + (int)maxVida);
         infoAliadoVida.setPosition(xBase, yBase - 30);
         infoAliadoVida.dibujar();
-        
-        infoAliadoFe.setTexto("Fe: " + fe + "/" + maxFe + "  $: " + monedas);
+
+        infoAliadoFe.setTexto("Fe: " + fe + "-" + maxFe + "  $: " + monedas);
         infoAliadoFe.setPosition(xBase, yBase - 60);
         infoAliadoFe.dibujar();
     }
@@ -739,12 +739,12 @@ public class PantallaFraudeMulti implements Screen {
             }
 
             if (!esperandoInput && (entradas.isEnter() || justClicked)) {
-                
+
                 // MULTIJUGADOR: Enviar selecciones por separado (Protocolo v1 soportado)
                 hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ENEMIGO:" + enemigoSeleccionado);
                 hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ATAQUE:" + ataqueSeleccionado);
                 System.out.println("PantallaFraudeMulti: Enviadas selecciones: " + enemigoSeleccionado + ", " + ataqueSeleccionado);
-                
+
                 // CRUCIAL: Marcar que ya no es mi turno para evitar que el update() me regrese a SELECCION_ENEMIGO
                 hiloCliente.setEsMiTurno(false);
 
@@ -778,23 +778,23 @@ public class PantallaFraudeMulti implements Screen {
         if (arena != null) try{ arena.dispose(); }catch(Exception e){}
         if (danioSpr != null) try{ danioSpr.dispose(); }catch(Exception e){}
         if (lugar != null) try{ lugar.dispose(); }catch(Exception e){}
-        
+
         for (Imagen spr : enemigoSpr) if (spr != null) try{ spr.dispose(); }catch(Exception e){}
         enemigoSpr.clear();
-        
+
         for (Texto t : textosNombresEnemigos) try{ t.dispose(); }catch(Exception e){}
         for (Texto t : textosVidasEnemigos) try{ t.dispose(); }catch(Exception e){}
-        
+
         if (textoAtaques != null) for (Texto t : textoAtaques) if(t!=null) try{ t.dispose(); }catch(Exception e){}
 
         if (textoEnemigoSeleccionado != null) try{ textoEnemigoSeleccionado.dispose(); }catch(Exception e){}
         if (vidaEnemigoTexto != null) try{ vidaEnemigoTexto.dispose(); }catch(Exception e){}
         if (textoPS != null) try{ textoPS.dispose(); }catch(Exception e){}
-        if (textoFe != null) try{ textoFe.dispose(); }catch(Exception e){} 
+        if (textoFe != null) try{ textoFe.dispose(); }catch(Exception e){}
         if (textoUsos != null) try{ textoUsos.dispose(); }catch(Exception e){}
         if (textoCostoFe != null) try{ textoCostoFe.dispose(); }catch(Exception e){}
         if (logTexto != null) try{ logTexto.dispose(); }catch(Exception e){}
-        
+
         if (textoSeleccionarEnemigo != null) try{ textoSeleccionarEnemigo.dispose(); }catch(Exception e){}
         if (textoEsperandoReusable != null) try{ textoEsperandoReusable.dispose(); }catch(Exception e){}
         if (textoContinuarReusable != null) try{ textoContinuarReusable.dispose(); }catch(Exception e){}

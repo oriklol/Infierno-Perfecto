@@ -629,11 +629,11 @@ public class PantallaLimboMulti implements Screen {
         infoAliadoNombre.setPosition(xBase, yBase);
         infoAliadoNombre.dibujar();
 
-        infoAliadoVida.setTexto("HP: " + (int)vida + "/" + (int)maxVida);
+        infoAliadoVida.setTexto("HP: " + (int)vida + "-" + (int)maxVida);
         infoAliadoVida.setPosition(xBase, yBase - 40);
         infoAliadoVida.dibujar();
 
-        infoAliadoFe.setTexto("Fe: " + fe + "/" + maxFe + "  $: " + monedas);
+        infoAliadoFe.setTexto("Fe: " + fe + "-" + maxFe + "  $: " + monedas);
         infoAliadoFe.setPosition(xBase, yBase - 80);
         infoAliadoFe.dibujar();
     }

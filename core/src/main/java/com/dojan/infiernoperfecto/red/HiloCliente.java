@@ -34,12 +34,12 @@ public class HiloCliente extends Thread {
     private boolean esperandoOtroJugador = false;  // true cuando ya seleccionó y espera al otro
     private String logBatalla = "";         // Log de combate
     private String resultadoBatalla = "";   // Resultado final (VICTORIA/DERROTA)
-    
+
     // FASE 1 COMPLETAR PANTALLA: Estado de enemigos
     private float[] vidasEnemigos = new float[0];  // Vidas actuales de enemigos
     private boolean[] enemigosMuertos = new boolean[0];  // Estado de muerte de enemigos
     private int numEnemigos = 0;  // Cantidad de enemigos en batalla
-    
+
     // FASE 5.2: Instancia estática para auto-detección
     private static HiloCliente instanciaActiva = null;
 
@@ -49,23 +49,23 @@ public class HiloCliente extends Thread {
     private boolean irATienda = false;
     private boolean todosListosResultados = false;
     private boolean victoriaFinal = false;
-    
+
     private float vidaJugador1 = -1;
     private int feJugador1 = -1;
     private float vidaJugador2 = -1;
     private int feJugador2 = -1;
     private int monedasJugador1 = -1;
     private int monedasJugador2 = -1;
-    
+
     // FASE 6: Info estática de jugadores
     private String claseJugador1 = "---";
     private float vidaMaxJugador1 = 100;
     private int feMaxJugador1 = 100;
-    
+
     private String claseJugador2 = "---";
     private float vidaMaxJugador2 = 100;
     private int feMaxJugador2 = 100;
-    
+
     private int piso = 1; // Default PISO 1
 
     public int getPiso() { return piso; }
@@ -82,7 +82,7 @@ public class HiloCliente extends Thread {
             }
             socket.setBroadcast(true);
             socket.setSoTimeout(1000);
-            
+
             // Registrar esta instancia como activa
             instanciaActiva = this;
         } catch (Exception e) {
@@ -197,7 +197,7 @@ public class HiloCliente extends Thread {
             clienteExternoDesconectado = true;
             conectado = false;
             fin = true; // detiene el hilo
-        
+
         // ============================================================
         // MENSAJES DE BATALLA MULTIJUGADOR - FASE 2.2
         // ============================================================
@@ -208,23 +208,16 @@ public class HiloCliente extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        
+
         } else if (msg.startsWith("DATOS_BATALLA:")) {
-            // FASE 2: Protocolo Mejorado: DATOS_BATALLA:PISO:NIVEL:Enemigo1,Vida1...
-            // substring "DATOS_BATALLA:".length() -> "PISO:NIVEL:Enemigo..."
             String payload = msg.substring("DATOS_BATALLA:".length());
-            
-            // Separamos por ':' para obtener Piso y el resto
-            // Esperamos formato PISO:NIVEL,Enemigo1,Vida1...
-            // OJO: El servidor manda: "DATOS_BATALLA:" + piso + ":" + nivel + ","
-            // Ejemplo: DATOS_BATALLA:1:1,Enemigo1,100
-            
+
             String[] firstSplit = payload.split(":", 2);
             if (firstSplit.length >= 2) {
                 try {
                     this.piso = Integer.parseInt(firstSplit[0]);
                     this.datosBatalla = firstSplit[1]; // Resto: "NIVEL,Enemigo1,..."
-                    
+
                     System.out.println("Cliente: Detectado PISO " + piso + " desde servidor.");
                 } catch(NumberFormatException e) {
                     System.out.println("Cliente: Error parseando PISO. Usando formato antiguo?");
@@ -233,20 +226,20 @@ public class HiloCliente extends Thread {
             } else {
                 this.datosBatalla = payload;
             }
-            
+
             this.datosBatallaActualizados = true;
             System.out.println("Cliente: Datos de batalla recibidos (FRESCOS): " + datosBatalla);
-            
+
             // FASE 1: Inicializar arrays de enemigos
             // Formato: nivel,nombre1,hp1,nombre2,hp2...
             String[] partes = datosBatalla.split(",");
-            
+
             // Validar formato (offset por nivel)
             // partes[0] es NIVEL
             numEnemigos = (partes.length - 1) / 2;
             vidasEnemigos = new float[numEnemigos];
             enemigosMuertos = new boolean[numEnemigos];
-            
+
             // Parsear vidas iniciales (empezando desde índice 1 del array)
             for (int i = 0; i < numEnemigos; i++) {
                 try {
@@ -257,7 +250,7 @@ public class HiloCliente extends Thread {
                 }
             }
             System.out.println("Cliente: Inicializados " + numEnemigos + " enemigos (Protocolo v2)");
-        
+
         } else if (msg.startsWith("INFO_JUGADORES:")) {
             try {
                 // INFO_JUGADORES:1:Clase:MaxVida:MaxFe:2:Clase:MaxVida:MaxFe
@@ -268,7 +261,7 @@ public class HiloCliente extends Thread {
                     String clase = partes[idx++];
                     float vidaMax = Float.parseFloat(partes[idx++]);
                     int feMax = Integer.parseInt(partes[idx++]);
-                    
+
                     if (numJug == 1) {
                         this.claseJugador1 = clase;
                         this.vidaMaxJugador1 = vidaMax;
@@ -304,7 +297,7 @@ public class HiloCliente extends Thread {
             esperandoOtroJugador = true;
             esMiTurno = false;
             System.out.println("Cliente: Esperando a que el otro jugador elija...");
-        
+
         } else if (msg.startsWith("LOG_BATALLA:")) {
             // Acumular mensajes de log de batalla
             String mensajeLog = msg.substring("LOG_BATALLA:".length());
@@ -314,7 +307,7 @@ public class HiloCliente extends Thread {
                 logBatalla += "\n" + mensajeLog;
             }
             System.out.println("Cliente: [BATALLA] " + mensajeLog);
-        
+
         } else if (msg.startsWith("ACTUALIZAR_ENEMIGO:")) {
             try {
                 // Formato: ACTUALIZAR_ENEMIGO:indice:vida,maxVida
@@ -322,7 +315,7 @@ public class HiloCliente extends Thread {
                 int indice = Integer.parseInt(partes[1]);
                 String[] datosVida = partes[2].split(",");
                 float vida = Float.parseFloat(datosVida[0]);
-                
+
                 if (indice >= 0 && indice < vidasEnemigos.length) {
                     vidasEnemigos[indice] = vida;
                 }
@@ -334,14 +327,14 @@ public class HiloCliente extends Thread {
         } else if (msg.equals("TODOS_LISTOS_RESULTADOS")) {
             todosListosResultados = true;
             System.out.println("Cliente: Todos listos para salir de resultados");
-        
+
         } else if (msg.startsWith("ACTUALIZAR_JUGADOR:")) {
             try {
                 String[] partes = msg.split(":");
                 int numJug = Integer.parseInt(partes[1]);
                 float vida = Float.parseFloat(partes[2]);
                 int fe = Integer.parseInt(partes[3]);
-                
+
                 int monedas = -1;
                 if (partes.length > 4) {
                     try {
@@ -350,7 +343,7 @@ public class HiloCliente extends Thread {
                         // ignorar si no es numero
                     }
                 }
-                
+
                 if (numJug == 1) {
                     vidaJugador1 = vida;
                     feJugador1 = fe;
@@ -360,13 +353,13 @@ public class HiloCliente extends Thread {
                     feJugador2 = fe;
                     if (monedas != -1) monedasJugador2 = monedas;
                 }
-                
+
                 // Actualizar DIRECTAMENTE la configuración global si soy ese jugador
                 if (numJug == numeroJugador && Config.personajeSeleccionado != null) {
                     final int m = monedas;
                     final float v = vida;
                     final int f = fe;
-                    
+
                     if (Gdx.app != null) {
                         Gdx.app.postRunnable(new Runnable() {
                             @Override
@@ -384,14 +377,14 @@ public class HiloCliente extends Thread {
             } catch (Exception e) {
                 System.out.println("Cliente: Error parsing ACTUALIZAR_JUGADOR: " + e.getMessage());
             }
-        
+
         } else if (msg.startsWith("ENEMIGO_MUERTO:")) {
             // FASE 1: Marcar enemigo como muerto
             // Formato: ENEMIGO_MUERTO:indice
             try {
                 int indice = Integer.parseInt(msg.substring("ENEMIGO_MUERTO:".length()));
                 if (indice >= 0 && indice < enemigosMuertos.length) {
-                    enemigosMuertos[indice] = true;
+                    enemigosMuertos[indice] = true; // cuando detecta uno muerto lo pone true
                     vidasEnemigos[indice] = 0;
                     System.out.println("Cliente: Enemigo " + indice + " marcado como MUERTO");
                 }
@@ -430,28 +423,28 @@ public class HiloCliente extends Thread {
     public boolean isClienteExternoDesconectado() {
         return clienteExternoDesconectado;
     }
-    
+
     // ============================================================
     // GETTERS PARA MODO MULTIJUGADOR - FASE 2.2
     // ============================================================
-    
+
     public int getNumeroJugador() {
         return numeroJugador;
     }
-    
+
     public String getDatosBatalla() {
         return datosBatalla;
     }
-    
+
     public synchronized boolean hasDatosBatallaActualizados() {
         return datosBatallaActualizados;
     }
-    
+
     public synchronized void consumirDatosBatalla() {
         datosBatallaActualizados = false;
         // NO limpiar datosBatalla aquí, se limpia en resetDatosBatalla()
     }
-    
+
     /**
      * CRÍTICO: Resetear COMPLETAMENTE los datos de batalla
      * Llamar ANTES de esperar nuevos datos para evitar parsear datos viejos
@@ -462,15 +455,15 @@ public class HiloCliente extends Thread {
         logBatalla = "";
         System.out.println("Cliente: Buffer de datos de batalla LIMPIADO");
     }
-    
+
     public boolean isEsMiTurno() {
         return esMiTurno;
     }
-    
+
     public boolean isEsperandoOtroJugador() {
         return esperandoOtroJugador;
     }
-    
+
     public void setEsMiTurno(boolean esMiTurno) {
         this.esMiTurno = esMiTurno;
     }
@@ -501,48 +494,48 @@ public class HiloCliente extends Thread {
         }
         System.out.println("Cliente: Socket cerrado");
     }
-    
+
     // FASE 5: Métodos adicionales para PantallaLimboMulti
     public String getLogBatalla() {
         return logBatalla;
     }
-    
+
     public String getResultadoBatalla() {
         return resultadoBatalla;
     }
-    
+
     /**
      * Verifica si hay un cliente activo y conectado (modo multijugador)
      */
     public static boolean hayClienteActivo() {
         return instanciaActiva != null && instanciaActiva.isConectado();
     }
-    
+
     /**
      * Obtiene la instancia activa del cliente (para reutilizar en pantallas)
      */
     public static HiloCliente getInstanciaActiva() {
         return instanciaActiva;
     }
-    
+
     // ============================================================
     // GETTERS PARA ESTADO DE ENEMIGOS - FASE 1
     // ============================================================
-    
+
     /**
      * Obtiene el array de vidas de enemigos
      */
     public float[] getVidasEnemigos() {
         return vidasEnemigos;
     }
-    
+
     /**
      * Obtiene el array de estados de muerte de enemigos
      */
     public boolean[] getEnemigosMuertos() {
         return enemigosMuertos;
     }
-    
+
     /**
      * Obtiene la cantidad de enemigos en batalla
      */
@@ -555,10 +548,10 @@ public class HiloCliente extends Thread {
     public boolean isVictoria() { return victoria; }
     public boolean isIrATienda() { return irATienda; }
     public void setIrATienda(boolean irATienda) { this.irATienda = irATienda; }
-    
+
     public boolean isTodosListosResultados() { return todosListosResultados; }
     public void setTodosListosResultados(boolean v) { this.todosListosResultados = v; }
-    
+
     public float getVidaJugador1() { return vidaJugador1; }
     public float getVidaJugador2() { return vidaJugador2; }
     public int getFeJugador1() { return feJugador1; }
@@ -570,11 +563,11 @@ public class HiloCliente extends Thread {
     public String getClaseJugador1() { return claseJugador1; }
     public float getVidaMaxJugador1() { return vidaMaxJugador1; }
     public int getFeMaxJugador1() { return feMaxJugador1; }
-    
+
     public String getClaseJugador2() { return claseJugador2; }
     public float getVidaMaxJugador2() { return vidaMaxJugador2; }
     public int getFeMaxJugador2() { return feMaxJugador2; }
-    
+
 
 
     public void resetBatallaFlags() {
@@ -583,7 +576,7 @@ public class HiloCliente extends Thread {
         this.irATienda = false;
         this.todosListosResultados = false;
     }
-    
+
     public void limpiarLogBatalla() {
         this.logBatalla = "";
     }
