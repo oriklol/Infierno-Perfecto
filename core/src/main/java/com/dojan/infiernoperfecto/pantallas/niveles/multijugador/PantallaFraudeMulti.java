@@ -11,6 +11,7 @@ import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.pantallas.PantallaOpciones;
 import com.dojan.infiernoperfecto.pantallas.enciclopedia.PantallaEnciclopedia;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaLimboMulti;
 import com.dojan.infiernoperfecto.red.HiloCliente;
 import com.dojan.infiernoperfecto.utiles.*;
 import com.dojan.infiernoperfecto.entidades.Jugador;
@@ -21,19 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Pantalla de Batalla Multijugador - Limbo
- * Versión completa basada en PantallaLimbo pero adaptada para multijugador
- *
- * Diferencias clave vs PantallaLimbo:
- * - NO ejecuta batalla localmente
- * - Lee estado desde HiloCliente (vida, enemigos muertos, logs)
- * - Envía selecciones al servidor
- * - Sincroniza visualmente con mensajes del servidor
+ * Pantalla de Batalla Multijugador - Fraude (Piso 2)
  */
-public class PantallaLimboMulti implements Screen {
+public class PantallaFraudeMulti implements Screen {
 
     // ============================================================
-    // RECURSOS VISUALES (copiados de PantallaLimbo)
+    // RECURSOS VISUALES
     // ============================================================
     private Musica musicaFondo;
     private Imagen fondo;
@@ -79,7 +73,6 @@ public class PantallaLimboMulti implements Screen {
     private int opc = 0;
 
     private boolean esperandoInput = false;
-    private boolean esperandoConfirmacionResultados = false;
     private EstadoBatallaMulti estadoActual = EstadoBatallaMulti.ESPERANDO_DATOS_BATALLA;
 
     // ============================================================
@@ -107,18 +100,13 @@ public class PantallaLimboMulti implements Screen {
     private boolean esperandoEsc = false;
     private String logBatalla = "";
 
-    // ============================================================
-    // ESTADOS DE BATALLA MULTIJUGADOR
-    // ============================================================
-    // Enum EstadoBatallaMulti movido a archivo externo
-
 
     @Override
     public void show() {
-        System.out.println("PantallaLimboMulti.show() ejecutado");
+        System.out.println("PantallaFraudeMulti.show() ejecutado");
 
         musicaFondo = new Musica(Recursos.MUSICABATALLA);
-//        ControlAudio.setMusicaActual(musicaFondo);
+        ControladorAudio.setMusicaActual(musicaFondo);
 
         if (!inicializado) {
             inicializarRecursos();
@@ -134,10 +122,10 @@ public class PantallaLimboMulti implements Screen {
         hiloCliente = HiloCliente.getInstanciaActiva();
 
         if (hiloCliente == null || !hiloCliente.isConectado()) {
-            System.out.println("PantallaLimboMulti: ERROR - No hay cliente conectado");
+            System.out.println("PantallaFraudeMulti: ERROR - No hay cliente conectado");
             estadoActual = EstadoBatallaMulti.ESPERANDO_CONEXION;
         } else {
-            System.out.println("PantallaLimboMulti: Cliente conectado, esperando datos de batalla");
+            System.out.println("PantallaFraudeMulti: Cliente conectado, esperando datos de batalla");
             estadoActual = EstadoBatallaMulti.ESPERANDO_DATOS_BATALLA;
         }
 
@@ -148,9 +136,8 @@ public class PantallaLimboMulti implements Screen {
         entradas = new Entradas();
         Gdx.input.setInputProcessor(entradas);
 
-        // FASE 5: Validar que exista personaje seleccionado (evita crash en update)
         if (Config.personajeSeleccionado == null) {
-            System.out.println("PantallaLimboMulti: WARN - PersonajeSeleccionado es NULL. Creando Peleador por defecto.");
+            System.out.println("PantallaFraudeMulti: WARN - PersonajeSeleccionado es NULL. Creando Peleador por defecto.");
             String nombreJugador = "Jugador " + (hiloCliente != null ? hiloCliente.getNumeroJugador() : "?");
             Config.personajeSeleccionado = new Jugador(nombreJugador, new Peleador());
         }
@@ -167,20 +154,13 @@ public class PantallaLimboMulti implements Screen {
             Render.renderer = new ShapeRenderer();
         }
 
-        // MUSICA: Habilitar
-        // Usar música del nivel correspondiente si existe, o genérica
-        // MUSICA: Habilitar
-        // Usar música del nivel correspondiente si existe, o genérica
-        musicaFondo = new Musica(Recursos.MUSICABATALLA);
-        ControladorAudio.setMusicaActual(musicaFondo);
-
-        fondo = new Imagen(Recursos.FONDOLIMBO);
+        // --- CAMBIO PRINCIPAL: FONDO DE FRAUDE ---
+        fondo = new Imagen(Recursos.FONDOFRAUDE);
         arena = new Imagen(Recursos.FONDOARENA);
         danioSpr = new Imagen(Recursos.EFECTODANIO);
 
         lugar = new Texto(Recursos.FUENTEMENU, 60, Color.BLACK, false);
         lugar.setPosition((int) (Config.ANCHO / 1.2f), (int) (Config.ALTO / 1.1f));
-        // MULTIJUGADOR: Mostrar nivel actual (se actualizará dinámicamente)
         lugar.setTexto(Config.nivel + " - " + Config.piso);
 
         textoEnemigoSeleccionado = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
@@ -191,7 +171,6 @@ public class PantallaLimboMulti implements Screen {
         textoCostoFe = new Texto(Recursos.FUENTEMENU, 32, Color.CORAL, false);
         logTexto = new Texto(Recursos.FUENTEMENU, 35, Color.WHITE, false);
 
-        // Inicializar textos reutilizables UI (OPTIMIZACIÓN DE MEMORIA)
         textoSeleccionarEnemigo = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
         textoSeleccionarEnemigo.setTexto("Selecciona a un enemigo");
         textoSeleccionarEnemigo.setPosition((Config.ANCHO / 2 - ((int) textoSeleccionarEnemigo.getAncho() / 2)), 120);
@@ -210,19 +189,15 @@ public class PantallaLimboMulti implements Screen {
             Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
             Config.ALTO / 2 + 50
         );
-        
-        // Info Aliado (Textos mas grandes)
-        infoAliadoNombre = new Texto(Recursos.FUENTEMENU, 40, Color.CYAN, false);
-        infoAliadoVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
-        infoAliadoFe = new Texto(Recursos.FUENTEMENU, 30, Color.YELLOW, false);
+
+        // Info Aliado
+        infoAliadoNombre = new Texto(Recursos.FUENTEMENU, 30, Color.CYAN, false);
+        infoAliadoVida = new Texto(Recursos.FUENTEMENU, 24, Color.WHITE, false);
+        infoAliadoFe = new Texto(Recursos.FUENTEMENU, 24, Color.YELLOW, false);
     }
 
-    /**
-     * MULTIJUGADOR: Parsea datos de batalla del servidor y crea sprites/textos
-     * Se ejecuta SOLO una vez al recibir "DATOS_BATALLA"
-     */
     private void parsearDatosBatalla(String datos) {
-        System.out.println("PantallaLimboMulti: parsearDatosBatalla invocada con: " + datos);
+        System.out.println("PantallaFraudeMulti: parsearDatosBatalla invocada con: " + datos);
 
         if(hiloCliente != null) hiloCliente.resetBatallaFlags();
 
@@ -230,7 +205,7 @@ public class PantallaLimboMulti implements Screen {
 
         try {
             int nivelRecibido = Integer.parseInt(partes[0]);
-            if (nivelRecibido < Config.nivel) return;
+            // if (nivelRecibido < Config.nivel) return; // REMOVIDO: Bloqueaba el cambio de piso (nivel 4 -> nivel 1)
             Config.nivel = nivelRecibido;
         } catch (NumberFormatException e) {
             System.out.println("Error parseando nivel.");
@@ -242,33 +217,28 @@ public class PantallaLimboMulti implements Screen {
 
         int numEnemigos = (partes.length - 1) / 2;
 
-        // Inicializar arrays de datos puros
         nombresEnemigos = new String[numEnemigos];
         vidasEnemigos = new float[numEnemigos];
         vidasMaximasEnemigos = new float[numEnemigos];
         enemigosMuertos = new boolean[numEnemigos];
 
-        // 1. Limpiar recursos gráficos anteriores
         for (Imagen spr : enemigoSpr) if (spr != null) spr.dispose();
         enemigoSpr.clear();
 
-        // 2. Limpiar textos anteriores
         for (Texto t : textosNombresEnemigos) t.dispose();
         textosNombresEnemigos.clear();
 
         for (Texto t : textosVidasEnemigos) t.dispose();
         textosVidasEnemigos.clear();
 
-        // 3. Crear nuevos recursos
         for (int i = 0; i < numEnemigos; i++) {
             int indexDatos = 1 + (i * 2);
             nombresEnemigos[i] = partes[indexDatos];
             vidasEnemigos[i] = Float.parseFloat(partes[indexDatos + 1]);
             vidasMaximasEnemigos[i] = vidasEnemigos[i];
 
-            // Sprite
             Imagen nuevoSpr = crearSpriteEnemigo(nombresEnemigos[i]);
-            // Posicionar sprite (necesario para posicionar textos después)
+            
             int posX;
             if (numEnemigos == 1) {
                 posX = Config.ANCHO / 2 - (int)(nuevoSpr.getAncho() / 2);
@@ -278,7 +248,6 @@ public class PantallaLimboMulti implements Screen {
             nuevoSpr.setPosition(posX, Config.ALTO / 2);
             enemigoSpr.add(nuevoSpr);
 
-            // Texto Nombre (Creado una sola vez)
             Texto tNombre = new Texto(Recursos.FUENTEMENU, 24, Color.CYAN, false);
             tNombre.setTexto(nombresEnemigos[i]);
             tNombre.setPosition(
@@ -287,7 +256,6 @@ public class PantallaLimboMulti implements Screen {
             );
             textosNombresEnemigos.add(tNombre);
 
-            // Texto Vida (Creado una sola vez)
             Texto tVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
             tVida.setTexto("HP: " + (int)vidasEnemigos[i]);
             tVida.setPosition(
@@ -297,7 +265,6 @@ public class PantallaLimboMulti implements Screen {
             textosVidasEnemigos.add(tVida);
         }
 
-        // Crear botones de ataque (Reutilización simple, recreamos si cambian, es poco frecuente)
         if (Config.personajeSeleccionado != null) {
             List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
             textoAtaques = new Texto[ataques.size()];
@@ -309,20 +276,20 @@ public class PantallaLimboMulti implements Screen {
                 textoAtaques[i].setPosition(x, y);
             }
         }
-
-        System.out.println("PantallaLimboMulti: Parseados " + numEnemigos + " enemigos y generados recursos gráficos.");
     }
 
     private Imagen crearSpriteEnemigo(String nombre) {
-        String recurso = Recursos.ENEMIGOLIMBO1; // Default
-        if (nombre.contains("Mini") || nombre.contains("mini")) {
-            recurso = Recursos.ENEMIGOLIMBO1;
-        } else if (nombre.contains("Esbirro") || nombre.contains("esbirro")) {
-            recurso = Recursos.ENEMIGOLIMBO2;
-        } else if (nombre.contains("Sabueso") || nombre.contains("sabueso")) {
-            recurso = Recursos.MINIBOSSLIMBO;
+        String recurso = Recursos.ENEMIGOFRAUDE1; // Default: Bebon
+        
+        if (nombre.equalsIgnoreCase("Bebon")) {
+            recurso = Recursos.ENEMIGOFRAUDE1;
+        } else if (nombre.equalsIgnoreCase("CangreSaura")) {
+            recurso = Recursos.ENEMIGOFRAUDE2;
+        } else if (nombre.equalsIgnoreCase("SinRostro")) {
+            recurso = Recursos.MINIBOSSFRAUDE;
         }
-        System.out.println("DEBUG SPRITE: Creando sprite para '" + nombre + "' usando recurso: " + recurso);
+        
+        System.out.println("DEBUG SPRITE FRAUDE: '" + nombre + "' -> " + recurso);
         return new Imagen(recurso);
     }
 
@@ -332,22 +299,17 @@ public class PantallaLimboMulti implements Screen {
         if (disposed) return;
         
         Render.limpiarPantalla(0, 0, 0);
-        
 
-        // Actualizar lógica de input seguro (Rising Edge Detection)
         boolean clickActual = entradas.isClick();
         justClicked = clickActual && !clickPrevio;
         clickPrevio = clickActual;
 
-        // Configurar ShapeRenderer con la cámara del viewport
         Render.renderer.setProjectionMatrix(InfiernoPerfecto.camera.combined);
 
-        // MULTIJUGADOR: Actualizar estado desde servidor
         if (actualizarEstadoDesdeServidor()) {
-            return; // Si cambió de pantalla, dejar de renderizar
+            return; 
         }
 
-        // Dibujar fondo
         Render.batch.begin();
         fondo.dibujar();
         arena.dibujar();
@@ -355,24 +317,22 @@ public class PantallaLimboMulti implements Screen {
         dibujarInfoAliado();
         Render.batch.end();
 
-        // Dibujar enemigos
         try {
            dibujarEnemigos();
         } catch(Exception e) {
            System.out.println("Error dibujando enemigos: " + e.getMessage());
         }
 
-        // Manejo de teclas especiales
         if (!esperandoEsc && entradas.isEnciclopedia()) {
             GestorPantallas.getInstance().irAPantalla(new PantallaEnciclopedia());
             esperandoEsc = true;
-            return; // IMPORTANT: Return to avoid NPE
+            return;
         }
 
         if (!esperandoEsc && entradas.isEsc()) {
             GestorPantallas.getInstance().irAPantalla(new PantallaOpciones(true));
             esperandoEsc = true;
-            return; // IMPORTANT: Return to avoid NPE
+            return;
         }
 
         if (!entradas.isEsc() && !entradas.isEnciclopedia()) {
@@ -381,11 +341,10 @@ public class PantallaLimboMulti implements Screen {
 
         tiempo += delta;
 
-        // Máquina de estados
         if (null != estadoActual) switch (estadoActual) {
             case ESPERANDO_DATOS_BATALLA:
                 Render.batch.begin();
-                Texto esperando = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false); // Podria optimizarse
+                Texto esperando = new Texto(Recursos.FUENTEMENU, 60, Color.WHITE, false);
                 esperando.setTexto("Esperando datos de batalla...");
                 esperando.setPosition(Config.ANCHO / 2 - (int)(esperando.getAncho() / 2), Config.ALTO / 2);
                 esperando.dibujar();
@@ -415,19 +374,14 @@ public class PantallaLimboMulti implements Screen {
                 break;
 
             case RESULTADOS_COMBATE:
-                // Mostrar log hasta que el usuario haga click
                 Render.batch.begin();
 
                 if (logBatalla != null && !logBatalla.isEmpty()) {
-                    // Reusar logTexto si es posible, o crear uno temporal si se necesita configuración diferente
-                    // Usaremos logTexto configurado en inicializarRecursos
                     logTexto.setTexto(logBatalla);
-                    // BAJADO para no tapar enemigos
-                    logTexto.setPosition(50, 150); 
+                    logTexto.setPosition(50, Config.ALTO / 2); // Log location adjustment if needed
                     logTexto.dibujar();
                 }
 
-                // Mensaje parpadeante
                 if ((int)(tiempo * 2) % 2 == 0) {
                     if (textoContinuarReusable != null) {
                         textoContinuarReusable.dibujar();
@@ -436,18 +390,10 @@ public class PantallaLimboMulti implements Screen {
 
                 Render.batch.end();
 
-                // Esperar click del usuario (USANDO JUST CLICKED)
                 if (entradas.isEnter() || justClicked) {
-                    System.out.println("PantallaLimboMulti: Usuario confirmó log con click seguro.");
-
-                    // Limpiar el log local
                     logBatalla = "";
                     hiloCliente.limpiarLogBatalla();
-
-                    // Notificar al servidor que vimos el log
                     hiloCliente.enviarMensajeAlServidor("CONFIRMAR_LOG");
-
-                    // Esperar respuesta del servidor (TU_TURNO o FIN_BATALLA)
                     estadoActual = EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR;
                     tiempo = 0;
                 }
@@ -461,7 +407,6 @@ public class PantallaLimboMulti implements Screen {
                 Render.batch.end();
 
                 if (tiempo > 3.0f) {
-                    System.out.println("PantallaLimboMulti: FIN_BATALLA tiempo cumplido. Enviando LISTO...");
                     if (hiloCliente.isIrATienda()) {
                         ControladorJuego.getInstance().irATienda();
                     } else {
@@ -479,50 +424,39 @@ public class PantallaLimboMulti implements Screen {
         }
     }
 
-    /**
-     * @return true si se cambió de pantalla
-     */
     private boolean actualizarEstadoDesdeServidor() {
         if (hiloCliente == null) return false;
 
-        // Obtener número de jugador
         if (numeroJugador == 0 && hiloCliente.getNumeroJugador() > 0) {
             numeroJugador = hiloCliente.getNumeroJugador();
-            System.out.println("PantallaLimboMulti: Soy el jugador " + numeroJugador);
         }
 
         // Detectar cambio de piso
         if (hiloCliente.getPiso() > Config.piso && hiloCliente.getPiso() != 0) {
-            System.out.println("PantallaLimboMulti: Detectado cambio de piso a " + hiloCliente.getPiso());
+            System.out.println("PantallaFraudeMulti: Detectado cambio de piso a " + hiloCliente.getPiso());
             Config.piso = hiloCliente.getPiso();
-            ControladorJuego.getInstance().cargarNivel(); 
+            ControladorJuego.getInstance().cargarNivel(); // Cambiar pantalla
             return true;
         }
 
-        // 1. PROCESAR DATOS DE BATALLA NUEVOS
         if (hiloCliente.hasDatosBatallaActualizados() &&
             estadoActual == EstadoBatallaMulti.ESPERANDO_DATOS_BATALLA) {
 
             String datos = hiloCliente.getDatosBatalla();
             if (datos != null && !datos.isEmpty()) {
-                System.out.println("PantallaLimboMulti: Parseando datos FRESCOS: " + datos);
                 parsearDatosBatalla(datos);
                 hiloCliente.consumirDatosBatalla();
                 estadoActual = EstadoBatallaMulti.SELECCION_ENEMIGO;
-                System.out.println("PantallaLimboMulti: Estado -> SELECCION_ENEMIGO");
             }
             return false;
         }
 
-        // 2. MOSTRAR LOG DE BATALLA
         String nuevoLog = hiloCliente.getLogBatalla();
         if (nuevoLog != null && !nuevoLog.isEmpty()) {
             logBatalla = nuevoLog;
             if (estadoActual != EstadoBatallaMulti.RESULTADOS_COMBATE &&
                 estadoActual != EstadoBatallaMulti.FIN_BATALLA &&
                 estadoActual != EstadoBatallaMulti.ESPERANDO_DATOS_BATALLA) {
-
-                System.out.println("PantallaLimboMulti: LOG recibido, mostrando RESULTADOS_COMBATE");
                 estadoActual = EstadoBatallaMulti.RESULTADOS_COMBATE;
                 tiempo = 0;
                 esperandoInput = false;
@@ -530,15 +464,12 @@ public class PantallaLimboMulti implements Screen {
             }
         }
 
-        // 3. VERIFICAR FIN DE BATALLA
         if (hiloCliente.isBatallaTerminada() && estadoActual != EstadoBatallaMulti.FIN_BATALLA) {
-            System.out.println("PantallaLimboMulti: Batalla terminada, estado -> FIN_BATALLA");
             estadoActual = EstadoBatallaMulti.FIN_BATALLA;
             tiempo = 0;
             return false;
         }
 
-        // 4. SINCRONIZAR VIDA DE ENEMIGOS
         if (vidasEnemigos != null && hiloCliente.getNumEnemigos() > 0) {
             float[] vidasActualizadas = hiloCliente.getVidasEnemigos();
             for (int i = 0; i < Math.min(vidasEnemigos.length, vidasActualizadas.length); i++) {
@@ -546,21 +477,11 @@ public class PantallaLimboMulti implements Screen {
                      vidasEnemigos[i] = vidasActualizadas[i];
                      if (i < textosVidasEnemigos.size()) {
                          textosVidasEnemigos.get(i).setTexto("HP: " + (int)vidasEnemigos[i]);
-                         // Recentrar - asumiendo posicion de sprite no cambia drásticamente en batalla estática
-                         if (i < enemigoSpr.size()) {
-                             Imagen spr = enemigoSpr.get(i);
-                             Texto tVida = textosVidasEnemigos.get(i);
-                             tVida.setPosition(
-                                (int) (spr.getX() + spr.getAncho() / 2 - tVida.getAncho() / 2),
-                                (int) (spr.getY() - 20)
-                            );
-                         }
                      }
                 }
             }
         }
 
-        // 5. SINCRONIZAR VIDA DEL JUGADOR
         if (numeroJugador == 1) {
             if (hiloCliente.getVidaJugador1() != -1) {
                 Config.personajeSeleccionado.setVidaActual(hiloCliente.getVidaJugador1());
@@ -579,63 +500,25 @@ public class PantallaLimboMulti implements Screen {
             }
         }
 
-        // 6. VERIFICAR SI ES MI TURNO
         if (hiloCliente.isEsMiTurno() && estadoActual == EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR) {
             estadoActual = EstadoBatallaMulti.SELECCION_ENEMIGO;
-            System.out.println("PantallaLimboMulti: Es mi turno, estado -> SELECCION_ENEMIGO");
         }
 
-        // 8. VERIFICAR TRANSICIÓN A TIENDA
         if (hiloCliente.isIrATienda()) {
-            System.out.println("PantallaLimboMulti: Servidor indica IR A TIENDA");
-            hiloCliente.setIrATienda(false); // Consumir flag
+            hiloCliente.setIrATienda(false); 
             GestorPantallas.getInstance().irAPantalla(new PantallaTiendaMulti());
             return true;
         }
 
-        // 7. VERIFICAR SI ESTOY ESPERANDO
         if (hiloCliente.isEsperandoOtroJugador() &&
             estadoActual != EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR &&
             estadoActual != EstadoBatallaMulti.FIN_BATALLA &&
             estadoActual != EstadoBatallaMulti.RESULTADOS_COMBATE &&
             estadoActual != EstadoBatallaMulti.ESPERANDO_DATOS_BATALLA) {
             estadoActual = EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR;
-            System.out.println("PantallaLimboMulti: Esperando otro jugador");
         }
 
         return false;
-    }
-    
-    private void dibujarInfoAliado() {
-        if (hiloCliente == null) return;
-        int soy = numeroJugador;
-        int el = (soy == 1) ? 2 : 1;
-        
-        String clase = (el == 1) ? hiloCliente.getClaseJugador1() : hiloCliente.getClaseJugador2();
-        float vida = (el == 1) ? hiloCliente.getVidaJugador1() : hiloCliente.getVidaJugador2();
-        float maxVida = (el == 1) ? hiloCliente.getVidaMaxJugador1() : hiloCliente.getVidaMaxJugador2();
-        int fe = (el == 1) ? hiloCliente.getFeJugador1() : hiloCliente.getFeJugador2();
-        int maxFe = (el == 1) ? hiloCliente.getFeMaxJugador1() : hiloCliente.getFeMaxJugador2();
-        int monedas = (el == 1) ? hiloCliente.getMonedasJugador1() : hiloCliente.getMonedasJugador2();
-        
-        // Si no hay datos, mostrar espera
-        if (clase.equals("---")) return;
-
-        // MOVIDO A LA DERECHA Y MAS ABAJO (Bajo enemigos)
-        int xBase = Config.ANCHO - 250;
-        int yBase = 250; // Posicion absoluta baja
-
-        infoAliadoNombre.setTexto("Aliado: P" + el + " [" + clase + "]");
-        infoAliadoNombre.setPosition(xBase, yBase);
-        infoAliadoNombre.dibujar();
-        
-        infoAliadoVida.setTexto("HP: " + (int)vida + "/" + (int)maxVida);
-        infoAliadoVida.setPosition(xBase, yBase - 40);
-        infoAliadoVida.dibujar();
-        
-        infoAliadoFe.setTexto("Fe: " + fe + "/" + maxFe + "  $: " + monedas);
-        infoAliadoFe.setPosition(xBase, yBase - 80);
-        infoAliadoFe.dibujar();
     }
 
     private void dibujarEnemigos() {
@@ -645,15 +528,12 @@ public class PantallaLimboMulti implements Screen {
 
         Render.batch.begin();
         for (int i = 0; i < enemigoSpr.size(); i++) {
-            // Ocultar enemigos muertos
             if (i < enemigosMuertos.length && enemigosMuertos[i]) {
                 continue;
             }
 
-            // Dibujar Sprite
             enemigoSpr.get(i).dibujar();
 
-            // Dibujar textos pre-generados de las listas
             if (i < textosVidasEnemigos.size()) {
                 textosVidasEnemigos.get(i).dibujar();
             }
@@ -664,9 +544,9 @@ public class PantallaLimboMulti implements Screen {
         }
         Render.batch.end();
 
-        // Rectángulo de selección
+        // Rectángulo de selección (Copiado de PantallaLimboMulti)
         if (opc >= 0 && opc < enemigoSpr.size()) {
-            if (opc >= enemigosMuertos.length || !enemigosMuertos[opc]) {
+            if (opc >= enemigosMuertos.length || !enemigosMuertos[opc]) { // Validaci¾n clave
                 Render.renderer.begin(ShapeRenderer.ShapeType.Line);
                 Render.renderer.setColor(Color.YELLOW);
                 Imagen spr = enemigoSpr.get(opc);
@@ -740,11 +620,14 @@ public class PantallaLimboMulti implements Screen {
                 // Doble validacion antes de enviar
                 if (opc >= 0 && opc < enemigosMuertos.length && !enemigosMuertos[opc]) {
                     enemigoSeleccionado = opc;
-                    // FASE 5: Enviar selección de enemigo al servidor
                     hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ENEMIGO:" + opc);
                     estadoActual = EstadoBatallaMulti.SELECCION_ATAQUE;
                     tiempo = 0;
                 }
+            }
+            
+            if (!(entradas.isEnter() || entradas.isClick())) {
+                esperandoInput = false;
             }
         }
 
@@ -753,34 +636,58 @@ public class PantallaLimboMulti implements Screen {
             textoSeleccionarEnemigo.dibujar();
         }
         Render.batch.end();
+        
+        // NOTA: El rectángulo se dibuja ahora en dibujarEnemigos() para consistencia visual
+    }
+    
+    private void dibujarInfoAliado() {
+        if (hiloCliente == null) return;
+        int soy = numeroJugador;
+        int el = (soy == 1) ? 2 : 1;
+        
+        String clase = (el == 1) ? hiloCliente.getClaseJugador1() : hiloCliente.getClaseJugador2();
+        float vida = (el == 1) ? hiloCliente.getVidaJugador1() : hiloCliente.getVidaJugador2();
+        float maxVida = (el == 1) ? hiloCliente.getVidaMaxJugador1() : hiloCliente.getVidaMaxJugador2();
+        int fe = (el == 1) ? hiloCliente.getFeJugador1() : hiloCliente.getFeJugador2();
+        int maxFe = (el == 1) ? hiloCliente.getFeMaxJugador1() : hiloCliente.getFeMaxJugador2();
+        int monedas = (el == 1) ? hiloCliente.getMonedasJugador1() : hiloCliente.getMonedasJugador2();
+        
+        // Si no hay datos, mostrar espera
+        if (clase.equals("---")) return;
+
+        // MOVIDO A LA DERECHA Y ABAJO
+        int xBase = Config.ANCHO - 250;
+        int yBase = Config.ALTO - 200; 
+
+        infoAliadoNombre.setTexto("Aliado: P" + el + " [" + clase + "]");
+        infoAliadoNombre.setPosition(xBase, yBase);
+        infoAliadoNombre.dibujar();
+        
+        infoAliadoVida.setTexto("HP: " + (int)vida + "/" + (int)maxVida);
+        infoAliadoVida.setPosition(xBase, yBase - 30);
+        infoAliadoVida.dibujar();
+        
+        infoAliadoFe.setTexto("Fe: " + fe + "/" + maxFe + "  $: " + monedas);
+        infoAliadoFe.setPosition(xBase, yBase - 60);
+        infoAliadoFe.dibujar();
     }
 
     private void manejarSeleccionAtaque() {
-        if (Config.personajeSeleccionado == null || textoAtaques == null) return;
-
         List<Ataque> ataques = Config.personajeSeleccionado.getClase().getAtaques();
         int feActual = Config.personajeSeleccionado.getFeActual();
 
-        // Mouse hover
         int mouseX = entradas.getMouseX();
         int mouseY = entradas.getMouseY();
-
         for (int i = 0; i < textoAtaques.length; i++) {
-            Texto textoAtaque = textoAtaques[i];
-            int x = textoAtaque.getX();
-            int y = textoAtaque.getY() - 50;
-            int ancho = (int) textoAtaque.getAncho();
-            int alto = (int) textoAtaque.getAlto() + 50;
-            if (mouseX >= x && mouseX <= x + ancho && mouseY >= y && mouseY <= y + alto) {
-                Ataque a = ataques.get(i);
-                boolean usable = a.getCantUsos() > 0 && a.getCostoFe() <= feActual;
-                if (usable) {
-                    ataqueSeleccionado = i;
-                }
+            if (mouseX >= textoAtaques[i].getX() && mouseX <= textoAtaques[i].getX() + textoAtaques[i].getAncho() &&
+                mouseY >= textoAtaques[i].getY() - 40 && mouseY <= textoAtaques[i].getY() + 10) {
+                 Ataque a = ataques.get(i);
+                 if (a.getCantUsos() > 0 && a.getCostoFe() <= feActual) {
+                     ataqueSeleccionado = i;
+                 }
             }
         }
 
-        // Colorear ataques
         for (int i = 0; i < textoAtaques.length; i++) {
             Ataque a = ataques.get(i);
             boolean usable = a.getCantUsos() > 0 && a.getCostoFe() <= feActual;
@@ -793,19 +700,14 @@ public class PantallaLimboMulti implements Screen {
             }
         }
 
-        // Dibujar ataques
-        for (Texto textoAtaque : textoAtaques) {
+        for (Texto t : textoAtaques) {
             Render.batch.begin();
-            textoAtaque.dibujar();
+            t.dibujar();
             Render.batch.end();
         }
 
-        if (ataqueSeleccionado < 0) ataqueSeleccionado = 0;
-        if (ataqueSeleccionado >= textoAtaques.length) ataqueSeleccionado = textoAtaques.length - 1;
-
         Ataque ataqueSel = ataques.get(ataqueSeleccionado);
 
-        // Dibujar info del jugador
         Render.batch.begin();
         textoPS.setTexto("P.S. " + (int) Config.personajeSeleccionado.getVidaActual());
         textoPS.setPosition(500, 120);
@@ -827,36 +729,38 @@ public class PantallaLimboMulti implements Screen {
         Render.batch.end();
 
         if (tiempo > 0.15f) {
-            if (entradas.isDerecha()) {
-                ataqueSeleccionado++;
-                if (ataqueSeleccionado >= textoAtaques.length) ataqueSeleccionado = 0;
+             if (entradas.isDerecha()) {
+                ataqueSeleccionado = (ataqueSeleccionado + 1) % textoAtaques.length;
                 tiempo = 0;
             }
             if (entradas.isIzquierda()) {
-                ataqueSeleccionado--;
-                if (ataqueSeleccionado < 0) ataqueSeleccionado = textoAtaques.length - 1;
+                ataqueSeleccionado = (ataqueSeleccionado - 1 + textoAtaques.length) % textoAtaques.length;
                 tiempo = 0;
             }
 
-            if (entradas.isEnter() || justClicked) {
-                Ataque a = ataques.get(ataqueSeleccionado);
-                if (a.getCantUsos() > 0 && a.getCostoFe() <= feActual) {
-                    hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ATAQUE:" + ataqueSeleccionado);
-                    // FASE 5: Marcar que ya no es mi turno para evitar saltos prematuros a RESULTADOS
-                    hiloCliente.setEsMiTurno(false);
+            if (!esperandoInput && (entradas.isEnter() || justClicked)) {
+                
+                // MULTIJUGADOR: Enviar selecciones por separado (Protocolo v1 soportado)
+                hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ENEMIGO:" + enemigoSeleccionado);
+                hiloCliente.enviarMensajeAlServidor("SELECCIONAR_ATAQUE:" + ataqueSeleccionado);
+                System.out.println("PantallaFraudeMulti: Enviadas selecciones: " + enemigoSeleccionado + ", " + ataqueSeleccionado);
+                
+                // CRUCIAL: Marcar que ya no es mi turno para evitar que el update() me regrese a SELECCION_ENEMIGO
+                hiloCliente.setEsMiTurno(false);
 
-                    estadoActual = EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR;
-                    esperandoInput = true;
-                }
+                estadoActual = EstadoBatallaMulti.ESPERANDO_OTRO_JUGADOR;
                 tiempo = 0;
+                esperandoInput = true;
+            }
+
+            if (!(entradas.isEnter() || entradas.isClick())) {
+                esperandoInput = false;
             }
         }
     }
 
     @Override
-    public void resize(int width, int height) {
-        InfiernoPerfecto.viewport.update(width, height);
-    }
+    public void resize(int width, int height) {}
 
     @Override
     public void pause() {}
@@ -865,40 +769,36 @@ public class PantallaLimboMulti implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {
-        dispose();
-    }
+    public void hide() {}
 
     @Override
     public void dispose() {
-        if (disposed) return;
         disposed = true;
-        System.out.println("PantallaLimboMulti: DISPOSING resources");
-        if (musicaFondo != null) musicaFondo.dispose();
-        if (fondo != null) fondo.dispose();
-        if (arena != null) arena.dispose();
-        if (danioSpr != null) danioSpr.dispose();
-
-        for (Imagen spr : enemigoSpr) {
-            if (spr != null) spr.dispose();
-        }
-        enemigoSpr.clear();
-
-        // Limpiar textos
-        for (Texto t : textosNombresEnemigos) if (t!=null) t.dispose();
-        for (Texto t : textosVidasEnemigos) if (t!=null) t.dispose();
-
-        if (textoAtaques != null) {
-            for (Texto t : textoAtaques) if (t!=null) t.dispose();
-        }
-
-        // Disposear textos estáticos
-        if (lugar != null) lugar.dispose();
-        if (textoSeleccionarEnemigo != null) textoSeleccionarEnemigo.dispose();
-        if (textoEsperandoReusable != null) textoEsperandoReusable.dispose();
-        if (textoContinuarReusable != null) textoContinuarReusable.dispose();
-        if (textoVictoria != null) textoVictoria.dispose();
+        if (fondo != null) try{ fondo.dispose(); }catch(Exception e){}
+        if (arena != null) try{ arena.dispose(); }catch(Exception e){}
+        if (danioSpr != null) try{ danioSpr.dispose(); }catch(Exception e){}
+        if (lugar != null) try{ lugar.dispose(); }catch(Exception e){}
         
+        for (Imagen spr : enemigoSpr) if (spr != null) try{ spr.dispose(); }catch(Exception e){}
+        enemigoSpr.clear();
+        
+        for (Texto t : textosNombresEnemigos) try{ t.dispose(); }catch(Exception e){}
+        for (Texto t : textosVidasEnemigos) try{ t.dispose(); }catch(Exception e){}
+        
+        if (textoAtaques != null) for (Texto t : textoAtaques) if(t!=null) try{ t.dispose(); }catch(Exception e){}
+
+        if (textoEnemigoSeleccionado != null) try{ textoEnemigoSeleccionado.dispose(); }catch(Exception e){}
+        if (vidaEnemigoTexto != null) try{ vidaEnemigoTexto.dispose(); }catch(Exception e){}
+        if (textoPS != null) try{ textoPS.dispose(); }catch(Exception e){}
+        if (textoFe != null) try{ textoFe.dispose(); }catch(Exception e){} 
+        if (textoUsos != null) try{ textoUsos.dispose(); }catch(Exception e){}
+        if (textoCostoFe != null) try{ textoCostoFe.dispose(); }catch(Exception e){}
+        if (logTexto != null) try{ logTexto.dispose(); }catch(Exception e){}
+        
+        if (textoSeleccionarEnemigo != null) try{ textoSeleccionarEnemigo.dispose(); }catch(Exception e){}
+        if (textoEsperandoReusable != null) try{ textoEsperandoReusable.dispose(); }catch(Exception e){}
+        if (textoContinuarReusable != null) try{ textoContinuarReusable.dispose(); }catch(Exception e){}
+        if (textoVictoria != null) try{ textoVictoria.dispose(); }catch(Exception e){}
         if (infoAliadoNombre != null) try{ infoAliadoNombre.dispose(); }catch(Exception e){}
         if (infoAliadoVida != null) try{ infoAliadoVida.dispose(); }catch(Exception e){}
         if (infoAliadoFe != null) try{ infoAliadoFe.dispose(); }catch(Exception e){}

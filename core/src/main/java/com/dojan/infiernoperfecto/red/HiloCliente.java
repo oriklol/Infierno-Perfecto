@@ -48,6 +48,7 @@ public class HiloCliente extends Thread {
     private boolean victoria = false;
     private boolean irATienda = false;
     private boolean todosListosResultados = false;
+    private boolean victoriaFinal = false;
     
     private float vidaJugador1 = -1;
     private int feJugador1 = -1;
@@ -55,6 +56,19 @@ public class HiloCliente extends Thread {
     private int feJugador2 = -1;
     private int monedasJugador1 = -1;
     private int monedasJugador2 = -1;
+    
+    // FASE 6: Info estática de jugadores
+    private String claseJugador1 = "---";
+    private float vidaMaxJugador1 = 100;
+    private int feMaxJugador1 = 100;
+    
+    private String claseJugador2 = "---";
+    private float vidaMaxJugador2 = 100;
+    private int feMaxJugador2 = 100;
+    
+    private int piso = 1; // Default PISO 1
+
+    public int getPiso() { return piso; }
 
     public HiloCliente() {
         this.setDaemon(true);
@@ -196,7 +210,30 @@ public class HiloCliente extends Thread {
             }
         
         } else if (msg.startsWith("DATOS_BATALLA:")) {
-            this.datosBatalla = msg.substring("DATOS_BATALLA:".length());
+            // FASE 2: Protocolo Mejorado: DATOS_BATALLA:PISO:NIVEL:Enemigo1,Vida1...
+            // substring "DATOS_BATALLA:".length() -> "PISO:NIVEL:Enemigo..."
+            String payload = msg.substring("DATOS_BATALLA:".length());
+            
+            // Separamos por ':' para obtener Piso y el resto
+            // Esperamos formato PISO:NIVEL,Enemigo1,Vida1...
+            // OJO: El servidor manda: "DATOS_BATALLA:" + piso + ":" + nivel + ","
+            // Ejemplo: DATOS_BATALLA:1:1,Enemigo1,100
+            
+            String[] firstSplit = payload.split(":", 2);
+            if (firstSplit.length >= 2) {
+                try {
+                    this.piso = Integer.parseInt(firstSplit[0]);
+                    this.datosBatalla = firstSplit[1]; // Resto: "NIVEL,Enemigo1,..."
+                    
+                    System.out.println("Cliente: Detectado PISO " + piso + " desde servidor.");
+                } catch(NumberFormatException e) {
+                    System.out.println("Cliente: Error parseando PISO. Usando formato antiguo?");
+                    this.datosBatalla = payload; // Fallback
+                }
+            } else {
+                this.datosBatalla = payload;
+            }
+            
             this.datosBatallaActualizados = true;
             System.out.println("Cliente: Datos de batalla recibidos (FRESCOS): " + datosBatalla);
             
@@ -205,19 +242,13 @@ public class HiloCliente extends Thread {
             String[] partes = datosBatalla.split(",");
             
             // Validar formato (offset por nivel)
+            // partes[0] es NIVEL
             numEnemigos = (partes.length - 1) / 2;
             vidasEnemigos = new float[numEnemigos];
             enemigosMuertos = new boolean[numEnemigos];
             
             // Parsear vidas iniciales (empezando desde índice 1 del array)
             for (int i = 0; i < numEnemigos; i++) {
-                // El HP está en: 1 (nivel) + i*2 (iteración) + 1 (nombre) = index + 1
-                // indices:
-                // partes[0] = nivel
-                // partes[1] = nombre 0
-                // partes[2] = hp 0
-                // partes[3] = nombre 1
-                // partes[4] = hp 1
                 try {
                     vidasEnemigos[i] = Float.parseFloat(partes[2 + (i * 2)]);
                     enemigosMuertos[i] = false;
@@ -227,6 +258,32 @@ public class HiloCliente extends Thread {
             }
             System.out.println("Cliente: Inicializados " + numEnemigos + " enemigos (Protocolo v2)");
         
+        } else if (msg.startsWith("INFO_JUGADORES:")) {
+            try {
+                // INFO_JUGADORES:1:Clase:MaxVida:MaxFe:2:Clase:MaxVida:MaxFe
+                String[] partes = msg.split(":");
+                int idx = 1;
+                while(idx < partes.length) {
+                    int numJug = Integer.parseInt(partes[idx++]);
+                    String clase = partes[idx++];
+                    float vidaMax = Float.parseFloat(partes[idx++]);
+                    int feMax = Integer.parseInt(partes[idx++]);
+                    
+                    if (numJug == 1) {
+                        this.claseJugador1 = clase;
+                        this.vidaMaxJugador1 = vidaMax;
+                        this.feMaxJugador1 = feMax;
+                    } else if (numJug == 2) {
+                        this.claseJugador2 = clase;
+                        this.vidaMaxJugador2 = vidaMax;
+                        this.feMaxJugador2 = feMax;
+                    }
+                }
+                System.out.println("Cliente: Info de jugadores recibida: J1(" + claseJugador1 + "), J2(" + claseJugador2 + ")");
+            } catch(Exception e) {
+                System.out.println("Cliente: Error parsing INFO_JUGADORES: " + e.getMessage());
+            }
+
         } else if (msg.equals("TU_TURNO")) {
             esMiTurno = true;
             esperandoOtroJugador = false;
@@ -242,6 +299,7 @@ public class HiloCliente extends Thread {
             System.out.println("Cliente: Ir a tienda después de este nivel");
         }else if (msg.equals("VICTORIA_FINAL")) {
             System.out.println("Cliente: ¡VICTORIA FINAL DEL JUEGO!");
+            victoriaFinal = true;
         } else if (msg.equals("ESPERANDO_OTRO_JUGADOR")) {
             esperandoOtroJugador = true;
             esMiTurno = false;
@@ -417,6 +475,14 @@ public class HiloCliente extends Thread {
         this.esMiTurno = esMiTurno;
     }
 
+    public boolean isVictoriaFinal() {
+        return victoriaFinal;
+    }
+
+    public void setVictoriaFinal(boolean victoriaFinal) {
+        this.victoriaFinal = victoriaFinal;
+    }
+
     public void desconectar() {
         if (conectado) {
             System.out.println("Cliente: Enviando mensaje de desconexión...");
@@ -499,6 +565,16 @@ public class HiloCliente extends Thread {
     public int getFeJugador2() { return feJugador2; }
     public int getMonedasJugador1() { return monedasJugador1; }
     public int getMonedasJugador2() { return monedasJugador2; }
+
+
+    public String getClaseJugador1() { return claseJugador1; }
+    public float getVidaMaxJugador1() { return vidaMaxJugador1; }
+    public int getFeMaxJugador1() { return feMaxJugador1; }
+    
+    public String getClaseJugador2() { return claseJugador2; }
+    public float getVidaMaxJugador2() { return vidaMaxJugador2; }
+    public int getFeMaxJugador2() { return feMaxJugador2; }
+    
 
 
     public void resetBatallaFlags() {

@@ -1,4 +1,4 @@
-package com.dojan.infiernoperfecto.pantallas.niveles;
+package com.dojan.infiernoperfecto.pantallas.niveles.unjugador;
 
 import java.util.ArrayList;
 import java.util.List;

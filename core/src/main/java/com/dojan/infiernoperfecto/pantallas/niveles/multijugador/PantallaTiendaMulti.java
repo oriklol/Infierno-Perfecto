@@ -132,7 +132,8 @@ public class PantallaTiendaMulti implements Screen {
             if (hiloCliente.hasDatosBatallaActualizados()) {
                 System.out.println("PantallaTiendaMulti: Datos de batalla recibidos. Iniciando MiniBoss.");
                 // NO consumir datos aquí, los consume PantallaLimboMulti
-                GestorPantallas.getInstance().irAPantalla(new PantallaLimboMulti());
+                // Usar ControladorJuego para cargar el nivel correcto según el piso actual
+                ControladorJuego.getInstance().cargarNivel();
                 return;
             }
             

@@ -4,11 +4,16 @@ import com.dojan.infiernoperfecto.pantallas.PantallaGameOver;
 import com.dojan.infiernoperfecto.pantallas.PantallaSiguientePiso;
 import com.dojan.infiernoperfecto.pantallas.PantallaTienda;
 import com.dojan.infiernoperfecto.pantallas.PantallaVictoria;
-import com.dojan.infiernoperfecto.pantallas.niveles.PantallaCodicia;
-import com.dojan.infiernoperfecto.pantallas.niveles.PantallaFraude;
-import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLimbo;
-import com.dojan.infiernoperfecto.pantallas.niveles.PantallaLujuria;
-import com.dojan.infiernoperfecto.pantallas.niveles.PantallaTraicion;
+import com.dojan.infiernoperfecto.pantallas.niveles.unjugador.PantallaCodicia;
+import com.dojan.infiernoperfecto.pantallas.niveles.unjugador.PantallaFraude;
+import com.dojan.infiernoperfecto.pantallas.niveles.unjugador.PantallaLimbo;
+import com.dojan.infiernoperfecto.pantallas.niveles.unjugador.PantallaLujuria;
+import com.dojan.infiernoperfecto.pantallas.niveles.unjugador.PantallaTraicion;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaLimboMulti;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaFraudeMulti;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaCodiciaMulti;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaLujuriaMulti;
+import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaTraicionMulti;
 
 public class ControladorJuego {
 
@@ -20,6 +25,8 @@ public class ControladorJuego {
 
     private int nivelActual = 1;
     private int pisoActual = 1;
+    
+    private boolean modoMultijugador = false;
 
     private PantallaLimbo pantallaLimbo;
     private PantallaFraude pantallaFraude;  // ← AGREGAR
@@ -40,14 +47,60 @@ public class ControladorJuego {
         }
         return instancia;
     }
+    
+    public void setModoMultijugador(boolean modo) {
+        this.modoMultijugador = modo;
+    }
+    
+    public boolean isModoMultijugador() {
+        return this.modoMultijugador;
+    }
+
 
     // fuuncion para cargar el nivel actual
-    private void cargarNivel() {
+    public void cargarNivel() {
         // Actualizar variables globales
-        Config.piso = pisoActual;
-        Config.nivel = nivelActual;
+        if (modoMultijugador) {
+            this.pisoActual = Config.piso;
+            this.nivelActual = Config.nivel;
+        } else {
+            Config.piso = pisoActual;
+            Config.nivel = nivelActual;
+        }
 
-        // ← MODIFICAR: Cargar la pantalla según el piso actual
+        if (modoMultijugador) {
+            // LÓGICA MULTIJUGADOR
+            switch (pisoActual) {
+                case 1:
+                    PantallaLimboMulti pantallaLimboMulti = new PantallaLimboMulti(); 
+                    Render.app.setScreen(pantallaLimboMulti);
+                    break;
+                case 2:
+                    PantallaFraudeMulti pantallaFraudeMulti = new PantallaFraudeMulti();
+                    Render.app.setScreen(pantallaFraudeMulti);
+                    break;
+                case 3:
+                     PantallaCodiciaMulti pantallaCodiciaMulti = new PantallaCodiciaMulti();
+                     Render.app.setScreen(pantallaCodiciaMulti);
+                     break;
+                case 4:
+                     PantallaLujuriaMulti pantallaLujuriaMulti = new PantallaLujuriaMulti();
+                     Render.app.setScreen(pantallaLujuriaMulti);
+                     break;
+                case 5:
+                     PantallaTraicionMulti pantallaTraicionMulti = new PantallaTraicionMulti();
+                     Render.app.setScreen(pantallaTraicionMulti);
+                     break;
+                default:
+                    // Fallback
+                    PantallaLimboMulti pantallaDefault = new PantallaLimboMulti(); 
+                    Render.app.setScreen(pantallaDefault);
+                    break;
+            }
+            return; // Salir, no cargar lógica single player
+        }
+
+        // LÓGICA UN JUGADOR
         switch (pisoActual) {
             case 1:
                 // PISO 1: LIMBO
