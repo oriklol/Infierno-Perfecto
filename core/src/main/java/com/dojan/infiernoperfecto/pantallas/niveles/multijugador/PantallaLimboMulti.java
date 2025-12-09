@@ -52,7 +52,7 @@ public class PantallaLimboMulti implements Screen {
     private Texto textoCostoFe;
     private Texto logTexto;
     private Texto textoVictoria;
-    
+
     // UI Info Aliado
     private Texto infoAliadoNombre;
     private Texto infoAliadoVida;
@@ -210,7 +210,7 @@ public class PantallaLimboMulti implements Screen {
             Config.ANCHO / 2 - (int)(textoVictoria.getAncho() / 2),
             Config.ALTO / 2 + 50
         );
-        
+
         // Info Aliado (Textos mas grandes)
         infoAliadoNombre = new Texto(Recursos.FUENTEMENU, 40, Color.CYAN, false);
         infoAliadoVida = new Texto(Recursos.FUENTEMENU, 30, Color.WHITE, false);
@@ -230,10 +230,10 @@ public class PantallaLimboMulti implements Screen {
 
         try {
             int nivelRecibido = Integer.parseInt(partes[0]);
-            if (nivelRecibido < Config.nivel) return;
-            Config.nivel = nivelRecibido;
+            Config.nivel = nivelRecibido; // ← SIN validación
+            System.out.println("✅ Nivel actualizado a: " + Config.nivel);
         } catch (NumberFormatException e) {
-            System.out.println("Error parseando nivel.");
+            System.out.println("Error parseando nivel: " + e.getMessage());
         }
 
         if (lugar != null) {
@@ -330,9 +330,9 @@ public class PantallaLimboMulti implements Screen {
     public void render(float delta) {
         ControladorAudio.reproducirMusica();
         if (disposed) return;
-        
+
         Render.limpiarPantalla(0, 0, 0);
-        
+
 
         // Actualizar lógica de input seguro (Rising Edge Detection)
         boolean clickActual = entradas.isClick();
@@ -423,7 +423,7 @@ public class PantallaLimboMulti implements Screen {
                     // Usaremos logTexto configurado en inicializarRecursos
                     logTexto.setTexto(logBatalla);
                     // BAJADO para no tapar enemigos
-                    logTexto.setPosition(50, 150); 
+                    logTexto.setPosition(50, 150);
                     logTexto.dibujar();
                 }
 
@@ -495,7 +495,7 @@ public class PantallaLimboMulti implements Screen {
         if (hiloCliente.getPiso() > Config.piso && hiloCliente.getPiso() != 0) {
             System.out.println("PantallaLimboMulti: Detectado cambio de piso a " + hiloCliente.getPiso());
             Config.piso = hiloCliente.getPiso();
-            ControladorJuego.getInstance().cargarNivel(); 
+            ControladorJuego.getInstance().cargarNivel();
             return true;
         }
 
@@ -605,19 +605,19 @@ public class PantallaLimboMulti implements Screen {
 
         return false;
     }
-    
+
     private void dibujarInfoAliado() {
         if (hiloCliente == null) return;
         int soy = numeroJugador;
         int el = (soy == 1) ? 2 : 1;
-        
+
         String clase = (el == 1) ? hiloCliente.getClaseJugador1() : hiloCliente.getClaseJugador2();
         float vida = (el == 1) ? hiloCliente.getVidaJugador1() : hiloCliente.getVidaJugador2();
         float maxVida = (el == 1) ? hiloCliente.getVidaMaxJugador1() : hiloCliente.getVidaMaxJugador2();
         int fe = (el == 1) ? hiloCliente.getFeJugador1() : hiloCliente.getFeJugador2();
         int maxFe = (el == 1) ? hiloCliente.getFeMaxJugador1() : hiloCliente.getFeMaxJugador2();
         int monedas = (el == 1) ? hiloCliente.getMonedasJugador1() : hiloCliente.getMonedasJugador2();
-        
+
         // Si no hay datos, mostrar espera
         if (clase.equals("---")) return;
 
@@ -628,11 +628,11 @@ public class PantallaLimboMulti implements Screen {
         infoAliadoNombre.setTexto("Aliado: P" + el + " [" + clase + "]");
         infoAliadoNombre.setPosition(xBase, yBase);
         infoAliadoNombre.dibujar();
-        
+
         infoAliadoVida.setTexto("HP: " + (int)vida + "/" + (int)maxVida);
         infoAliadoVida.setPosition(xBase, yBase - 40);
         infoAliadoVida.dibujar();
-        
+
         infoAliadoFe.setTexto("Fe: " + fe + "/" + maxFe + "  $: " + monedas);
         infoAliadoFe.setPosition(xBase, yBase - 80);
         infoAliadoFe.dibujar();
@@ -898,7 +898,7 @@ public class PantallaLimboMulti implements Screen {
         if (textoEsperandoReusable != null) textoEsperandoReusable.dispose();
         if (textoContinuarReusable != null) textoContinuarReusable.dispose();
         if (textoVictoria != null) textoVictoria.dispose();
-        
+
         if (infoAliadoNombre != null) try{ infoAliadoNombre.dispose(); }catch(Exception e){}
         if (infoAliadoVida != null) try{ infoAliadoVida.dispose(); }catch(Exception e){}
         if (infoAliadoFe != null) try{ infoAliadoFe.dispose(); }catch(Exception e){}

@@ -9,12 +9,13 @@ import com.dojan.infiernoperfecto.utiles.Recursos;
 import com.dojan.infiernoperfecto.utiles.Render;
 
 public class PantallaTutorial implements Screen {
-    private final Imagen[] imagenesTutorial = new Imagen[3];
-    final private Texto TEXTOS_TUTORIAL[] = new Texto[3];
+    private final Imagen[] imagenesTutorial = new Imagen[4];
+    final private Texto TEXTOS_TUTORIAL[] = new Texto[4];
     String textos[] = {
         "ELIGE EL ENEMIGO QUE DESEES ATACAR.",
         "ELIGE EL ATAQUE QUE DESEES USAR.",
-        "COMPRA OBJETOS PARA CURAR TU VIDA."
+        "COMPRA OBJETOS PARA CURARTE.",
+        "TOCA C PARA USAR LA ENCICLOPEDIA."
     };
 
     private float tiempo = 0f;
@@ -26,13 +27,14 @@ public class PantallaTutorial implements Screen {
         imagenesTutorial[0] = new Imagen(Recursos.IMAGENTUTORIAL1);
         imagenesTutorial[1] = new Imagen(Recursos.IMAGENTUTORIAL2);
         imagenesTutorial[2] = new Imagen(Recursos.IMAGENTUTORIAL3);
+        imagenesTutorial[3] = new Imagen(Recursos.IMAGENTUTORIAL4);
 
         for (Imagen imagenesTutorial : imagenesTutorial) {
             if (imagenesTutorial != null) imagenesTutorial.setSize(Config.ANCHO, Config.ALTO);
         }
 
         for (int i = 0; i < TEXTOS_TUTORIAL.length; i++) {
-            TEXTOS_TUTORIAL[i] = new Texto(Recursos.FUENTEMENU, 53  , Color.BLACK, false);
+            TEXTOS_TUTORIAL[i] = new Texto(Recursos.FUENTEMENU, 53  , Color.WHITE, true);
             TEXTOS_TUTORIAL[i].setTexto(textos[i]);
         }
 

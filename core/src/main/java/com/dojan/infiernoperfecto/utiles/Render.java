@@ -8,6 +8,7 @@ import com.dojan.infiernoperfecto.InfiernoPerfecto;
 
 public class Render {
 
+    // objetos estáticos para renderizar
     public static SpriteBatch batch;
     public static ShapeRenderer renderer;
     public static InfiernoPerfecto app;

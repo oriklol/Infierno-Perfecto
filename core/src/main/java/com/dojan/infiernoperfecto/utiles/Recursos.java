@@ -17,7 +17,7 @@ public class Recursos {
     public static final String FONDOINTRO = "imagenes/fondos/INTRO.png";
     public static final String FONDOOPCIONES = "imagenes/fondos/opciones.png";
     public static final String FONDOSELECCION = "imagenes/fondos/SELECCIONPERSONAJES.png";
-    public static final String MAPA = "imagenes/fondos/Conceptomapa2.png";
+    public static final String MAPA = "imagenes/fondos/mapa.png";
     public static final String FONDOARENA = "imagenes/fondos/ARENA.png";
     public static final String FONDOARENA1 = "imagenes/fondos/FONDOUNENEMIGO.png";
     public static final String FONDOARENA2 = "imagenes/fondos/FONDODOSENEMIGOS.png";
@@ -37,6 +37,7 @@ public class Recursos {
     public static final String IMAGENTUTORIAL1 = "imagenes/fondos/tutorial/imgTutorial1.png";
     public static final String IMAGENTUTORIAL2 = "imagenes/fondos/tutorial/imgTutorial2.png";
     public static final String IMAGENTUTORIAL3 = "imagenes/fondos/tutorial/imgTutorial3.png";
+    public static final String IMAGENTUTORIAL4 = "imagenes/fondos/tutorial/imgTutorial4.png";
 
 
 

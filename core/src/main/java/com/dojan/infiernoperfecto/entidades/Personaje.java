@@ -27,7 +27,7 @@ public abstract class Personaje {
     protected int monedasActual;
     private EstadoAlterado estadoAlterado;
 
-
+    // constructor con monedas incluidas
     public Personaje(String nombre, int vida, int danio, int defensa, int monedas,List<Ataque> ataques) {
         this.nombre = nombre;
         this.vidaBase = vida;
@@ -43,6 +43,7 @@ public abstract class Personaje {
         this.feActual = 0;
     }
 
+    // constructor sin monedas
     public Personaje(String nombre, int vida, int danio, int defensa, List<Ataque> ataques) {
         this.nombre = nombre;
         this.vidaBase = vida;

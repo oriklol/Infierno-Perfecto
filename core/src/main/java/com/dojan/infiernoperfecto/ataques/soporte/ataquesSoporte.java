@@ -1,6 +1,7 @@
 package com.dojan.infiernoperfecto.ataques.soporte;
 
 import com.dojan.infiernoperfecto.ataques.Ataque;
+import com.dojan.infiernoperfecto.ataques.magico.Concentracion;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,9 +11,10 @@ public class ataquesSoporte {
         return Arrays.asList(
             new BesoDeAngel(),
             new EnElNombreDelPadre(),
-            new RotacionAurea(),
+            //new RotacionAurea(), // no terminado
             new LibrameDeAmor(),
-            new SalvemePerdoneme()
+            new Concentracion() // ataque del magico para recuperar fe
+            //new SalvemePerdoneme() // no terminado
 
         );
     }

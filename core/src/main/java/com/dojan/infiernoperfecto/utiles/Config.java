@@ -24,6 +24,14 @@ public class Config {
     // FASE 5.2: Flag para modo multijugador
     public static boolean esPartidaMultijugador = true;
 
+    public static void resetearPartida() {
+        nivel = 1;
+        piso = 1;
+        empiezaPartida = false;
+        // NO resetear personajeSeleccionado aquí (se hace en PantallaHistoria)
+        System.out.println("✅ Config reseteado: Nivel=" + nivel + ", Piso=" + piso);
+    }
+
 //    public void aumentarNivel() {
 //        if (nivel<4){
 //            nivel++;

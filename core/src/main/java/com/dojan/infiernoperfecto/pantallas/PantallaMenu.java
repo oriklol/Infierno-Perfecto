@@ -8,10 +8,8 @@ import com.dojan.infiernoperfecto.elementos.Imagen;
 import com.dojan.infiernoperfecto.elementos.Musica;
 import com.dojan.infiernoperfecto.elementos.Texto;
 import com.dojan.infiernoperfecto.red.HiloCliente;
-import com.dojan.infiernoperfecto.utiles.Config;
-import com.dojan.infiernoperfecto.utiles.ControladorAudio;
-import com.dojan.infiernoperfecto.utiles.GestorPantallas;
-import com.dojan.infiernoperfecto.utiles.Recursos;
+import com.dojan.infiernoperfecto.utiles.*;
+
 import static com.dojan.infiernoperfecto.utiles.Render.app;
 import static com.dojan.infiernoperfecto.utiles.Render.batch;
 
@@ -53,6 +51,8 @@ public class PantallaMenu implements Screen {
     @Override
     public void show() {
         // DECLARACION DE RECURSOS
+        // resetear partida
+        Config.resetearPartida();
         // resetear el cliente al mostrar el menú
         limpiarCliente();
 
@@ -276,7 +276,11 @@ public class PantallaMenu implements Screen {
             app.setCliente(null);
         }
 
+        // ✅ NUEVO: Resetear el controlador de juego
+        ControladorJuego.getInstance().resetearControlador();
+
         // Resetear configuración
+        Config.resetearPartida(); // ← Ya lo tienes en show(), pero por seguridad
         Config.empiezaPartida = false;
 
         System.out.println("✅ Información del cliente completamente reseteada");

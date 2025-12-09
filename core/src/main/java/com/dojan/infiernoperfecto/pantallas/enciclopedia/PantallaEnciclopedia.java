@@ -94,10 +94,10 @@ public class PantallaEnciclopedia implements Screen {
     }
 
     private void actualizarFiltro() {
-        categoriaActual = categorias.get(categoriaSeleccionada);
-        entradasFiltradas = EntradaEnciclopedia.filtrarPorCategoria(categoriaActual);
-        entradaSeleccionada = 0;
-        actualizarListaEntradas();
+        categoriaActual = categorias.get(categoriaSeleccionada); // actualizar categoria actual
+        entradasFiltradas = EntradaEnciclopedia.filtrarPorCategoria(categoriaActual);   // muestra las entradas de la categoria seleccionada
+        entradaSeleccionada = 0; // reinicia la seleccion de entrada
+        actualizarListaEntradas(); // actualiza la lista de entradas mostradas
     }
 
     private void actualizarListaEntradas() {

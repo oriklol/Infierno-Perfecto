@@ -14,6 +14,8 @@ import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaFraudeM
 import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaCodiciaMulti;
 import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaLujuriaMulti;
 import com.dojan.infiernoperfecto.pantallas.niveles.multijugador.PantallaTraicionMulti;
+import com.dojan.infiernoperfecto.utiles.Config;
+import com.dojan.infiernoperfecto.utiles.Render;
 
 public class ControladorJuego {
 
@@ -25,7 +27,7 @@ public class ControladorJuego {
 
     private int nivelActual = 1;
     private int pisoActual = 1;
-    
+
     private boolean modoMultijugador = false;
 
     private PantallaLimbo pantallaLimbo;
@@ -47,11 +49,11 @@ public class ControladorJuego {
         }
         return instancia;
     }
-    
+
     public void setModoMultijugador(boolean modo) {
         this.modoMultijugador = modo;
     }
-    
+
     public boolean isModoMultijugador() {
         return this.modoMultijugador;
     }
@@ -59,7 +61,7 @@ public class ControladorJuego {
 
     // fuuncion para cargar el nivel actual
     public void cargarNivel() {
-        // Actualizar variables globales
+        //Actualizar Variables globales
         if (modoMultijugador) {
             this.pisoActual = Config.piso;
             this.nivelActual = Config.nivel;
@@ -72,7 +74,7 @@ public class ControladorJuego {
             // LÓGICA MULTIJUGADOR
             switch (pisoActual) {
                 case 1:
-                    PantallaLimboMulti pantallaLimboMulti = new PantallaLimboMulti(); 
+                    PantallaLimboMulti pantallaLimboMulti = new PantallaLimboMulti();
                     Render.app.setScreen(pantallaLimboMulti);
                     break;
                 case 2:
@@ -80,26 +82,25 @@ public class ControladorJuego {
                     Render.app.setScreen(pantallaFraudeMulti);
                     break;
                 case 3:
-                     PantallaCodiciaMulti pantallaCodiciaMulti = new PantallaCodiciaMulti();
-                     Render.app.setScreen(pantallaCodiciaMulti);
-                     break;
+                    PantallaCodiciaMulti pantallaCodiciaMulti = new PantallaCodiciaMulti();
+                    Render.app.setScreen(pantallaCodiciaMulti);
+                    break;
                 case 4:
-                     PantallaLujuriaMulti pantallaLujuriaMulti = new PantallaLujuriaMulti();
-                     Render.app.setScreen(pantallaLujuriaMulti);
-                     break;
+                    PantallaLujuriaMulti pantallaLujuriaMulti = new PantallaLujuriaMulti();
+                    Render.app.setScreen(pantallaLujuriaMulti);
+                    break;
                 case 5:
-                     PantallaTraicionMulti pantallaTraicionMulti = new PantallaTraicionMulti();
-                     Render.app.setScreen(pantallaTraicionMulti);
-                     break;
+                    PantallaTraicionMulti pantallaTraicionMulti = new PantallaTraicionMulti();
+                    Render.app.setScreen(pantallaTraicionMulti);
+                    break;
                 default:
                     // Fallback
-                    PantallaLimboMulti pantallaDefault = new PantallaLimboMulti(); 
+                    PantallaLimboMulti pantallaDefault = new PantallaLimboMulti();
                     Render.app.setScreen(pantallaDefault);
                     break;
             }
             return; // Salir, no cargar lógica single player
         }
-
         // LÓGICA UN JUGADOR
         switch (pisoActual) {
             case 1:
@@ -143,6 +144,23 @@ public class ControladorJuego {
 
     }
 
+    // resetear completamente el controlador
+    public void resetearControlador() {
+        nivelActual = 1;
+        pisoActual = 1;
+        modoMultijugador = false;
+
+        // Limpiar cache de pantallas
+        pantallaLimbo = null;
+        pantallaFraude = null;
+        pantallaCodicia = null;
+        pantallaLujuria = null;
+        pantallaTraicion = null;
+        pantallaTienda = null;
+
+        System.out.println("✅ ControladorJuego reseteado completamente");
+    }
+
     // Iniciar una nueva partida
     public void iniciarJuego() {
         pisoActual = 1;
@@ -150,7 +168,10 @@ public class ControladorJuego {
 
         // Limpiar cache de pantallas para empezar limpio
         pantallaLimbo = null;
-        pantallaFraude = null;  // ← AGREGAR
+        pantallaFraude = null;
+        pantallaCodicia = null;
+        pantallaLujuria = null;
+        pantallaTraicion = null;
         pantallaTienda = null;
 
         cargarNivel();
@@ -217,3 +238,4 @@ public class ControladorJuego {
         Render.app.setScreen(new PantallaGameOver());
     }
 }
+

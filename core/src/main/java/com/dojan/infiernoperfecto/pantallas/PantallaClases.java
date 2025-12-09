@@ -132,6 +132,7 @@ public class PantallaClases implements Screen {
             }
         }
 
+        // creacion del personaje
         if(entradas.isEnter() || entradas.isClick()) {
             if (((opc == 1) && (entradas.isEnter())) || ((opc == 1) && (entradas.isClick()) && (mouseClick))) {
                 Config.personajeSeleccionado = new Jugador("personaje1", new Peleador());
